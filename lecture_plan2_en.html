@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MFLR Project 12-Week Course Plan - MVP Focused</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .main-content {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #5a67d8;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            border-bottom: 3px solid #5a67d8;
+            padding-bottom: 15px;
+        }
+        
+        h2 {
+            color: #2d3748;
+            font-size: 1.8rem;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: linear-gradient(90deg, #f7fafc 0%, transparent 100%);
+            border-left: 4px solid #5a67d8;
+        }
+        
+        h3 {
+            color: #4a5568;
+            font-size: 1.4rem;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+        
+        h4 {
+            color: #718096;
+            font-size: 1.1rem;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #718096;
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+        }
+        
+        .module-overview {
+            background: #f0f9ff;
+            border: 2px solid #3182ce;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 30px 0;
+        }
+        
+        .module-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .module-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            transition: transform 0.3s, border-color 0.3s;
+        }
+        
+        .module-card:hover {
+            transform: translateY(-5px);
+            border-color: #5a67d8;
+        }
+        
+        .module-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .phase {
+            background: #f7fafc;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 30px 0;
+            border-left: 5px solid #5a67d8;
+        }
+        
+        .week {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .week:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .week-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .week-number {
+            background: #5a67d8;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        th {
+            background: #5a67d8;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        tr:hover {
+            background: #f7fafc;
+        }
+        
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        
+        .code-comment {
+            color: #68d391;
+            font-style: italic;
+        }
+        
+        .highlight {
+            background: #fef5e7;
+            padding: 20px;
+            border-left: 4px solid #f39c12;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        
+        .checklist {
+            background: #f0f4f8;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .checklist li {
+            list-style: none;
+            padding: 8px 0;
+            padding-left: 30px;
+            position: relative;
+        }
+        
+        .checklist li:before {
+            content: "☐";
+            position: absolute;
+            left: 0;
+            color: #5a67d8;
+            font-size: 1.2rem;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin: 0 5px;
+        }
+        
+        .badge-new {
+            background: #48bb78;
+            color: white;
+        }
+        
+        .badge-important {
+            background: #ed8936;
+            color: white;
+        }
+        
+        .badge-info {
+            background: #4299e1;
+            color: white;
+        }
+        
+        .timeline {
+            position: relative;
+            padding-left: 40px;
+            margin: 30px 0;
+        }
+        
+        .timeline:before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #cbd5e0;
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin-bottom: 25px;
+        }
+        
+        .timeline-item:before {
+            content: '';
+            position: absolute;
+            left: -30px;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #5a67d8;
+            border: 3px solid white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            transition: transform 0.3s;
+        }
+        
+        .card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .progress-bar {
+            background: #e2e8f0;
+            border-radius: 10px;
+            height: 30px;
+            margin: 20px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            height: 100%;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            transition: width 0.5s;
+        }
+        
+        .emoji {
+            font-size: 1.5rem;
+            margin: 0 5px;
+        }
+        
+        .feature-box {
+            background: linear-gradient(135deg, #667eea20 0%, #764ba220 100%);
+            border: 2px solid #667eea;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .main-content {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            h2 {
+                font-size: 1.4rem;
+            }
+            
+            table {
+                font-size: 0.9rem;
+            }
+            
+            .module-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media print {
+            body {
+                background: white;
+            }
+            
+            .main-content {
+                box-shadow: none;
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="main-content">
+            <h1>🧠 MFLR Project 12-Week Course Plan</h1>
+            <p class="subtitle">MVP-Focused Practical Digital Therapeutics Development Course</p>
+            
+            <!-- Project Overview -->
+            <div class="highlight">
+                <h3>📌 Core Objective</h3>
+                <p><strong>Develop a Working Prototype MVP</strong> - A functional AI-based cognitive health conversation system</p>
+            </div>
+            
+            <!-- 3 Module Introduction -->
+            <div class="module-overview">
+                <h3>🎯 MVP Development Target: 3 Core Modules</h3>
+                <div class="module-grid">
+                    <div class="module-card">
+                        <div class="module-icon">💬</div>
+                        <h4>HF (Heart Finder)</h4>
+                        <p>Discover user interests</p>
+                        <small>Explore user interests<br>Generate personalized conversation topics</small>
+                    </div>
+                    <div class="module-card">
+                        <div class="module-icon">❤️</div>
+                        <h4>LT (Love Talker)</h4>
+                        <p>Therapeutic conversation system</p>
+                        <small>Conduct therapeutic conversations<br>Provide emotional support</small>
+                    </div>
+                    <div class="module-card">
+                        <div class="module-icon">📊</div>
+                        <h4>MS (Mind Scanner)</h4>
+                        <p>Cognitive assessment tool</p>
+                        <small>Assess cognitive functions<br>Track progress</small>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Revised Scope Table -->
+            <h2>🎯 Project Scope (Realistic Goals)</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Original Plan</th>
+                        <th>Revised Plan <span class="badge badge-new">Updated</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Final Goal</strong></td>
+                        <td>Clinically validated digital therapeutic</td>
+                        <td><strong>3-Module Integrated MVP</strong></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Module Development</strong></td>
+                        <td>4 modules fully integrated</td>
+                        <td><strong>HF + LT + MS core functions</strong></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Testing</strong></td>
+                        <td>20-30 person clinical pilot</td>
+                        <td><strong>5-10 person usability test</strong></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Regulations</strong></td>
+                        <td>K-FDA submission documents</td>
+                        <td><strong>Regulatory requirements research</strong></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Validation</strong></td>
+                        <td>Clinical efficacy validation</td>
+                        <td><strong>Technical feasibility + Basic effectiveness</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <!-- Phase 1 -->
+            <div class="phase">
+                <h2>Phase 1: Foundation Learning & Team Formation (Weeks 1-3)</h2>
+                
+                <div class="week">
+                    <div class="week-header">
+                        <span class="week-number">Week 1</span>
+                        <h3>Project Understanding & Team Building</h3>
+                    </div>
+                    
+                    <h4>Lecture (2 hours)</h4>
+                    <ul>
+                        <li>Digital therapeutics concepts and MVP development methodology</li>
+                        <li>Introduction to MFLR 3-module system</li>
+                        <li>Successful MVP case study analysis</li>
+                    </ul>
+                    
+                    <h4>Lab Practice (4 hours)</h4>
+                    <ul>
+                        <li>Team formation (3-4 members) and role assignment</li>
+                        <li>Development environment setup (Python, Git, VS Code)</li>
+                        <li>Simple chatbot building practice</li>
+                    </ul>
+                    
+                    <div class="code-block">
+<span class="code-comment"># Week 1 Practice: First Chatbot</span>
+import streamlit as st
+
+st.title("My First Chatbot")
+user_input = st.text_input("Say hello:")
+if user_input:
+    st.write(f"Chatbot: Hello! You said '{user_input}'!")
+                    </div>
+                    
+                    <p><strong>Assignment (10%):</strong> Team charter creation, development environment setup screenshots</p>
+                </div>
+                
+                <div class="week">
+                    <div class="week-header">
+                        <span class="week-number">Week 2</span>
+                        <h3>Problem Definition & User Understanding</h3>
+                    </div>
+                    
+                    <h4>Lecture (2 hours)</h4>
+                    <ul>
+                        <li>Persona development methodology</li>
+                        <li>User journey mapping</li>
+                        <li>MVP planning methods</li>
+                    </ul>
+                    
+                    <h4>Lab Practice (4 hours)</h4>
+                    <ul>
+                        <li>Develop 3 personas</li>
+                        <li>Create simple survey (Google Forms)</li>
+                        <li>Competitive app analysis (3 apps)</li>
+                    </ul>
+                    
+                    <p><strong>Assignment (10%):</strong> Persona documents, user needs definition</p>
+                </div>
+                
+                <div class="week">
+                    <div class="week-header">
+                        <span class="week-number">Week 3</span>
+                        <h3>Technology Stack Learning</h3>
+                    </div>
+                    
+                    <h4>Lecture (2 hours)</h4>
+                    <ul>
+                        <li>Python basics review</li>
+                        <li>OpenAI API introduction</li>
+                        <li>Streamlit fundamentals</li>
+                    </ul>
+                    
+                    <h4>Lab Practice (4 hours)</h4>
+                    <div class="code-block">
+<span class="code-comment"># Week 3 Practice: GPT-4 Integration</span>
+import openai
+import streamlit as st
+
+def get_gpt_response(prompt):
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",  <span class="code-comment"># For cost savings</span>
+        messages=[{"role": "user", "content": prompt}],
+        max_tokens=100
+    )
+    return response.choices[0].message.content
+
+st.title("Chat with GPT")
+user_input = st.text_input("Question:")
+if st.button("Send"):
+    answer = get_gpt_response(user_input)
+    st.write(f"GPT: {answer}")
+                    </div>
+                    
+                    <p><strong>Assignment (10%):</strong> API integration success screenshot, technology learning log</p>
+                </div>
+            </div>
+            
+            <!-- Phase 2 -->
+            <div class="phase">
+                <h2>Phase 2: MVP Design & Development (Weeks 4-8)</h2>
+                
+                <div class="week">
+                    <div class="week-header">
+                        <span class="week-number">Week 4</span>
+                        <h3>MVP Design & Wireframing</h3>
+                    </div>
+                    
+                    <h4>Practice Content</h4>
+                    <div class="grid">
+                        <div class="card">
+                            <h4>🎨 UI/UX Design</h4>
+                            <ul>
+                                <li>Screen design with Figma (7-8 screens)</li>
+                                <li>Login/registration screens</li>
+                                <li>Main conversation interface</li>
+                                <li>Cognitive assessment screen</li>
+                                <li>Results dashboard</li>
+                            </ul>
+                        </div>
+                        <div class="card">
+                            <h4>📝 Documentation</h4>
+                            <ul>
+                                <li>3-module functional specifications</li>
+                                <li>Database schema</li>
+                                <li>API design</li>
+                                <li>User flow</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="week">
+                    <div class="week-header">
+                        <span class="week-number">Week 5</span>
+                        <h3>HF (Heart Finder) Module Development</h3>
+                    </div>
+                    
+                    <h4>Implementation Goals</h4>
+                    <ul>
+                        <li>User profile building system</li>
+                        <li>Interest extraction algorithm</li>
+                        <li>Conversation topic recommendation engine</li>
+                    </ul>
+                    
+                    <div class="code-block">
+<span class="code-comment"># Week 5: HF (Heart Finder) Module</span>
+class HeartFinder:
+    def __init__(self):
+        self.user_profile = {
+            'interests': [],
+            'emotions': [],
+            'memories': []
+        }
+        self.conversation_topics = []
+    
+    def extract_interests(self, user_input):
+        <span class="code-comment"># Interest extraction using GPT</span>
+        prompt = f"""
+        User message: '{user_input}'
+        
+        Extract from this message:
+        1. Interests or hobbies
+        2. Current emotional state
+        3. Important memories or experiences
+        
+        Return in JSON format.
+        """
+        
+        response = get_gpt_response(prompt)
+        self.update_profile(response)
+        return response
+    
+    def suggest_topics(self):
+        <span class="code-comment"># Generate personalized conversation topics</span>
+        topics = []
+        for interest in self.user_profile['interests']:
+            topic_prompt = f"3 interesting conversation topics about {interest}"
+            topics.extend(get_topic_suggestions(topic_prompt))
+        return topics
+                    </div>
+                </div>
+                
+                <div class="week">
+                    <div class="week-header">
+                        <span class="week-number">Week 6</span>
+                        <h3>LT (Love Talker) + MS (Mind Scanner) Integrated Development</h3>
+                    </div>
+                    
+                    <h4>LT Module: Therapeutic Conversation System</h4>
+                    <div class="code-block">
+<span class="code-comment"># Week 6-1: LT (Love Talker) Module</span>
+class LoveTalker:
+    def __init__(self):
+        self.emotional_state = "neutral"
+        self.conversation_depth = 0
+        
+    def therapeutic_conversation(self, user_input, user_profile):
+        <span class="code-comment"># 7-stage emotional deepening conversation</span>
+        prompts_by_depth = {
+            1: "Empathy and listening",
+            2: "Emotional exploration",
+            3: "Experience recollection",
+            4: "Meaning discovery",
+            5: "Positive reinforcement",
+            6: "Insight induction",
+            7: "Future hope"
+        }
+        
+        current_approach = prompts_by_depth[min(self.conversation_depth + 1, 7)]
+        
+        response = self.generate_therapeutic_response(
+            user_input, 
+            user_profile, 
+            current_approach
+        )
+        
+        self.conversation_depth += 1
+        return response
+                    </div>
+                    
+                    <h4>MS Module: Cognitive Assessment System</h4>
+                    <div class="code-block">
+<span class="code-comment"># Week 6-2: MS (Mind Scanner) Module</span>
+class MindScanner:
+    def __init__(self):
+        self.cognitive_scores = {
+            'memory': [],
+            'attention': [],
+            'language': [],
+            'executive': []
+        }
+        
+    def memory_test(self):
+        <span class="code-comment"># Word list memory test</span>
+        words = random.sample(["apple", "desk", "sky", "music", "happiness", 
+                              "travel", "friend", "coffee", "walk", "ocean"], 5)
+        
+        st.write("🧠 Memory Test")
+        st.write(f"Remember these words for 30 seconds:")
+        
+        cols = st.columns(5)
+        for i, word in enumerate(words):
+            cols[i].info(word)
+        
+        time.sleep(30)
+        st.empty()
+        
+        <span class="code-comment"># Interference task</span>
+        st.write("Let's talk about something else briefly.")
+        distractor = st.text_input("How's the weather today?")
+        
+        <span class="code-comment"># Recall test</span>
+        recalled = st.text_input("Please write all the words you saw earlier:")
+        score = self.calculate_memory_score(words, recalled)
+        
+        self.cognitive_scores['memory'].append(score)
+        return score
+    
+    def attention_test(self):
+        <span class="code-comment"># Reverse digit span test</span>
+        st.write("🎯 Attention Test")
+        
+        difficulty = len(self.cognitive_scores['attention']) + 3
+        numbers = [random.randint(1, 9) for _ in range(difficulty)]
+        
+        st.write(f"Say these numbers in reverse: {' '.join(map(str, numbers))}")
+        
+        answer = st.text_input("Answer:")
+        correct = ' '.join(map(str, reversed(numbers)))
+        
+        score = 100 if answer.replace(' ', '') == correct.replace(' ', '') else 0
+        self.cognitive_scores['attention'].append(score)
+        
+        return score
+    
+    def generate_report(self):
+        <span class="code-comment"># Generate cognitive function assessment report</span>
+        report = {
+            'overall_score': np.mean([
+                np.mean(scores) for scores in self.cognitive_scores.values() 
+                if scores
+            ]),
+            'memory_trend': self.calculate_trend(self.cognitive_scores['memory']),
+            'attention_trend': self.calculate_trend(self.cognitive_scores['attention']),
+            'recommendation': self.get_recommendation()
+        }
+        return report
+                    </div>
+                </div>
+                
+                <div class="week">
+                    <div class="week-header">
+                        <span class="week-number">Week 7</span>
+                        <h3>System Integration & Data Management</h3>
+                    </div>
+                    
+                    <h4>Integrated System Implementation</h4>
+                    <div class="code-block">
+<span class="code-comment"># Week 7: 3-Module Integration</span>
+class MFLRSystem:
+    def __init__(self):
+        self.hf = HeartFinder()      <span class="code-comment"># Heart Finder</span>
+        self.lt = LoveTalker()       <span class="code-comment"># Love Talker</span>
+        self.ms = MindScanner()      <span class="code-comment"># Mind Scanner</span>
+        self.session_data = []
+        
+    def run_session(self):
+        st.title("🧠 MFLR Cognitive Health Assistant")
+        
+        <span class="code-comment"># Tab configuration</span>
+        tab1, tab2, tab3, tab4 = st.tabs(["💬 Chat", "🧠 Assessment", "📊 Report", "⚙️ Settings"])
+        
+        with tab1:
+            <span class="code-comment"># HF + LT integrated conversation</span>
+            user_input = st.text_input("How was your day?")
+            
+            if user_input:
+                <span class="code-comment"># 1. Extract interests (HF)</span>
+                self.hf.extract_interests(user_input)
+                
+                <span class="code-comment"># 2. Generate therapeutic conversation (LT)</span>
+                response = self.lt.therapeutic_conversation(
+                    user_input, 
+                    self.hf.user_profile
+                )
+                
+                st.write(f"AI: {response}")
+                
+                <span class="code-comment"># 3. Naturally insert cognitive tasks during conversation</span>
+                if len(self.session_data) % 5 == 4:
+                    st.info("Let's do a quick brain exercise!")
+                    if st.button("Start"):
+                        self.ms.memory_test()
+        
+        with tab2:
+            <span class="code-comment"># MS standalone execution</span>
+            st.subheader("Cognitive Function Assessment")
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.button("🧠 Memory Test"):
+                    score = self.ms.memory_test()
+                    st.metric("Memory Score", f"{score} points")
+            
+            with col2:
+                if st.button("🎯 Attention Test"):
+                    score = self.ms.attention_test()
+                    st.metric("Attention Score", f"{score} points")
+        
+        with tab3:
+            <span class="code-comment"># Integrated report</span>
+            st.subheader("My Cognitive Health Report")
+            
+            if self.ms.cognitive_scores['memory']:
+                report = self.ms.generate_report()
+                
+                <span class="code-comment"># Score visualization</span>
+                st.metric("Overall Score", f"{report['overall_score']:.1f} points")
+                
+                <span class="code-comment"># Trend chart</span>
+                chart_data = pd.DataFrame({
+                    'Memory': self.ms.cognitive_scores['memory'],
+                    'Attention': self.ms.cognitive_scores['attention']
+                })
+                st.line_chart(chart_data)
+                
+                <span class="code-comment"># Recommendations</span>
+                st.info(f"💡 {report['recommendation']}")
+                    </div>
+                    
+                    <h4>Database Design</h4>
+                    <div class="code-block">
+<span class="code-comment"># SQLite Database Schema</span>
+CREATE TABLE users (
+    user_id INTEGER PRIMARY KEY,
+    created_at TIMESTAMP,
+    profile_data JSON
+);
+
+CREATE TABLE conversations (
+    conv_id INTEGER PRIMARY KEY,
+    user_id INTEGER,
+    message TEXT,
+    response TEXT,
+    emotion_score REAL,
+    timestamp TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+
+CREATE TABLE cognitive_scores (
+    score_id INTEGER PRIMARY KEY,
+    user_id INTEGER,
+    test_type VARCHAR(50),
+    score REAL,
+    test_data JSON,
+    timestamp TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+                    </div>
+                </div>
+                
+                <div class="week">
+                    <div class="week-header">
+                        <span class="week-number">Week 8</span>
+                        <h3>UI/UX Improvement & Optimization</h3>
+                    </div>
+                    
+                    <h4>Improvements</h4>
+                    <div class="checklist">
+                        <ul>
+                            <li>Natural transitions between 3 modules</li>
+                            <li>Enhanced visual feedback</li>
+                            <li>Added gamification elements</li>
+                            <li>Mobile responsive design</li>
+                            <li>Performance optimization</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="code-block">
+<span class="code-comment"># UI Improvement Example</span>
+st.markdown("""
+<style>
+    <span class="code-comment">/* Module-specific color themes */</span>
+    .hf-module { background: #e8f5e9; border-left: 4px solid #4caf50; }
+    .lt-module { background: #fce4ec; border-left: 4px solid #e91e63; }
+    .ms-module { background: #e3f2fd; border-left: 4px solid #2196f3; }
+    
+    <span class="code-comment">/* Animation effects */</span>
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+    
+    .score-display {
+        animation: pulse 2s infinite;
+        font-size: 2rem;
+        font-weight: bold;
+        color: #5a67d8;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+<span class="code-comment"># Gamification: Level system</span>
+def calculate_user_level(total_sessions, avg_score):
+    points = total_sessions * 10 + avg_score * 5
+    level = int(points / 100) + 1
+    badges = []
+    
+    if total_sessions >= 7:
+        badges.append("🏆 Week Attendance Award")
+    if avg_score >= 80:
+        badges.append("⭐ Excellent Learner")
+    if level >= 5:
+        badges.append("👑 Master")
+    
+    return level, badges
+
+<span class="code-comment"># Progress indicator</span>
+progress = st.progress(0)
+for i in range(100):
+    time.sleep(0.01)
+    progress.progress(i + 1)
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Phase 3 -->
+            <div class="phase">
+                <h2>Phase 3: Testing & Improvement (Weeks 9-10)</h2>
+                
+                <div class="week">
+                    <div class="week-header">
+                        <span class="week-number">Week 9</span>
+                        <h3>Integration Testing & Usability Evaluation</h3>
+                    </div>
+                    
+                    <h4>Test Scenarios (3 Modules)</h4>
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <strong>Scenario 1 (HF):</strong> Identify 3+ interests in first conversation
+                        </div>
+                        <div class="timeline-item">
+                            <strong>Scenario 2 (LT):</strong> 10-minute natural therapeutic conversation
+                        </div>
+                        <div class="timeline-item">
+                            <strong>Scenario 3 (MS):</strong> Complete 3 cognitive tests
+                        </div>
+                        <div class="timeline-item">
+                            <strong>Scenario 4 (Integration):</strong> Natural transition to cognitive tasks during conversation
+                        </div>
+                        <div class="timeline-item">
+                            <strong>Scenario 5 (Report):</strong> Verify personalized report generation
+                        </div>
+                    </div>
+                    
+                    <h4>Evaluation Metrics</h4>
+                    <div class="feature-box">
+                        <div class="grid">
+                            <div class="card">
+                                <h4>📊 Quantitative Metrics</h4>
+                                <ul>
+                                    <li>Average session time: Target 15 minutes</li>
+                                    <li>Cognitive task completion rate: Target 80%</li>
+                                    <li>System error rate: < 5%</li>
+                                    <li>Response time: < 2 seconds</li>
+                                </ul>
+                            </div>
+                            <div class="card">
+                                <h4>📝 Qualitative Metrics</h4>
+                                <ul>
+                                    <li>Conversation naturalness (1-5 scale)</li>
+                                    <li>UI intuitiveness (1-5 scale)</li>
+                                    <li>Overall satisfaction (NPS)</li>
+                                    <li>Intention to reuse</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <p><strong>Testers:</strong> 5-10 people (various age groups)</p>
+                    <p><strong>Assignment (10%):</strong> Test results report, improvement priority list</p>
+                </div>
+                
+                <div class="week">
+                    <div class="week-header">
+                        <span class="week-number">Week 10</span>
+                        <h3>Bug Fixes & Final Optimization</h3>
+                    </div>
+                    
+                    <h4>Major Improvement Tasks</h4>
+                    <ul>
+                        <li>Optimize data synchronization between 3 modules</li>
+                        <li>Resolve memory leaks and performance issues</li>
+                        <li>Strengthen error handling</li>
+                        <li>Configure deployment environment</li>
+                    </ul>
+                    
+                    <div class="code-block">
+<span class="code-comment"># Week 10: Deployment Preparation</span>
+<span class="code-comment"># requirements.txt</span>
+streamlit==1.28.0
+openai==0.28.0
+pandas==2.0.0
+numpy==1.24.0
+plotly==5.17.0
+sqlite3
+python-dotenv==1.0.0
+
+<span class="code-comment"># .env file</span>
+OPENAI_API_KEY="your-key-here"
+DATABASE_URL="sqlite:///mflr.db"
+MAX_TOKENS=2000
+TEMPERATURE=0.7
+
+<span class="code-comment"># app.py (main execution file)</span>
+import streamlit as st
+from modules.heart_finder import HeartFinder
+from modules.love_talker import LoveTalker
+from modules.mind_scanner import MindScanner
+from utils.database import DatabaseManager
+
+def main():
+    st.set_page_config(
+        page_title="MFLR Cognitive Health Assistant",
+        page_icon="🧠",
+        layout="wide"
+    )
+    
+    <span class="code-comment"># Session initialization</span>
+    if 'mflr_system' not in st.session_state:
+        st.session_state.mflr_system = MFLRSystem()
+    
+    <span class="code-comment"># Run main app</span>
+    st.session_state.mflr_system.run_session()
+
+if __name__ == "__main__":
+    main()
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Phase 4 -->
+            <div class="phase">
+                <h2>Phase 4: Documentation & Presentation (Weeks 11-12)</h2>
+                
+                <div class="week">
+                    <div class="week-header">
+                        <span class="week-number">Week 11</span>
+                        <h3>Comprehensive Documentation</h3>
+                    </div>
+                    
+                    <h4>Documentation Checklist</h4>
+                    <div class="checklist">
+                        <ul>
+                            <li>GitHub README.md (installation, execution guide)</li>
+                            <li>3-module API documentation</li>
+                            <li>User manual (with screenshots)</li>
+                            <li>Technical architecture documentation</li>
+                            <li>Test results report</li>
+                        </ul>
+                    </div>
+                    
+                    <h4>README Template</h4>
+                    <div class="code-block">
+# 🧠 MFLR MVP - AI-based Cognitive Health Assistant
+
+## System Components
+- **HF (Heart Finder)**: User interest exploration and profile building
+- **LT (Love Talker)**: Therapeutic conversation system
+- **MS (Mind Scanner)**: Cognitive function assessment and tracking
+
+## Key Features
+✅ GPT-4 based personalized conversation
+✅ 4 types of cognitive assessments (memory, attention, language, executive function)
+✅ Real-time progress tracking
+✅ Personalized report generation
+
+## Tech Stack
+- Frontend: Streamlit
+- Backend: Python 3.8+
+- AI: OpenAI GPT-4
+- Database: SQLite
+- Visualization: Plotly
+
+## Installation & Execution
+```bash
+git clone https://github.com/team/mflr-mvp
+cd mflr-mvp
+pip install -r requirements.txt
+streamlit run app.py
+                    </div>
+                </div>
+
+                <div class="week">
+                    <div class="week-header">
+                        <span class="week-number">Week 12</span>
+                        <h3>Final Presentation & Demo</h3>
+                    </div>
+                    
+                    <h4>Presentation Structure (15 min + 5 min Q&A)</h4>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 13%">Problem Definition (2 min)</div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 20%">3-Module Introduction (3 min)</div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 33%">Live Demo (5 min)</div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 20%">Technical Challenges (3 min)</div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 13%">Future Plans (2 min)</div>
+                    </div>
+                    
+                    <h4>Live Demo Scenario</h4>
+                    <div class="feature-box">
+                        <ol>
+                            <li><strong>Start (1 min):</strong> System introduction and login</li>
+                            <li><strong>HF Demo (1.5 min):</strong> User understanding through first conversation</li>
+                            <li><strong>LT Demo (1.5 min):</strong> Therapeutic conversation progress</li>
+                            <li><strong>MS Demo (1.5 min):</strong> Cognitive test execution</li>
+                            <li><strong>Integration (1.5 min):</strong> Report review and insights</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Evaluation Criteria -->
+            <h2>📊 Evaluation Criteria (3-Module Basis)</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Weight</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Attendance/Participation</td>
+                        <td>10%</td>
+                        <td>Weekly participation</td>
+                    </tr>
+                    <tr>
+                        <td>Phase 1</td>
+                        <td>20%</td>
+                        <td>Team formation(5%), Personas(10%), API integration(5%)</td>
+                    </tr>
+                    <tr>
+                        <td>Phase 2</td>
+                        <td>30%</td>
+                        <td>HF module(10%), LT module(10%), MS module(10%)</td>
+                    </tr>
+                    <tr>
+                        <td>Phase 3</td>
+                        <td>20%</td>
+                        <td>Integration testing(10%), Improvements(10%)</td>
+                    </tr>
+                    <tr>
+                        <td>Phase 4</td>
+                        <td>20%</td>
+                        <td>Documentation(10%), Final presentation(10%)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- MVP Evaluation Rubric -->
+            <h2>🎯 3-Module MVP Evaluation Rubric</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Criteria</th>
+                        <th>Excellent (A)</th>
+                        <th>Good (B)</th>
+                        <th>Needs Improvement (C)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Module Completeness</strong></td>
+                        <td>3 modules fully integrated</td>
+                        <td>2 modules + partial integration</td>
+                        <td>Only 1 module working</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Function Implementation</strong></td>
+                        <td>100% core functions working</td>
+                        <td>70% core functions working</td>
+                        <td>Basic functions only</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Data Integration</strong></td>
+                        <td>Perfect real-time synchronization</td>
+                        <td>Basic data storage</td>
+                        <td>Session maintenance only</td>
+                    </tr>
+                    <tr>
+                        <td><strong>UI/UX</strong></td>
+                        <td>Intuitive, responsive, aesthetic</td>
+                        <td>Usable, basic design</td>
+                        <td>Needs improvement</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Testing</strong></td>
+                        <td>5+ users, quantitative/qualitative analysis</td>
+                        <td>3-4 users, basic analysis</td>
+                        <td>1-2 user testing</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Expected Outcomes -->
+            <h2>🎯 Realistic Expected Outcomes</h2>
+            <div class="highlight">
+                <h4>Guaranteed Outcomes ✅</h4>
+                <ul>
+                    <li><strong>3-Module Integrated MVP</strong> completion</li>
+                    <li>GitHub portfolio development</li>
+                    <li>AI chatbot + cognitive assessment system development experience</li>
+                    <li>Team project collaboration skills</li>
+                </ul>
+                <h4>Additional Possible Outcomes 🎯</h4>
+                <ul>
+                    <li>University competition awards</li>
+                    <li>Academic conference presentations</li>
+                    <li>Open source project development</li>
+                    <li>Startup business ideas</li>
+                    <li>Follow-up research project derivation</li>
+                </ul>
+            </div>
+
+            <!-- Instructor Tips -->
+            <h2>📝 3-Module Checkpoints for Instructors</h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <strong>Week 1:</strong> Team role assignment (designate HF/LT/MS leads)
+                </div>
+                <div class="timeline-item">
+                    <strong>Week 3:</strong> Everyone successfully connected to OpenAI API?
+                </div>
+                <div class="timeline-item">
+                    <strong>Week 5:</strong> HF module - extracting 3+ interests?
+                </div>
+                <div class="timeline-item">
+                    <strong>Week 6:</strong> LT/MS modules running independently?
+                </div>
+                <div class="timeline-item">
+                    <strong>Week 7:</strong> Confirm 3-module data sharing
+                </div>
+                <div class="timeline-item">
+                    <strong>Week 9:</strong> Integrated system running 15+ minutes?
+                </div>
+                <div class="timeline-item">
+                    <strong>Week 11:</strong> All functions working on deployment URL?
+                </div>
+            </div>
+
+            <div class="highlight" style="margin-top: 40px; background: linear-gradient(135deg, #667eea20 0%, #764ba220 100%); border: 2px solid #667eea;">
+                <h3 style="text-align: center;">💡 Core Message</h3>
+                <p style="text-align: center; font-size: 1.2rem; margin-top: 20px;">
+                    <strong>"HF (Heart Finder) + LT (Love Talker) + MS (Mind Scanner)<br>
+                    Through organically integrated 3-module MVP,<br>
+                    we will complete a functional digital therapeutics prototype"</strong>
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MFLR 프로젝트 12주 강의 계획 - MVP 중심</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .main-content {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #5a67d8;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            border-bottom: 3px solid #5a67d8;
+            padding-bottom: 15px;
+        }
+        
+        h2 {
+            color: #2d3748;
+            font-size: 1.8rem;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: linear-gradient(90deg, #f7fafc 0%, transparent 100%);
+            border-left: 4px solid #5a67d8;
+        }
+        
+        h3 {
+            color: #4a5568;
+            font-size: 1.4rem;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+        
+        h4 {
+            color: #718096;
+            font-size: 1.1rem;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #718096;
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+        }
+        
+        .module-overview {
+            background: #f0f9ff;
+            border: 2px solid #3182ce;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 30px 0;
+        }
+        
+        .module-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .module-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            transition: transform 0.3s, border-color 0.3s;
+        }
+        
+        .module-card:hover {
+            transform: translateY(-5px);
+            border-color: #5a67d8;
+        }
+        
+        .module-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .phase {
+            background: #f7fafc;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 30px 0;
+            border-left: 5px solid #5a67d8;
+        }
+        
+        .week {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .week:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .week-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .week-number {
+            background: #5a67d8;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        th {
+            background: #5a67d8;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        tr:hover {
+            background: #f7fafc;
+        }
+        
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        
+        .code-comment {
+            color: #68d391;
+            font-style: italic;
+        }
+        
+        .highlight {
+            background: #fef5e7;
+            padding: 20px;
+            border-left: 4px solid #f39c12;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        
+        .checklist {
+            background: #f0f4f8;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .checklist li {
+            list-style: none;
+            padding: 8px 0;
+            padding-left: 30px;
+            position: relative;
+        }
+        
+        .checklist li:before {
+            content: "☐";
+            position: absolute;
+            left: 0;
+            color: #5a67d8;
+            font-size: 1.2rem;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin: 0 5px;
+        }
+        
+        .badge-new {
+            background: #48bb78;
+            color: white;
+        }
+        
+        .badge-important {
+            background: #ed8936;
+            color: white;
+        }
+        
+        .badge-info {
+            background: #4299e1;
+            color: white;
+        }
+        
+        .timeline {
+            position: relative;
+            padding-left: 40px;
+            margin: 30px 0;
+        }
+        
+        .timeline:before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #cbd5e0;
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin-bottom: 25px;
+        }
+        
+        .timeline-item:before {
+            content: '';
+            position: absolute;
+            left: -30px;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #5a67d8;
+            border: 3px solid white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            transition: transform 0.3s;
+        }
+        
+        .card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .progress-bar {
+            background: #e2e8f0;
+            border-radius: 10px;
+            height: 30px;
+            margin: 20px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            height: 100%;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            transition: width 0.5s;
+        }
+        
+        .emoji {
+            font-size: 1.5rem;
+            margin: 0 5px;
+        }
+        
+        .feature-box {
+            background: linear-gradient(135deg, #667eea20 0%, #764ba220 100%);
+            border: 2px solid #667eea;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .main-content {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            h2 {
+                font-size: 1.4rem;
+            }
+            
+            table {
+                font-size: 0.9rem;
+            }
+            
+            .module-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media print {
+            body {
+                background: white;
+            }
+            
+            .main-content {
+                box-shadow: none;
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="main-content">
+            <h1>🧠 MFLR 프로젝트 12주 강의 계획</h1>
+            <p class="subtitle">MVP 중심 실습형 디지털 치료제 개발 과정</p>
+            
+            <!-- 프로젝트 개요 -->
+            <div class="highlight">
+                <h3>📌 핵심 목표</h3>
+                <p><strong>작동하는 프로토타입 MVP 개발</strong> - 실제 사용 가능한 AI 기반 인지건강 대화 시스템</p>
+            </div>
+            
+            <!-- 3개 모듈 소개 -->
+            <div class="module-overview">
+                <h3>🎯 MVP 개발 대상: 3개 핵심 모듈</h3>
+                <div class="module-grid">
+                    <div class="module-card">
+                        <div class="module-icon">💬</div>
+                        <h4>HF (마음발굴기)</h4>
+                        <p>Heart Finder</p>
+                        <small>사용자 관심사 탐색<br>개인화된 대화 주제 생성</small>
+                    </div>
+                    <div class="module-card">
+                        <div class="module-icon">❤️</div>
+                        <h4>LT (사랑대화기)</h4>
+                        <p>Love Talker</p>
+                        <small>치료적 대화 진행<br>정서적 지원 제공</small>
+                    </div>
+                    <div class="module-card">
+                        <div class="module-icon">📊</div>
+                        <h4>MS (인지측정기)</h4>
+                        <p>Mind Scanner</p>
+                        <small>인지 기능 평가<br>진행 상황 추적</small>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 수정된 범위 테이블 -->
+            <h2>🎯 프로젝트 범위 (현실적 목표)</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>구분</th>
+                        <th>원래 계획</th>
+                        <th>수정 계획 <span class="badge badge-new">Updated</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>최종 목표</strong></td>
+                        <td>임상 검증된 디지털 치료제</td>
+                        <td><strong>3개 모듈 통합 MVP</strong></td>
+                    </tr>
+                    <tr>
+                        <td><strong>모듈 개발</strong></td>
+                        <td>4개 모듈 완전 통합</td>
+                        <td><strong>HF + LT + MS 핵심 기능</strong></td>
+                    </tr>
+                    <tr>
+                        <td><strong>테스트</strong></td>
+                        <td>20-30명 임상 파일럿</td>
+                        <td><strong>5-10명 사용성 테스트</strong></td>
+                    </tr>
+                    <tr>
+                        <td><strong>규제</strong></td>
+                        <td>K-FDA 제출 문서 작성</td>
+                        <td><strong>규제 요구사항 조사</strong></td>
+                    </tr>
+                    <tr>
+                        <td><strong>검증</strong></td>
+                        <td>임상적 유효성 검증</td>
+                        <td><strong>기술적 실현가능성 + 기초 효과성</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <!-- Phase 1 -->
+            <div class="phase">
+                <h2>Phase 1: 기초 학습 및 팀 구성 (Weeks 1-3)</h2>
+                
+                <div class="week">
+                    <div class="week-header">
+                        <span class="week-number">Week 1</span>
+                        <h3>프로젝트 이해와 팀 빌딩</h3>
+                    </div>
+                    
+                    <h4>강의 (2시간)</h4>
+                    <ul>
+                        <li>디지털 치료제 개념과 MVP 개발 방법론</li>
+                        <li>MFLR 3개 모듈 시스템 소개</li>
+                        <li>성공적인 MVP 사례 분석</li>
+                    </ul>
+                    
+                    <h4>실습 (4시간)</h4>
+                    <ul>
+                        <li>팀 구성 (3-4명) 및 역할 분담</li>
+                        <li>개발 환경 설정 (Python, Git, VS Code)</li>
+                        <li>간단한 챗봇 만들기 실습</li>
+                    </ul>
+                    
+                    <div class="code-block">
+<span class="code-comment"># Week 1 실습: 첫 번째 챗봇</span>
+import streamlit as st
+
+st.title("나의 첫 챗봇")
+user_input = st.text_input("인사해보세요:")
+if user_input:
+    st.write(f"챗봇: 안녕하세요! '{user_input}'라고 하셨네요!")
+                    </div>
+                    
+                    <p><strong>과제 (10%):</strong> 팀 차터 작성, 개발 환경 구축 스크린샷</p>
+                </div>
+                
+                <div class="week">
+                    <div class="week-header">
+                        <span class="week-number">Week 2</span>
+                        <h3>문제 정의와 사용자 이해</h3>
+                    </div>
+                    
+                    <h4>강의 (2시간)</h4>
+                    <ul>
+                        <li>페르소나 개발 방법론</li>
+                        <li>사용자 여정 맵핑</li>
+                        <li>MVP 기획 방법</li>
+                    </ul>
+                    
+                    <h4>실습 (4시간)</h4>
+                    <ul>
+                        <li>페르소나 3개 개발</li>
+                        <li>간단한 설문조사 작성 (Google Forms)</li>
+                        <li>경쟁 앱 분석 (3개)</li>
+                    </ul>
+                    
+                    <p><strong>과제 (10%):</strong> 페르소나 문서, 사용자 니즈 정의서</p>
+                </div>
+                
+                <div class="week">
+                    <div class="week-header">
+                        <span class="week-number">Week 3</span>
+                        <h3>기술 스택 학습</h3>
+                    </div>
+                    
+                    <h4>강의 (2시간)</h4>
+                    <ul>
+                        <li>Python 기초 문법 리뷰</li>
+                        <li>OpenAI API 소개</li>
+                        <li>Streamlit 기초</li>
+                    </ul>
+                    
+                    <h4>실습 (4시간)</h4>
+                    <div class="code-block">
+<span class="code-comment"># Week 3 실습: GPT-4 연동</span>
+import openai
+import streamlit as st
+
+def get_gpt_response(prompt):
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",  <span class="code-comment"># 비용 절감용</span>
+        messages=[{"role": "user", "content": prompt}],
+        max_tokens=100
+    )
+    return response.choices[0].message.content
+
+st.title("GPT와 대화하기")
+user_input = st.text_input("질문:")
+if st.button("전송"):
+    answer = get_gpt_response(user_input)
+    st.write(f"GPT: {answer}")
+                    </div>
+                    
+                    <p><strong>과제 (10%):</strong> API 연동 성공 화면, 기술 학습 로그</p>
+                </div>
+            </div>
+            
+            <!-- Phase 2 -->
+            <div class="phase">
+                <h2>Phase 2: MVP 설계 및 개발 (Weeks 4-8)</h2>
+                
+                <div class="week">
+                    <div class="week-header">
+                        <span class="week-number">Week 4</span>
+                        <h3>MVP 설계와 와이어프레임</h3>
+                    </div>
+                    
+                    <h4>실습 내용</h4>
+                    <div class="grid">
+                        <div class="card">
+                            <h4>🎨 UI/UX 설계</h4>
+                            <ul>
+                                <li>Figma로 화면 설계 (7-8개)</li>
+                                <li>로그인/가입 화면</li>
+                                <li>메인 대화 화면</li>
+                                <li>인지 평가 화면</li>
+                                <li>결과 대시보드</li>
+                            </ul>
+                        </div>
+                        <div class="card">
+                            <h4>📝 문서화</h4>
+                            <ul>
+                                <li>3개 모듈 기능 명세서</li>
+                                <li>데이터베이스 스키마</li>
+                                <li>API 설계</li>
+                                <li>사용자 플로우</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="week">
+                    <div class="week-header">
+                        <span class="week-number">Week 5</span>
+                        <h3>HF(마음발굴기) 모듈 개발</h3>
+                    </div>
+                    
+                    <h4>구현 목표</h4>
+                    <ul>
+                        <li>사용자 프로필 구축 시스템</li>
+                        <li>관심사 추출 알고리즘</li>
+                        <li>대화 주제 추천 엔진</li>
+                    </ul>
+                    
+                    <div class="code-block">
+<span class="code-comment"># Week 5: HF(마음발굴기) 모듈</span>
+class HeartFinder:
+    def __init__(self):
+        self.user_profile = {
+            'interests': [],
+            'emotions': [],
+            'memories': []
+        }
+        self.conversation_topics = []
+    
+    def extract_interests(self, user_input):
+        <span class="code-comment"># GPT를 활용한 관심사 추출</span>
+        prompt = f"""
+        사용자 메시지: '{user_input}'
+        
+        이 메시지에서 추출할 수 있는:
+        1. 관심사나 취미
+        2. 현재 감정 상태
+        3. 중요한 기억이나 경험
+        
+        JSON 형식으로 반환하세요.
+        """
+        
+        response = get_gpt_response(prompt)
+        self.update_profile(response)
+        return response
+    
+    def suggest_topics(self):
+        <span class="code-comment"># 개인화된 대화 주제 생성</span>
+        topics = []
+        for interest in self.user_profile['interests']:
+            topic_prompt = f"{interest}에 대한 흥미로운 대화 주제 3개"
+            topics.extend(get_topic_suggestions(topic_prompt))
+        return topics
+                    </div>
+                </div>
+                
+                <div class="week">
+                    <div class="week-header">
+                        <span class="week-number">Week 6</span>
+                        <h3>LT(사랑대화기) + MS(인지측정기) 통합 개발</h3>
+                    </div>
+                    
+                    <h4>LT 모듈: 치료적 대화 시스템</h4>
+                    <div class="code-block">
+<span class="code-comment"># Week 6-1: LT(사랑대화기) 모듈</span>
+class LoveTalker:
+    def __init__(self):
+        self.emotional_state = "neutral"
+        self.conversation_depth = 0
+        
+    def therapeutic_conversation(self, user_input, user_profile):
+        <span class="code-comment"># 7단계 감정 심화 대화</span>
+        prompts_by_depth = {
+            1: "공감과 경청",
+            2: "감정 탐색",
+            3: "경험 회상",
+            4: "의미 발견",
+            5: "긍정 강화",
+            6: "통찰 유도",
+            7: "미래 희망"
+        }
+        
+        current_approach = prompts_by_depth[min(self.conversation_depth + 1, 7)]
+        
+        response = self.generate_therapeutic_response(
+            user_input, 
+            user_profile, 
+            current_approach
+        )
+        
+        self.conversation_depth += 1
+        return response
+                    </div>
+                    
+                    <h4>MS 모듈: 인지 평가 시스템</h4>
+                    <div class="code-block">
+<span class="code-comment"># Week 6-2: MS(인지측정기) 모듈</span>
+class MindScanner:
+    def __init__(self):
+        self.cognitive_scores = {
+            'memory': [],
+            'attention': [],
+            'language': [],
+            'executive': []
+        }
+        
+    def memory_test(self):
+        <span class="code-comment"># 단어 목록 기억 테스트</span>
+        words = random.sample(["사과", "책상", "하늘", "음악", "행복", 
+                              "여행", "친구", "커피", "산책", "바다"], 5)
+        
+        st.write("🧠 기억력 테스트")
+        st.write(f"다음 단어들을 30초간 기억해주세요:")
+        
+        cols = st.columns(5)
+        for i, word in enumerate(words):
+            cols[i].info(word)
+        
+        time.sleep(30)
+        st.empty()
+        
+        <span class="code-comment"># 간섭 과제</span>
+        st.write("잠시 다른 이야기를 해볼까요?")
+        distractor = st.text_input("오늘 날씨는 어떤가요?")
+        
+        <span class="code-comment"># 회상 테스트</span>
+        recalled = st.text_input("아까 본 단어들을 모두 적어주세요:")
+        score = self.calculate_memory_score(words, recalled)
+        
+        self.cognitive_scores['memory'].append(score)
+        return score
+    
+    def attention_test(self):
+        <span class="code-comment"># 숫자 거꾸로 따라하기 (Digit Span)</span>
+        st.write("🎯 주의력 테스트")
+        
+        difficulty = len(self.cognitive_scores['attention']) + 3
+        numbers = [random.randint(1, 9) for _ in range(difficulty)]
+        
+        st.write(f"숫자를 거꾸로 말해주세요: {' '.join(map(str, numbers))}")
+        
+        answer = st.text_input("답:")
+        correct = ' '.join(map(str, reversed(numbers)))
+        
+        score = 100 if answer.replace(' ', '') == correct.replace(' ', '') else 0
+        self.cognitive_scores['attention'].append(score)
+        
+        return score
+    
+    def generate_report(self):
+        <span class="code-comment"># 인지 기능 평가 리포트 생성</span>
+        report = {
+            'overall_score': np.mean([
+                np.mean(scores) for scores in self.cognitive_scores.values() 
+                if scores
+            ]),
+            'memory_trend': self.calculate_trend(self.cognitive_scores['memory']),
+            'attention_trend': self.calculate_trend(self.cognitive_scores['attention']),
+            'recommendation': self.get_recommendation()
+        }
+        return report
+                    </div>
+                </div>
+                
+                <div class="week">
+                    <div class="week-header">
+                        <span class="week-number">Week 7</span>
+                        <h3>시스템 통합과 데이터 관리</h3>
+                    </div>
+                    
+                    <h4>통합 시스템 구현</h4>
+                    <div class="code-block">
+<span class="code-comment"># Week 7: 3개 모듈 통합</span>
+class MFLRSystem:
+    def __init__(self):
+        self.hf = HeartFinder()      <span class="code-comment"># 마음발굴기</span>
+        self.lt = LoveTalker()       <span class="code-comment"># 사랑대화기</span>
+        self.ms = MindScanner()      <span class="code-comment"># 인지측정기</span>
+        self.session_data = []
+        
+    def run_session(self):
+        st.title("🧠 MFLR 인지건강 도우미")
+        
+        <span class="code-comment"># 탭 구성</span>
+        tab1, tab2, tab3, tab4 = st.tabs(["💬 대화", "🧠 인지평가", "📊 리포트", "⚙️ 설정"])
+        
+        with tab1:
+            <span class="code-comment"># HF + LT 통합 대화</span>
+            user_input = st.text_input("오늘 하루는 어떠셨나요?")
+            
+            if user_input:
+                <span class="code-comment"># 1. 관심사 추출 (HF)</span>
+                self.hf.extract_interests(user_input)
+                
+                <span class="code-comment"># 2. 치료적 대화 생성 (LT)</span>
+                response = self.lt.therapeutic_conversation(
+                    user_input, 
+                    self.hf.user_profile
+                )
+                
+                st.write(f"AI: {response}")
+                
+                <span class="code-comment"># 3. 대화 중 자연스럽게 인지 과제 삽입</span>
+                if len(self.session_data) % 5 == 4:
+                    st.info("잠깐, 간단한 두뇌 운동을 해볼까요?")
+                    if st.button("시작하기"):
+                        self.ms.memory_test()
+        
+        with tab2:
+            <span class="code-comment"># MS 독립 실행</span>
+            st.subheader("인지 기능 평가")
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.button("🧠 기억력 테스트"):
+                    score = self.ms.memory_test()
+                    st.metric("기억력 점수", f"{score}점")
+            
+            with col2:
+                if st.button("🎯 주의력 테스트"):
+                    score = self.ms.attention_test()
+                    st.metric("주의력 점수", f"{score}점")
+        
+        with tab3:
+            <span class="code-comment"># 통합 리포트</span>
+            st.subheader("나의 인지건강 리포트")
+            
+            if self.ms.cognitive_scores['memory']:
+                report = self.ms.generate_report()
+                
+                <span class="code-comment"># 점수 시각화</span>
+                st.metric("종합 점수", f"{report['overall_score']:.1f}점")
+                
+                <span class="code-comment"># 트렌드 차트</span>
+                chart_data = pd.DataFrame({
+                    '기억력': self.ms.cognitive_scores['memory'],
+                    '주의력': self.ms.cognitive_scores['attention']
+                })
+                st.line_chart(chart_data)
+                
+                <span class="code-comment"># 추천사항</span>
+                st.info(f"💡 {report['recommendation']}")
+                    </div>
+                    
+                    <h4>데이터베이스 설계</h4>
+                    <div class="code-block">
+<span class="code-comment"># SQLite 데이터베이스 스키마</span>
+CREATE TABLE users (
+    user_id INTEGER PRIMARY KEY,
+    created_at TIMESTAMP,
+    profile_data JSON
+);
+
+CREATE TABLE conversations (
+    conv_id INTEGER PRIMARY KEY,
+    user_id INTEGER,
+    message TEXT,
+    response TEXT,
+    emotion_score REAL,
+    timestamp TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+
+CREATE TABLE cognitive_scores (
+    score_id INTEGER PRIMARY KEY,
+    user_id INTEGER,
+    test_type VARCHAR(50),
+    score REAL,
+    test_data JSON,
+    timestamp TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+                    </div>
+                </div>
+                
+                <div class="week">
+                    <div class="week-header">
+                        <span class="week-number">Week 8</span>
+                        <h3>UI/UX 개선과 최적화</h3>
+                    </div>
+                    
+                    <h4>개선 사항</h4>
+                    <div class="checklist">
+                        <ul>
+                            <li>3개 모듈 간 자연스러운 전환</li>
+                            <li>시각적 피드백 강화</li>
+                            <li>게이미피케이션 요소 추가</li>
+                            <li>모바일 반응형 디자인</li>
+                            <li>성능 최적화</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="code-block">
+<span class="code-comment"># UI 개선 예시</span>
+st.markdown("""
+<style>
+    <span class="code-comment">/* 모듈별 색상 테마 */</span>
+    .hf-module { background: #e8f5e9; border-left: 4px solid #4caf50; }
+    .lt-module { background: #fce4ec; border-left: 4px solid #e91e63; }
+    .ms-module { background: #e3f2fd; border-left: 4px solid #2196f3; }
+    
+    <span class="code-comment">/* 애니메이션 효과 */</span>
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+    
+    .score-display {
+        animation: pulse 2s infinite;
+        font-size: 2rem;
+        font-weight: bold;
+        color: #5a67d8;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+<span class="code-comment"># 게이미피케이션: 레벨 시스템</span>
+def calculate_user_level(total_sessions, avg_score):
+    points = total_sessions * 10 + avg_score * 5
+    level = int(points / 100) + 1
+    badges = []
+    
+    if total_sessions >= 7:
+        badges.append("🏆 일주일 개근상")
+    if avg_score >= 80:
+        badges.append("⭐ 우수 학습자")
+    if level >= 5:
+        badges.append("👑 마스터")
+    
+    return level, badges
+
+<span class="code-comment"># 진행률 표시</span>
+progress = st.progress(0)
+for i in range(100):
+    time.sleep(0.01)
+    progress.progress(i + 1)
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Phase 3 -->
+            <div class="phase">
+                <h2>Phase 3: 테스트와 개선 (Weeks 9-10)</h2>
+                
+                <div class="week">
+                    <div class="week-header">
+                        <span class="week-number">Week 9</span>
+                        <h3>통합 테스트와 사용성 평가</h3>
+                    </div>
+                    
+                    <h4>테스트 시나리오 (3개 모듈)</h4>
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <strong>시나리오 1 (HF):</strong> 첫 대화에서 3개 이상 관심사 파악
+                        </div>
+                        <div class="timeline-item">
+                            <strong>시나리오 2 (LT):</strong> 10분간 자연스러운 치료적 대화
+                        </div>
+                        <div class="timeline-item">
+                            <strong>시나리오 3 (MS):</strong> 3가지 인지 테스트 완료
+                        </div>
+                        <div class="timeline-item">
+                            <strong>시나리오 4 (통합):</strong> 대화 중 인지과제 자연스러운 전환
+                        </div>
+                        <div class="timeline-item">
+                            <strong>시나리오 5 (리포트):</strong> 개인 맞춤 리포트 생성 확인
+                        </div>
+                    </div>
+                    
+                    <h4>평가 메트릭</h4>
+                    <div class="feature-box">
+                        <div class="grid">
+                            <div class="card">
+                                <h4>📊 정량적 지표</h4>
+                                <ul>
+                                    <li>평균 세션 시간: 목표 15분</li>
+                                    <li>인지과제 완료율: 목표 80%</li>
+                                    <li>시스템 오류율: < 5%</li>
+                                    <li>응답 시간: < 2초</li>
+                                </ul>
+                            </div>
+                            <div class="card">
+                                <h4>📝 정성적 지표</h4>
+                                <ul>
+                                    <li>대화 자연스러움 (1-5점)</li>
+                                    <li>UI 직관성 (1-5점)</li>
+                                    <li>전반적 만족도 (NPS)</li>
+                                    <li>재사용 의향</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <p><strong>테스터:</strong> 5-10명 (다양한 연령대 포함)</p>
+                    <p><strong>과제 (10%):</strong> 테스트 결과 보고서, 개선사항 우선순위</p>
+                </div>
+                
+                <div class="week">
+                    <div class="week-header">
+                        <span class="week-number">Week 10</span>
+                        <h3>버그 수정과 최종 최적화</h3>
+                    </div>
+                    
+                    <h4>주요 개선 작업</h4>
+                    <ul>
+                        <li>3개 모듈 간 데이터 동기화 최적화</li>
+                        <li>메모리 누수 및 성능 이슈 해결</li>
+                        <li>에러 핸들링 강화</li>
+                        <li>배포 환경 설정</li>
+                    </ul>
+                    
+                    <div class="code-block">
+<span class="code-comment"># Week 10: 배포 준비</span>
+<span class="code-comment"># requirements.txt</span>
+streamlit==1.28.0
+openai==0.28.0
+pandas==2.0.0
+numpy==1.24.0
+plotly==5.17.0
+sqlite3
+python-dotenv==1.0.0
+
+<span class="code-comment"># .env 파일</span>
+OPENAI_API_KEY="your-key-here"
+DATABASE_URL="sqlite:///mflr.db"
+MAX_TOKENS=2000
+TEMPERATURE=0.7
+
+<span class="code-comment"># app.py (메인 실행 파일)</span>
+import streamlit as st
+from modules.heart_finder import HeartFinder
+from modules.love_talker import LoveTalker
+from modules.mind_scanner import MindScanner
+from utils.database import DatabaseManager
+
+def main():
+    st.set_page_config(
+        page_title="MFLR 인지건강 도우미",
+        page_icon="🧠",
+        layout="wide"
+    )
+    
+    <span class="code-comment"># 세션 초기화</span>
+    if 'mflr_system' not in st.session_state:
+        st.session_state.mflr_system = MFLRSystem()
+    
+    <span class="code-comment"># 메인 앱 실행</span>
+    st.session_state.mflr_system.run_session()
+
+if __name__ == "__main__":
+    main()
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Phase 4 -->
+            <div class="phase">
+                <h2>Phase 4: 문서화와 발표 (Weeks 11-12)</h2>
+                
+                <div class="week">
+                    <div class="week-header">
+                        <span class="week-number">Week 11</span>
+                        <h3>종합 문서화</h3>
+                    </div>
+                    
+                    <h4>문서화 체크리스트</h4>
+                    <div class="checklist">
+                        <ul>
+                            <li>GitHub README.md (설치, 실행 가이드)</li>
+                            <li>3개 모듈 API 문서</li>
+                            <li>사용자 매뉴얼 (스크린샷 포함)</li>
+                            <li>기술 아키텍처 문서</li>
+                            <li>테스트 결과 보고서</li>
+                        </ul>
+                    </div>
+                    
+                    <h4>README 템플릿</h4>
+                    <div class="code-block">
+# 🧠 MFLR MVP - AI 기반 인지건강 도우미
+
+## 시스템 구성
+- **HF (Heart Finder)**: 사용자 관심사 탐색 및 프로필 구축
+- **LT (Love Talker)**: 치료적 대화 시스템
+- **MS (Mind Scanner)**: 인지 기능 평가 및 추적
+
+## 주요 기능
+✅ GPT-4 기반 개인화 대화
+✅ 4가지 인지 기능 평가 (기억력, 주의력, 언어, 실행기능)
+✅ 실시간 진행 상황 추적
+✅ 개인 맞춤 리포트 생성
+
+## 기술 스택
+- Frontend: Streamlit
+- Backend: Python 3.8+
+- AI: OpenAI GPT-4
+- Database: SQLite
+- Visualization: Plotly
+
+## 설치 및 실행
+```bash
+git clone https://github.com/team/mflr-mvp
+cd mflr-mvp
+pip install -r requirements.txt
+streamlit run app.py
+</div>
+</div>
+
+<div class="week">
+    <div class="week-header">
+        <span class="week-number">Week 12</span>
+        <h3>최종 발표와 시연</h3>
+    </div>
+    
+    <h4>발표 구성 (15분 + 5분 Q&A)</h4>
+    <div class="progress-bar">
+        <div class="progress-fill" style="width: 13%">문제 정의 (2분)</div>
+    </div>
+    <div class="progress-bar">
+        <div class="progress-fill" style="width: 20%">3개 모듈 소개 (3분)</div>
+    </div>
+    <div class="progress-bar">
+        <div class="progress-fill" style="width: 33%">라이브 데모 (5분)</div>
+    </div>
+    <div class="progress-bar">
+        <div class="progress-fill" style="width: 20%">기술적 도전 (3분)</div>
+    </div>
+    <div class="progress-bar">
+        <div class="progress-fill" style="width: 13%">향후 계획 (2분)</div>
+    </div>
+    
+    <h4>라이브 데모 시나리오</h4>
+    <div class="feature-box">
+        <ol>
+            <li><strong>시작 (1분):</strong> 시스템 소개 및 로그인</li>
+            <li><strong>HF 데모 (1.5분):</strong> 첫 대화로 사용자 파악</li>
+            <li><strong>LT 데모 (1.5분):</strong> 치료적 대화 진행</li>
+            <li><strong>MS 데모 (1.5분):</strong> 인지 테스트 실행</li>
+            <li><strong>통합 (1.5분):</strong> 리포트 확인 및 인사이트</li>
+        </ol>
+    </div>
+</div>
+</div>
+
+<!-- 평가 기준 -->
+<h2>📊 평가 기준 (3개 모듈 기준)</h2>
+<table>
+<thead>
+    <tr>
+        <th>구분</th>
+        <th>배점</th>
+        <th>세부 내용</th>
+    </tr>
+</thead>
+<tbody>
+    <tr>
+        <td>출석/참여</td>
+        <td>10%</td>
+        <td>매주 참여도</td>
+    </tr>
+    <tr>
+        <td>Phase 1</td>
+        <td>20%</td>
+        <td>팀구성(5%), 페르소나(10%), API연동(5%)</td>
+    </tr>
+    <tr>
+        <td>Phase 2</td>
+        <td>30%</td>
+        <td>HF모듈(10%), LT모듈(10%), MS모듈(10%)</td>
+    </tr>
+    <tr>
+        <td>Phase 3</td>
+        <td>20%</td>
+        <td>통합테스트(10%), 개선(10%)</td>
+    </tr>
+    <tr>
+        <td>Phase 4</td>
+        <td>20%</td>
+        <td>문서화(10%), 최종발표(10%)</td>
+    </tr>
+</tbody>
+</table>
+
+<!-- MVP 평가 루브릭 -->
+<h2>🎯 3개 모듈 MVP 평가 루브릭</h2>
+<table>
+<thead>
+    <tr>
+        <th>항목</th>
+        <th>우수 (A)</th>
+        <th>양호 (B)</th>
+        <th>개선필요 (C)</th>
+    </tr>
+</thead>
+<tbody>
+    <tr>
+        <td><strong>모듈 완성도</strong></td>
+        <td>3개 모듈 완전 통합</td>
+        <td>2개 모듈 + 부분통합</td>
+        <td>1개 모듈만 작동</td>
+    </tr>
+    <tr>
+        <td><strong>기능 구현</strong></td>
+        <td>핵심기능 100% 작동</td>
+        <td>핵심기능 70% 작동</td>
+        <td>기본기능만 작동</td>
+    </tr>
+    <tr>
+        <td><strong>데이터 연동</strong></td>
+        <td>실시간 동기화 완벽</td>
+        <td>기본 데이터 저장</td>
+        <td>세션만 유지</td>
+    </tr>
+    <tr>
+        <td><strong>UI/UX</strong></td>
+        <td>직관적, 반응형, 심미적</td>
+        <td>사용가능, 기본디자인</td>
+        <td>개선 필요</td>
+    </tr>
+    <tr>
+        <td><strong>테스트</strong></td>
+        <td>5명이상, 정량/정성분석</td>
+        <td>3-4명, 기본분석</td>
+        <td>1-2명 테스트</td>
+    </tr>
+</tbody>
+</table>
+
+<!-- 기대 성과 -->
+<h2>🎯 현실적 기대 성과</h2>
+<div class="highlight">
+<h4>보장된 성과 ✅</h4>
+<ul>
+    <li><strong>3개 모듈 통합 MVP</strong> 완성</li>
+    <li>GitHub 포트폴리오 구축</li>
+    <li>AI 챗봇 + 인지평가 시스템 개발 경험</li>
+    <li>팀 프로젝트 협업 능력</li>
+</ul>
+<h4>추가 가능한 성과 🎯</h4>
+<ul>
+    <li>교내 경진대회 수상</li>
+    <li>학술대회 발표</li>
+    <li>오픈소스 프로젝트화</li>
+    <li>스타트업 창업 아이템</li>
+    <li>후속 연구과제 도출</li>
+</ul>
+</div>
+
+<!-- 교수자 팁 -->
+<h2>📝 교수자를 위한 3개 모듈 체크포인트</h2>
+<div class="timeline">
+<div class="timeline-item">
+    <strong>Week 1:</strong> 팀별 역할 분담 (HF/LT/MS 담당자 지정)
+</div>
+<div class="timeline-item">
+    <strong>Week 3:</strong> OpenAI API 전원 연동 성공?
+</div>
+<div class="timeline-item">
+    <strong>Week 5:</strong> HF 모듈 - 관심사 3개 이상 추출?
+</div>
+<div class="timeline-item">
+    <strong>Week 6:</strong> LT/MS 모듈 각각 독립 실행?
+</div>
+<div class="timeline-item">
+    <strong>Week 7:</strong> 3개 모듈 데이터 공유 확인
+</div>
+<div class="timeline-item">
+    <strong>Week 9:</strong> 통합 시스템 15분 이상 작동?
+</div>
+<div class="timeline-item">
+    <strong>Week 11:</strong> 배포 URL에서 모든 기능 작동?
+</div>
+</div>
+
+<div class="highlight" style="margin-top: 40px; background: linear-gradient(135deg, #667eea20 0%, #764ba220 100%); border: 2px solid #667eea;">
+<h3 style="text-align: center;">💡 핵심 메시지</h3>
+<p style="text-align: center; font-size: 1.2rem; margin-top: 20px;">
+    <strong>"HF(마음발굴기) + LT(사랑대화기) + MS(인지측정기)<br>
+    3개 모듈이 유기적으로 통합된 MVP를 통해<br>
+    실제 사용 가능한 디지털 치료제 프로토타입을 완성합니다"</strong>
+</p>
+</div>
+</div>
+</div>
