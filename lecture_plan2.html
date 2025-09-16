@@ -450,7 +450,7 @@
                         <h3>프로젝트 이해와 팀 빌딩</h3>
                     </div>
                     
-                    <h4>강의 (2시간)</h4>
+                    <h4>팀발표 (2시간)</h4>
                     <ul>
                         <li>디지털 치료제 개념과 MVP 개발 방법론</li>
                         <li>MFLR 3개 모듈 시스템 소개</li>
@@ -480,61 +480,71 @@ if user_input:
                 <div class="week">
                     <div class="week-header">
                         <span class="week-number">Week 2</span>
-                        <h3>문제 정의와 사용자 이해</h3>
+                        <h3>Brain & MCI 이론 학습과 프로젝트 계획</h3>
                     </div>
-                    
-                    <h4>강의 (2시간)</h4>
+
+                    <h4>팀발표 (2시간)</h4>
                     <ul>
-                        <li>페르소나 개발 방법론</li>
-                        <li>사용자 여정 맵핑</li>
-                        <li>MVP 기획 방법</li>
+                        <li>뇌 구조와 인지 기능의 이해</li>
+                        <li>경도인지장애(MCI) 정의 및 특징</li>
+                        <li>디지털 치료제의 신경가소성 원리</li>
                     </ul>
-                    
+
                     <h4>실습 (4시간)</h4>
                     <ul>
-                        <li>페르소나 3개 개발</li>
-                        <li>간단한 설문조사 작성 (Google Forms)</li>
-                        <li>경쟁 앱 분석 (3개)</li>
+                        <li>팀 규칙 제정 (회의, 커뮤니케이션, 역할)</li>
+                        <li>프로젝트 계획서 작성 (일정, 마일스톤)</li>
+                        <li>MCI 관련 논문 리뷰 및 요약 (팀별 3편)</li>
                     </ul>
-                    
-                    <p><strong>과제 (10%):</strong> 페르소나 문서, 사용자 니즈 정의서</p>
+
+                    <p><strong>과제 (10%):</strong> 팀 규칙 문서, 프로젝트 계획서, MCI 이론 정리</p>
                 </div>
                 
                 <div class="week">
                     <div class="week-header">
                         <span class="week-number">Week 3</span>
-                        <h3>기술 스택 학습</h3>
+                        <h3>Spec Kit을 이용한 프로젝트 명세 정리</h3>
                     </div>
-                    
-                    <h4>강의 (2시간)</h4>
+
+                    <h4>팀발표 (2시간)</h4>
                     <ul>
-                        <li>Python 기초 문법 리뷰</li>
-                        <li>OpenAI API 소개</li>
-                        <li>Streamlit 기초</li>
+                        <li>Spec Kit 방법론 소개 및 활용법</li>
+                        <li>요구사항 명세서 작성 기법</li>
+                        <li>유스케이스 다이어그램과 시나리오 작성</li>
                     </ul>
-                    
+
                     <h4>실습 (4시간)</h4>
+                    <ul>
+                        <li>Spec Kit 템플릿으로 프로젝트 명세서 작성</li>
+                        <li>3개 모듈(HF, LT, MS) 기능 명세 상세화</li>
+                        <li>API 명세 및 데이터 흐름도 작성</li>
+                        <li>비기능적 요구사항 정의 (성능, 보안, 사용성)</li>
+                    </ul>
+
                     <div class="code-block">
-<span class="code-comment"># Week 3 실습: GPT-4 연동</span>
-import openai
-import streamlit as st
+<span class="code-comment"># Week 3 실습: Spec Kit 명세 예시</span>
+"""
+프로젝트: MFLR 디지털 치료제 MVP
+버전: 1.0.0
 
-def get_gpt_response(prompt):
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",  <span class="code-comment"># 비용 절감용</span>
-        messages=[{"role": "user", "content": prompt}],
-        max_tokens=100
-    )
-    return response.choices[0].message.content
+1. 기능 요구사항
+   - HF 모듈: 사용자 프로필 구축, 관심사 추출
+   - LT 모듈: 7단계 치료적 대화 시스템
+   - MS 모듈: 4가지 인지 평가 도구
 
-st.title("GPT와 대화하기")
-user_input = st.text_input("질문:")
-if st.button("전송"):
-    answer = get_gpt_response(user_input)
-    st.write(f"GPT: {answer}")
+2. 비기능 요구사항
+   - 응답시간: < 2초
+   - 동시접속: 100명
+   - 데이터 보안: 개인정보 암호화
+
+3. 인터페이스 명세
+   - REST API 엔드포인트
+   - 데이터베이스 스키마
+   - 모듈 간 통신 프로토콜
+"""
                     </div>
-                    
-                    <p><strong>과제 (10%):</strong> API 연동 성공 화면, 기술 학습 로그</p>
+
+                    <p><strong>과제 (10%):</strong> Spec Kit 기반 프로젝트 명세서, API 문서, 데이터 플로우 다이어그램</p>
                 </div>
             </div>
             
