@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>나의 대화 스타일 찾기</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .main-container {
+            max-width: 800px;
+            width: 100%;
+            background: white;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            animation: fadeIn 0.8s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+        }
+        
+        /* Progress Bar */
+        .progress-container {
+            padding: 30px 40px 20px;
+            background: #f8f9fa;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: #e0e0e0;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 6px;
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+        
+        .progress-step {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .step-number {
+            width: 30px;
+            height: 30px;
+            background: #e0e0e0;
+            color: #999;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+            transition: all 0.3s;
+        }
+        
+        .step-number.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            transform: scale(1.2);
+        }
+        
+        .step-number.completed {
+            background: #2ecc71;
+            color: white;
+        }
+        
+        .step-label {
+            font-size: 0.85rem;
+            color: #666;
+        }
+        
+        /* Question Section */
+        .question-section {
+            padding: 40px;
+            min-height: 400px;
+        }
+        
+        .question-number {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 16px;
+            background: linear-gradient(135deg, rgba(102,126,234,0.1), rgba(118,75,162,0.1));
+            border-radius: 20px;
+            color: #667eea;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        
+        .question-text {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 35px;
+            line-height: 1.4;
+            animation: slideIn 0.6s ease;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        /* Options */
+        .options-container {
+            display: grid;
+            gap: 15px;
+        }
+        
+        .option {
+            padding: 20px;
+            background: #f8f9fa;
+            border: 3px solid #e0e0e0;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .option:hover {
+            background: linear-gradient(135deg, rgba(102,126,234,0.05), rgba(118,75,162,0.05));
+            border-color: #667eea;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102,126,234,0.2);
+        }
+        
+        .option.selected {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-color: #764ba2;
+            transform: scale(1.03);
+            box-shadow: 0 15px 35px rgba(102,126,234,0.3);
+        }
+        
+        .option.selected::after {
+            content: '✓';
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5rem;
+            animation: checkIn 0.3s ease;
+        }
+        
+        @keyframes checkIn {
+            from { transform: translateY(-50%) scale(0); }
+            to { transform: translateY(-50%) scale(1); }
+        }
+        
+        .option-emoji {
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+            display: block;
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .option-text {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+        
+        .option-description {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            line-height: 1.4;
+        }
+        
+        .option.selected .option-description {
+            opacity: 0.95;
+        }
+        
+        /* Situation Options */
+        .situation-container {
+            background: linear-gradient(135deg, rgba(243,156,18,0.05), rgba(243,156,18,0.02));
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .situation-label {
+            color: #f39c12;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .situation-text {
+            color: #333;
+            font-size: 1.1rem;
+            font-style: italic;
+        }
+        
+        /* Navigation Buttons */
+        .navigation {
+            padding: 20px 40px 40px;
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-width: 120px;
+        }
+        
+        .btn-back {
+            background: #e0e0e0;
+            color: #666;
+        }
+        
+        .btn-back:hover {
+            background: #d0d0d0;
+            transform: translateX(-5px);
+        }
+        
+        .btn-next {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 5px 20px rgba(102,126,234,0.3);
+        }
+        
+        .btn-next:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102,126,234,0.4);
+        }
+        
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        /* Result Section */
+        .result-container {
+            padding: 40px;
+            text-align: center;
+            display: none;
+            animation: fadeIn 0.8s ease;
+        }
+        
+        .result-container.show {
+            display: block;
+        }
+        
+        .result-emoji {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            animation: celebration 1s ease;
+        }
+        
+        @keyframes celebration {
+            0% { transform: scale(0) rotate(0); }
+            50% { transform: scale(1.2) rotate(180deg); }
+            100% { transform: scale(1) rotate(360deg); }
+        }
+        
+        .result-title {
+            font-size: 2.5rem;
+            color: #764ba2;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        
+        .result-description {
+            font-size: 1.1rem;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .result-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+        }
+        
+        .feature-card {
+            padding: 15px;
+            background: linear-gradient(135deg, rgba(102,126,234,0.1), rgba(118,75,162,0.1));
+            border-radius: 12px;
+        }
+        
+        .feature-label {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .feature-value {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #764ba2;
+        }
+        
+        .result-example {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+            text-align: left;
+        }
+        
+        .result-example-label {
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .result-example-text {
+            color: #333;
+            font-style: italic;
+            line-height: 1.5;
+        }
+        
+        .restart-btn {
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+        
+        .restart-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(46,204,113,0.3);
+        }
+        
+        /* Loading Animation */
+        .loading {
+            text-align: center;
+            padding: 60px;
+            display: none;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid #e0e0e0;
+            border-top: 5px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            color: #666;
+            font-size: 1.1rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .question-text {
+                font-size: 1.2rem;
+            }
+            
+            .option {
+                padding: 15px;
+            }
+            
+            .result-features {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="header">
+            <h1>🧠 나의 대화 스타일 찾기</h1>
+            <p>간단한 질문으로 당신에게 맞는 대화 방식을 찾아드립니다</p>
+        </div>
+        
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar" style="width: 20%;"></div>
+            </div>
+            <div class="progress-steps">
+                <div class="progress-step">
+                    <div class="step-number active" id="step1">1</div>
+                    <div class="step-label">기본 성향</div>
+                </div>
+                <div class="progress-step">
+                    <div class="step-number" id="step2">2</div>
+                    <div class="step-label">대화 속도</div>
+                </div>
+                <div class="progress-step">
+                    <div class="step-number" id="step3">3</div>
+                    <div class="step-label">상황 대응</div>
+                </div>
+                <div class="progress-step">
+                    <div class="step-number" id="step4">4</div>
+                    <div class="step-label">세부 확인</div>
+                </div>
+                <div class="progress-step">
+                    <div class="step-number" id="step5">5</div>
+                    <div class="step-label">결과 분석</div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="questionSection" class="question-section">
+            <!-- Questions will be dynamically inserted here -->
+        </div>
+        
+        <div id="loadingSection" class="loading">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">당신의 대화 스타일을 분석중입니다...</div>
+        </div>
+        
+        <div id="resultSection" class="result-container">
+            <!-- Results will be dynamically inserted here -->
+        </div>
+        
+        <div id="navigationSection" class="navigation">
+            <button class="btn btn-back" id="backBtn" onclick="previousQuestion()" disabled>이전</button>
+            <button class="btn btn-next" id="nextBtn" onclick="nextQuestion()" disabled>다음</button>
+        </div>
+    </div>
+    
+    <script>
+        // Question Data
+        const questions = [
+            {
+                id: 1,
+                text: "대화를 할 때 가장 중요한 건 무엇인가요?",
+                options: [
+                    {
+                        emoji: "💝",
+                        text: "내 마음을 알아주는 것",
+                        description: "감정적 공감과 이해를 중요하게 생각합니다",
+                        value: "emotional"
+                    },
+                    {
+                        emoji: "💡",
+                        text: "필요한 정보를 얻는 것",
+                        description: "실용적이고 효율적인 소통을 선호합니다",
+                        value: "solution"
+                    },
+                    {
+                        emoji: "💬",
+                        text: "이야기를 나누는 것 자체",
+                        description: "대화 과정과 교감을 즐깁니다",
+                        value: "process"
+                    }
+                ]
+            },
+            {
+                id: 2,
+                text: "어떤 속도의 대화가 편하세요?",
+                options: [
+                    {
+                        emoji: "🐢",
+                        text: "천천히, 여유있게",
+                        description: "충분한 시간을 갖고 깊이 있는 대화",
+                        value: "slow"
+                    },
+                    {
+                        emoji: "🚶",
+                        text: "보통 속도로",
+                        description: "자연스럽고 편안한 리듬",
+                        value: "medium"
+                    },
+                    {
+                        emoji: "🏃",
+                        text: "활발하고 빠르게",
+                        description: "역동적이고 활기찬 주고받기",
+                        value: "fast"
+                    }
+                ]
+            },
+            {
+                id: 3,
+                text: "속상한 일이 있을 때, 어떤 말을 듣고 싶으세요?",
+                situation: "오늘 정말 힘든 일이 있었어요...",
+                options: [
+                    {
+                        text: "정말 힘드셨겠네요. 어떤 일이 있었는지 천천히 말씀해주세요.",
+                        value: "empathy"
+                    },
+                    {
+                        text: "어떻게 해결하면 좋을지 같이 방법을 찾아봐요.",
+                        value: "solution"
+                    },
+                    {
+                        text: "힘내세요! 내일은 분명 더 좋은 날이 될 거예요!",
+                        value: "energy"
+                    },
+                    {
+                        text: "그런 날도 있죠. 일단 오늘은 푹 쉬세요.",
+                        value: "routine"
+                    }
+                ]
+            },
+            {
+                id: 4,
+                text: "대화할 때 선호하는 방식은?",
+                options: [
+                    {
+                        emoji: "🎯",
+                        text: "핵심만 간단명료하게",
+                        description: "필요한 내용만 효율적으로",
+                        value: "concise"
+                    },
+                    {
+                        emoji: "📚",
+                        text: "자세하고 충분한 설명",
+                        description: "배경과 맥락을 포함한 상세한 대화",
+                        value: "detailed"
+                    },
+                    {
+                        emoji: "🎨",
+                        text: "비유와 예시를 활용",
+                        description: "이해하기 쉽게 풀어서 설명",
+                        value: "metaphorical"
+                    }
+                ]
+            }
+        ];
+        
+        // Style Results
+        const styles = {
+            'emotional-slow-empathy': {
+                emoji: '💝',
+                name: '정서지지형',
+                description: '당신은 따뜻한 공감과 깊은 이해를 통해 마음의 안정을 찾는 분입니다. 천천히 감정을 나누고 충분히 들어주는 대화를 선호합니다.',
+                features: {
+                    '대화 속도': '느리고 여유롭게',
+                    '감정 표현': '매우 따뜻함',
+                    '선호 주제': '감정과 마음',
+                    '핵심 가치': '공감과 위로'
+                },
+                example: '괜찮아요, 충분히 그럴 수 있어요. 지금 마음이 많이 복잡하신 것 같은데, 제가 옆에서 들어드릴게요. 천천히 이야기해주세요.'
+            },
+            'solution-medium-solution': {
+                emoji: '💡',
+                name: '해결중심형',
+                description: '당신은 실용적이고 효율적인 해결책을 찾는 것을 중요하게 생각합니다. 문제를 빠르게 파악하고 구체적인 방법을 제시받기를 원합니다.',
+                features: {
+                    '대화 속도': '적당히 빠르게',
+                    '접근 방식': '직접적이고 명확',
+                    '선호 주제': '해결 방법',
+                    '핵심 가치': '효율성'
+                },
+                example: '문제를 정확히 파악했습니다. 3가지 해결 방법이 있는데요: 1) 즉시 가능한 방법, 2) 시간이 걸리지만 확실한 방법, 3) 대안적 접근. 어떤 것부터 시도해볼까요?'
+            },
+            'emotional-fast-energy': {
+                emoji: '⚡',
+                name: '활력충전형',
+                description: '당신은 긍정적인 에너지와 활기찬 격려를 통해 힘을 얻습니다. 빠르고 역동적인 대화 속에서 동기부여를 받습니다.',
+                features: {
+                    '대화 속도': '빠르고 활발',
+                    '감정 톤': '밝고 긍정적',
+                    '선호 주제': '희망과 가능성',
+                    '핵심 가치': '에너지와 열정'
+                },
+                example: '와! 정말 대단하세요! 그런 어려움 속에서도 이렇게 노력하시다니! 할 수 있어요, 우리 함께 해봐요! 파이팅!'
+            },
+            'process-slow-empathy': {
+                emoji: '🔍',
+                name: '탐구대화형',
+                description: '당신은 깊이 있는 대화와 충분한 소통 자체를 즐깁니다. 서두르지 않고 천천히 생각을 나누며 서로를 이해해가는 과정을 중요하게 생각합니다.',
+                features: {
+                    '대화 속도': '매우 느림',
+                    '대화 깊이': '깊고 사색적',
+                    '선호 주제': '생각과 의미',
+                    '핵심 가치': '과정과 탐구'
+                },
+                example: '흥미로운 이야기네요... (잠시 침묵) 그때 어떤 기분이셨는지, 무슨 생각이 드셨는지 더 들려주시겠어요? 천천히 생각해보셔도 좋아요.'
+            },
+            'process-medium-routine': {
+                emoji: '📅',
+                name: '일상루틴형',
+                description: '당신은 예측 가능하고 안정적인 대화를 선호합니다. 규칙적이고 구조화된 소통 속에서 편안함을 느낍니다.',
+                features: {
+                    '대화 속도': '일정하고 안정적',
+                    '대화 구조': '체계적',
+                    '선호 주제': '일상과 계획',
+                    '핵심 가치': '안정감'
+                },
+                example: '오늘도 평소처럼 시작해볼까요? 먼저 오늘 일정 확인하고, 어제 하신 일 점검한 다음, 내일 계획을 세워봅시다. 매일 이 순서로 하면 안정적이죠.'
+            },
+            'emotional-medium-empathy': {
+                emoji: '📷',
+                name: '회상안내형',
+                description: '당신은 과거의 좋은 기억과 추억을 통해 현재의 의미를 찾습니다. 따뜻한 회상 속에서 정체성과 연결감을 느낍니다.',
+                features: {
+                    '대화 속도': '여유롭게',
+                    '시간 초점': '과거와 추억',
+                    '선호 주제': '경험과 이야기',
+                    '핵심 가치': '연결과 의미'
+                },
+                example: '이런 상황이 예전에도 있으셨나요? 그때는 어떻게 극복하셨는지 기억나세요? 옛날 이야기 들려주시면, 오늘에도 도움이 될 것 같아요.'
+            }
+        };
+        
+        // Global Variables
+        let currentQuestion = 0;
+        let userAnswers = {};
+        
+        // Initialize
+        window.onload = function() {
+            showQuestion(0);
+        };
+        
+        function showQuestion(index) {
+            const question = questions[index];
+            const questionSection = document.getElementById('questionSection');
+            
+            let html = `
+                <div class="question-number">
+                    <span>질문 ${index + 1}</span>
+                    <span style="color: #999;">/ ${questions.length}</span>
+                </div>
+                <div class="question-text">${question.text}</div>
+            `;
+            
+            if (question.situation) {
+                html += `
+                    <div class="situation-container">
+                        <div class="situation-label">
+                            <span>💭</span>
+                            <span>상황</span>
+                        </div>
+                        <div class="situation-text">"${question.situation}"</div>
+                    </div>
+                `;
+            }
+            
+            html += '<div class="options-container">';
+            
+            question.options.forEach((option, i) => {
+                if (option.emoji) {
+                    html += `
+                        <div class="option" onclick="selectOption(${index}, '${option.value}')">
+                            <div class="option-emoji">${option.emoji}</div>
+                            <div class="option-text">${option.text}</div>
+                            ${option.description ? `<div class="option-description">${option.description}</div>` : ''}
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <div class="option" onclick="selectOption(${index}, '${option.value}')">
+                            <div class="option-text">${option.text}</div>
+                        </div>
+                    `;
+                }
+            });
+            
+            html += '</div>';
+            questionSection.innerHTML = html;
+            
+            // Update progress
+            updateProgress(index);
+            
+            // Update navigation buttons
+            updateNavigationButtons(index);
+            
+            // Restore selected option if exists
+            if (userAnswers[index]) {
+                const options = document.querySelectorAll('.option');
+                questions[index].options.forEach((opt, i) => {
+                    if (opt.value === userAnswers[index]) {
+                        options[i].classList.add('selected');
+                    }
+                });
+            }
+        }
+        
+        function selectOption(questionIndex, value) {
+            userAnswers[questionIndex] = value;
+            
+            // Update UI
+            const options = document.querySelectorAll('.option');
+            options.forEach(opt => opt.classList.remove('selected'));
+            event.currentTarget.classList.add('selected');
+            
+            // Enable next button
+            document.getElementById('nextBtn').disabled = false;
+            
+            // Auto advance after selection
+            setTimeout(() => {
+                if (questionIndex < questions.length - 1) {
+                    nextQuestion();
+                }
+            }, 300);
+        }
+        
+        function nextQuestion() {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                showQuestion(currentQuestion);
+            } else {
+                showResult();
+            }
+        }
+        
+        function previousQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                showQuestion(currentQuestion);
+            }
+        }
+        
+        function updateProgress(index) {
+            const progress = ((index + 1) / (questions.length + 1)) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+            
+            // Update step indicators
+            for (let i = 1; i <= 5; i++) {
+                const step = document.getElementById(`step${i}`);
+                if (i <= index + 1) {
+                    step.classList.add('completed');
+                    step.classList.remove('active');
+                } else if (i === index + 2) {
+                    step.classList.add('active');
+                    step.classList.remove('completed');
+                } else {
+                    step.classList.remove('active', 'completed');
+                }
+            }
+        }
+        
+        function updateNavigationButtons(index) {
+            const backBtn = document.getElementById('backBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            backBtn.disabled = index === 0;
+            nextBtn.disabled = !userAnswers[index];
+            
+            if (index === questions.length - 1) {
+                nextBtn.textContent = '결과 보기';
+            } else {
+                nextBtn.textContent = '다음';
+            }
+        }
+        
+        function showResult() {
+            // Hide question section
+            document.getElementById('questionSection').style.display = 'none';
+            document.getElementById('navigationSection').style.display = 'none';
+            
+            // Show loading
+            document.getElementById('loadingSection').classList.add('show');
+            
+            // Simulate analysis
+            setTimeout(() => {
+                // Hide loading
+                document.getElementById('loadingSection').classList.remove('show');
+                
+                // Calculate result
+                const styleKey = determineStyle();
+                const style = styles[styleKey] || styles['emotional-slow-empathy'];
+                
+                // Show result
+                const resultSection = document.getElementById('resultSection');
+                resultSection.innerHTML = `
+                    <div class="result-emoji">${style.emoji}</div>
+                    <div class="result-title">${style.name}</div>
+                    <div class="result-description">${style.description}</div>
+                    
+                    <div class="result-features">
+                        ${Object.entries(style.features).map(([key, value]) => `
+                            <div class="feature-card">
+                                <div class="feature-label">${key}</div>
+                                <div class="feature-value">${value}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="result-example">
+                        <div class="result-example-label">💬 대화 예시</div>
+                        <div class="result-example-text">${style.example}</div>
+                    </div>
+                    
+                    <button class="restart-btn" onclick="restart()">다시 테스트하기</button>
+                `;
+                resultSection.classList.add('show');
+                
+                // Update progress to 100%
+                document.getElementById('progressBar').style.width = '100%';
+                document.getElementById('step5').classList.add('completed');
+            }, 2000);
+        }
+        
+        function determineStyle() {
+            // Simple logic to determine style based on answers
+            const base = userAnswers[0] || 'emotional';
+            const speed = userAnswers[1] || 'medium';
+            const approach = userAnswers[2] || 'empathy';
+            
+            // Try to find matching style
+            const possibleKeys = [
+                `${base}-${speed}-${approach}`,
+                `${base}-${speed}-empathy`,
+                `emotional-${speed}-${approach}`,
+                'emotional-slow-empathy' // default
+            ];
+            
+            for (let key of possibleKeys) {
+                if (styles[key]) {
+                    return key;
+                }
+            }
+            
+            return 'emotional-slow-empathy'; // fallback
+        }
+        
+        function restart() {
+            currentQuestion = 0;
+            userAnswers = {};
+            
+            // Reset UI
+            document.getElementById('questionSection').style.display = 'block';
+            document.getElementById('navigationSection').style.display = 'flex';
+            document.getElementById('resultSection').classList.remove('show');
+            document.getElementById('resultSection').innerHTML = '';
+            
+            // Reset progress
+            for (let i = 1; i <= 5; i++) {
+                document.getElementById(`step${i}`).classList.remove('completed', 'active');
+            }
+            document.getElementById('step1').classList.add('active');
+            
+            // Show first question
+            showQuestion(0);
+        }
+    </script>
+</body>
+</html>
