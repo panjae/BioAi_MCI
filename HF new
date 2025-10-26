@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MCI DTx – HF 4×4 설문 (시연용)</title>
+<style>
+  :root{--bg:#0b1220;--card:#121a2a;--fg:#eaf2ff;--muted:#9fb3d1;--accent:#7aa2ff;--accent2:#37d6b5;}
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0}
+  body{background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,Segoe UI,Roboto,Noto Sans,Arial,sans-serif}
+  .wrap{max-width:1000px;margin:24px auto;padding:16px}
+  .card{background:var(--card);border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.35);overflow:hidden}
+  header{padding:20px 24px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;justify-content:space-between;align-items:center;gap:16px}
+  h1{margin:0;font-size:22px}
+  .muted{color:var(--muted)}
+  .progress{padding:16px 24px;border-bottom:1px solid rgba(255,255,255,.06)}
+  .bar{height:10px;background:#24304a;border-radius:6px;overflow:hidden}
+  .fill{height:100%;background:linear-gradient(90deg,var(--accent),#b388ff);width:0%;transition:width .35s ease}
+  .meta{display:flex;gap:14px;margin-top:10px;font-size:13px;color:var(--muted)}
+  .stage{padding:20px 24px}
+  .qid{display:inline-block;padding:6px 12px;border-radius:999px;background:#1b253a;color:#9fb3d1;font-weight:600;font-size:13px;margin-bottom:14px}
+  .qtext{font-size:22px;line-height:1.55;font-weight:800;margin:6px 0 18px}
+  .note{font-size:13px;color:var(--muted);margin-bottom:14px}
+  .opts{display:flex;flex-wrap:wrap;gap:10px}
+  .opt{background:#1a2439;border:2px solid #2a3858;border-radius:12px;padding:12px 14px;cursor:pointer;font-weight:700}
+  .opt.selected{border-color:var(--accent);background:#1f2e4e;box-shadow:0 0 0 2px rgba(122,162,255,.15) inset}
+  .nav{display:flex;justify-content:space-between;gap:12px;padding:18px 24px;border-top:1px solid rgba(255,255,255,.06)}
+  button{border:0;border-radius:10px;padding:12px 16px;font-weight:800;cursor:pointer}
+  .ghost{background:#223050;color:#b9c7e6}
+  .primary{background:linear-gradient(90deg,var(--accent),#b388ff);color:#0c1235}
+  .primary:disabled,.ghost:disabled{opacity:.45;cursor:not-allowed}
+  .hidden{display:none}
+  .result{padding:20px 24px}
+  .grid{display:grid;grid-template-columns:1fr;gap:18px}
+  @media(min-width:960px){.grid{grid-template-columns:1fr 1fr}}
+  .panel{background:#0f1626;border:1px solid #27324e;border-radius:12px;padding:16px}
+  .panel h3{margin:0 0 8px;font-size:18px}
+  .big{font-size:20px}
+  .tag{display:inline-block;margin-left:8px;padding:4px 8px;border-radius:999px;background:#1b253a;color:#9fb3d1;font-size:12px}
+  canvas{width:100%;height:320px;display:block}
+  footer{padding:10px 16px;border-top:1px dashed #2a3756;font-size:12px;color:#9fb3d1}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="app">
+    <header>
+      <h1>🧠 MCI DTx – HF(4×4) 설문</h1>
+      <div class="muted" id="phaseLabel">준비</div>
+    </header>
+
+    <div class="progress">
+      <div class="bar"><div class="fill" id="fill"></div></div>
+      <div class="meta">
+        <div>단계: <span id="stageName">Intro</span></div>
+        <div>진행도: <span id="count">0</span>/<span id="total">0</span></div>
+      </div>
+    </div>
+
+    <!-- Intro -->
+    <div class="stage" id="stageIntro">
+      <div class="qid">안내</div>
+      <div class="qtext">HF는 상담 초기, 사용자의 <b>대화방식 선호(4유형)</b>와 <b>대화주제 선호(4유형)</b>를 파악하는 단계입니다.<br>각 섹션 24문항(총 48문항), 5점 척도로 응답해 주세요. 문항은 한 번에 하나씩, <b>무작위</b>로 제시됩니다.</div>
+      <div class="note">대화방식 4유형 = 공감형 / 인지형 / 동기형 / 행동형 &nbsp; | &nbsp; 대화주제 4유형 = 자기인식·정서조절 / 관계·소통 / 회복·적응 / 행동·습관</div>
+      <div class="nav">
+        <button class="ghost" disabled>← 이전</button>
+        <button class="primary" id="startBtn">🟢 설문 시작</button>
+      </div>
+    </div>
+
+    <!-- Question -->
+    <div class="stage hidden" id="stageQ">
+      <div class="qid" id="qid">문항</div>
+      <div class="qtext" id="qtext">질문 텍스트</div>
+      <div class="opts" id="opts"></div>
+      <div class="nav">
+        <button class="ghost" id="prevBtn">← 이전</button>
+        <button class="primary" id="nextBtn" disabled>다음 →</button>
+      </div>
+    </div>
+
+    <!-- Result -->
+    <div class="result hidden" id="stageResult">
+      <div class="grid">
+        <div class="panel">
+          <h3>🗣️ 대화방식 결과 (4유형)</h3>
+          <div class="big" id="styleSummary">-</div>
+          <div class="muted" id="styleSub">-</div>
+        </div>
+        <div class="panel">
+          <h3>💭 대화주제 결과 (4유형)</h3>
+          <div class="big" id="topicSummary">-</div>
+          <div class="muted" id="topicSub">-</div>
+        </div>
+        <div class="panel">
+          <h3>📈 레이더 차트 – 대화방식</h3>
+          <canvas id="styleChart"></canvas>
+        </div>
+        <div class="panel">
+          <h3>📈 레이더 차트 – 대화주제</h3>
+          <canvas id="topicChart"></canvas>
+        </div>
+      </div>
+      <div class="nav">
+        <button class="ghost" id="restartBtn">🔁 처음으로</button>
+        <span></span>
+      </div>
+    </div>
+
+    <footer>
+      📌 분류 근거(요약): 공감형/동기형 → Motivational Interviewing, 공감·변화동기 / 인지형·행동형 → CBT(인지 재구조화·행동활성화).<br>
+      주제 4영역: 자기인식·정서조절(Emotion Regulation), 관계·소통(Interpersonal), 회복·적응(Resilience), 행동·습관(Behavioral Activation).
+    </footer>
+  </div>
+</div>
+
+<script>
+/* =========================
+   데이터 정의 (4×4 구조)
+========================= */
+// 공통
+const ANSWERS = ["전혀 아니다","대체로 아니다","보통이다","대체로 그렇다","매우 그렇다"];
+
+// 1) 대화방식(Style) 4유형
+const STYLE_TYPES = ["공감형","인지형","동기형","행동형"];
+const STYLE_QUESTIONS = [
+  // 공감형(6)
+  ["상대가 내 감정을 충분히 들어줄 때 마음이 가장 편안하다.","공감형"],
+  ["상담에서 공감과 위로가 선행될 때 대화에 몰입된다.","공감형"],
+  ["따뜻한 어조와 경청이 나에게 큰 안정감을 준다.","공감형"],
+  ["감정을 판단하지 않고 들어주는 태도를 선호한다.","공감형"],
+  ["힘든 상황을 말할 때, 먼저 감정을 인정해주면 도움이 된다.","공감형"],
+  ["솔루션보다 정서적 지지를 우선 제공받고 싶다.","공감형"],
+  // 인지형(6)
+  ["문제의 원인과 사고 패턴을 분석해주는 대화가 도움이 된다.","인지형"],
+  ["감정 위로보다 상황을 구조적으로 정리하는 것이 좋다.","인지형"],
+  ["사실과 해석을 구분해서 점검하는 방식이 맞는다.","인지형"],
+  ["논리적 근거와 예시를 통해 설득될 때 편안하다.","인지형"],
+  ["비합리적 사고를 짚어주는 조언이 유익하다.","인지형"],
+  ["감정보다 생각의 틀을 교정하는 접근이 효과적이다.","인지형"],
+  // 동기형(6)
+  ["변화의 장점과 의미를 상기시켜줄 때 의욕이 생긴다.","동기형"],
+  ["작은 성취도 인정받으면 다음 행동으로 이어진다.","동기형"],
+  ["스스로 선택하고 결정했다는 감각이 중요하다.","동기형"],
+  ["목표를 재확인하고 동기를 강화하는 대화를 선호한다.","동기형"],
+  ["나의 강점을 찾아주는 피드백이 행동을 촉진한다.","동기형"],
+  ["양가감정(하고 싶음/두려움)을 탐색하면 방향이 선명해진다.","동기형"],
+  // 행동형(6)
+  ["구체적 행동계획(언제·어디서·어떻게)이 필요하다.","행동형"],
+  ["실행 가능한 과제를 단계적으로 제시해주면 좋다.","행동형"],
+  ["일상 습관을 바꾸는 실천 팁이 가장 도움이 된다.","행동형"],
+  ["명확한 과제 점검과 피드백을 선호한다.","행동형"],
+  ["문제해결을 위한 현실적인 조언을 원한다.","행동형"],
+  ["대화 후 즉시 실천할 수 있는 체크리스트가 좋다.","행동형"]
+];
+
+// 2) 대화주제(Topic) 4유형
+const TOPIC_TYPES = ["자기인식·정서조절","관계·소통","회복·적응","행동·습관"];
+const TOPIC_QUESTIONS = [
+  // 자기인식·정서조절(6)
+  ["내 감정을 정확한 단어로 표현하는 연습이 필요하다.","자기인식·정서조절"],
+  ["불편한 감정을 다루는 구체적 방법을 배우고 싶다.","자기인식·정서조절"],
+  ["내 감정의 원인과 촉발 요인을 탐색하는 것이 중요하다.","자기인식·정서조절"],
+  ["숨 고르기·이완 같은 정서조절 기법이 도움이 된다.","자기인식·정서조절"],
+  ["감정 일기처럼 자기관찰을 주로 다루고 싶다.","자기인식·정서조절"],
+  ["상황-생각-감정의 연결을 이해하면 안정된다.","자기인식·정서조절"],
+  // 관계·소통(6)
+  ["가족·동료와의 갈등을 다루는 대화가 필요하다.","관계·소통"],
+  ["효과적인 의사소통 스킬(요약·확인)을 배우고 싶다.","관계·소통"],
+  ["공감과 경계 설정의 균형을 다뤄보고 싶다.","관계·소통"],
+  ["관계 패턴(가까워지면 피함 등)을 이해하고 싶다.","관계·소통"],
+  ["요청·거절을 건강히 표현하는 연습이 필요하다.","관계·소통"],
+  ["관계에서의 기대와 좌절을 재해석하고 싶다.","관계·소통"],
+  // 회복·적응(6)
+  ["실패나 후회를 재해석하는 이야기가 도움이 된다.","회복·적응"],
+  ["스트레스 상황에서의 대처전략을 점검하고 싶다.","회복·적응"],
+  ["좌절 후 다시 시도할 수 있는 힘을 기르고 싶다.","회복·적응"],
+  ["불확실성에 적응하는 방법을 배우고 싶다.","회복·적응"],
+  ["과거의 역경 경험을 자원화하는 게 필요하다.","회복·적응"],
+  ["회복력 사례를 듣고 나만의 전략을 정리하고 싶다.","회복·적응"],
+  // 행동·습관(6)
+  ["수면·운동·식사 같은 루틴 점검이 중요하다.","행동·습관"],
+  ["작은 목표를 꾸준히 실천하는 방법이 필요하다.","행동·습관"],
+  ["시간 관리·우선순위 전략을 배우고 싶다.","행동·습관"],
+  ["디지털 기기 사용 습관을 개선하고 싶다.","행동·습관"],
+  ["실행을 방해하는 장애요인을 줄이는 전략이 필요하다.","행동·습관"],
+  ["습관 형성의 보상 설계를 다루고 싶다.","행동·습관"]
+];
+
+/* =========================
+   상태 & 유틸
+========================= */
+let phase="intro"; // intro -> style -> topic -> result
+let orderStyle=[], orderTopic=[], idx=0;
+let answersStyle={}, answersTopic={};
+
+const $ = id => document.getElementById(id);
+const answerToScore = label => ANSWERS.indexOf(label)+1; // 1~5
+
+function shuffle(n){
+  const a=[...Array(n).keys()];
+  for(let i=n-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+
+function setPhase(p){
+  phase=p;
+  $("phaseLabel").textContent=(p==="style"?"대화방식":p==="topic"?"대화주제":p==="result"?"결과":"준비");
+  $("stageName").textContent=(p==="style"?"Style":p==="topic"?"Topic":p==="result"?"Result":"Intro");
+  $("stageIntro").classList.toggle("hidden",p!=="intro");
+  $("stageQ").classList.toggle("hidden",!(p==="style"||p==="topic"));
+  $("stageResult").classList.toggle("hidden",p!=="result");
+  const total=(p==="style")?orderStyle.length:(p==="topic")?orderTopic.length:0;
+  $("total").textContent=total; updateProgress();
+}
+
+function updateProgress(){
+  const total=(phase==="style")?orderStyle.length:(phase==="topic")?orderTopic.length:1;
+  const cur=(phase==="style"||phase==="topic")?idx+1:total;
+  $("count").textContent=(phase==="style"||phase==="topic")?cur:0;
+  const pct=(phase==="style"||phase==="topic")?Math.round(cur/total*100):(phase==="result"?100:0);
+  $("fill").style.width=pct+"%";
+}
+
+function renderQuestion(){
+  const list=(phase==="style")?STYLE_QUESTIONS:TOPIC_QUESTIONS;
+  const order=(phase==="style")?orderStyle:orderTopic;
+  const [text]=list[order[idx]];
+  $("qid").textContent=`${phase==="style"?"대화방식":"대화주제"} ${idx+1}/${order.length}`;
+  $("qtext").textContent=text;
+
+  const stored=(phase==="style"?answersStyle:answersTopic)[order[idx]];
+  $("opts").innerHTML = ANSWERS.map(a=>`<div class="opt ${stored===a?"selected":""}" data-val="${a}">${a}</div>`).join("");
+  [...document.querySelectorAll("#opts .opt")].forEach(el=>{
+    el.onclick=()=>{
+      [...document.querySelectorAll("#opts .opt")].forEach(x=>x.classList.remove("selected"));
+      el.classList.add("selected");
+      if(phase==="style") answersStyle[order[idx]]=el.dataset.val;
+      else answersTopic[order[idx]]=el.dataset.val;
+      $("nextBtn").disabled=false;
+    };
+  });
+  $("prevBtn").disabled = idx===0;
+  $("nextBtn").textContent = (idx===order.length-1) ? (phase==="style"?"다음 단계 →":"결과 보기") : "다음 →";
+  $("nextBtn").disabled = !stored;
+  updateProgress();
+}
+
+/* =========================
+   점수/결과 계산
+========================= */
+function computeScores(ansMap,list,types){
+  const sums={}; types.forEach(t=>sums[t]=0);
+  Object.entries(ansMap).forEach(([i,label])=>{
+    const s = answerToScore(label);
+    const cat = list[i][1];
+    sums[cat] += s;
+  });
+  return sums; // { 유형: 합계 }
+}
+function top2(scores){
+  const arr = Object.entries(scores).sort((a,b)=>b[1]-a[1]);
+  return [arr[0]||[null,0], arr[1]||[null,0]];
+}
+function explainStyle(k){
+  const m={
+    "공감형":"정서적 공감과 경청을 중시. 안정감·신뢰 형성이 우선 (MI/Hill 탐색단계).",
+    "인지형":"사고 패턴·논리 분석 선호. 인지 재구조화 중심 (CBT).",
+    "동기형":"변화의 이득·자기효능 강조. 양가감정 탐색 (MI).",
+    "행동형":"실행·습관·과제 중심. 행동활성화·해결지향 (CBT/SFT)."
+  };
+  return m[k]||"-";
+}
+function explainTopic(k){
+  const m={
+    "자기인식·정서조절":"감정의 명명·조절 스킬, 자기관찰 중심(Emotion Regulation).",
+    "관계·소통":"대인관계 패턴·경계·의사소통 향상(Interpersonal).",
+    "회복·적응":"역경 재해석·스트레스 대처·회복력 강화(Resilience).",
+    "행동·습관":"루틴·목표·시간관리·보상설계(Behavioral Activation)."
+  };
+  return m[k]||"-";
+}
+
+/* =========================
+   레이더 차트 (Canvas)
+========================= */
+function drawRadar(canvas, labels, values, color, max){
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width=canvas.clientWidth;
+  const H=canvas.height=canvas.clientHeight;
+  ctx.clearRect(0,0,W,H);
+  const cx=W/2, cy=H/2, r=Math.min(W,H)*0.38;
+  const N=labels.length;
+
+  // grid
+  ctx.strokeStyle="#2b395a"; ctx.lineWidth=1;
+  for(let ring=1; ring<=5; ring++){
+    const rr=r*ring/5; ctx.beginPath();
+    for(let i=0;i<N;i++){
+      const ang=-Math.PI/2 + i*2*Math.PI/N;
+      const x=cx+rr*Math.cos(ang), y=cy+rr*Math.sin(ang);
+      i?ctx.lineTo(x,y):ctx.moveTo(x,y);
+    }
+    ctx.closePath(); ctx.stroke();
+  }
+  // axes + labels
+  for(let i=0;i<N;i++){
+    const ang=-Math.PI/2 + i*2*Math.PI/N;
+    const x=cx+r*Math.cos(ang), y=cy+r*Math.sin(ang);
+    ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(x,y); ctx.stroke();
+    const lx=cx+(r+18)*Math.cos(ang), ly=cy+(r+18)*Math.sin(ang);
+    ctx.fillStyle="#d8e4ff"; ctx.font="12px system-ui";
+    ctx.textAlign = Math.cos(ang)>0.3 ? "left" : (Math.cos(ang)<-0.3 ? "right" : "center");
+    ctx.textBaseline = Math.sin(ang)>0.3 ? "top" : (Math.sin(ang)<-0.3 ? "bottom" : "middle");
+    ctx.fillText(labels[i], lx, ly);
+  }
+  // polygon
+  const rgba=(hex,a)=>{const m=hex.match(/^#?([a-f\\d]{2})([a-f\\d]{2})([a-f\\d]{2})$/i);if(!m)return hex;
+    const r=parseInt(m[1],16),g=parseInt(m[2],16),b=parseInt(m[3],16);return `rgba(${r},${g},${b},${a})`;};
+  const pts=[];
+  for(let i=0;i<N;i++){
+    const v=values[i]||0;
+    const rr=r*(v/max);
+    const ang=-Math.PI/2 + i*2*Math.PI/N;
+    pts.push([cx+rr*Math.cos(ang), cy+rr*Math.sin(ang)]);
+  }
+  ctx.beginPath(); pts.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));
+  ctx.closePath(); ctx.fillStyle=rgba(color,0.25); ctx.fill();
+  ctx.strokeStyle=color; ctx.lineWidth=2; ctx.stroke();
+  ctx.fillStyle=color; pts.forEach(([x,y])=>{ctx.beginPath();ctx.arc(x,y,3,0,Math.PI*2);ctx.fill();});
+}
+
+/* =========================
+   이벤트 바인딩
+========================= */
+$("startBtn").onclick=()=>{
+  orderStyle = shuffle(STYLE_QUESTIONS.length);
+  orderTopic = shuffle(TOPIC_QUESTIONS.length);
+  answersStyle = {}; answersTopic = {}; idx=0;
+  setPhase("style"); renderQuestion();
+};
+$("prevBtn").onclick=()=>{ if(idx>0){idx--; renderQuestion();} };
+$("nextBtn").onclick=()=>{
+  const order=(phase==="style")?orderStyle:orderTopic;
+  if(idx < order.length-1){
+    idx++; renderQuestion();
+  }else{
+    if(phase==="style"){ idx=0; setPhase("topic"); renderQuestion(); }
+    else{
+      // compute & show
+      const ss = computeScores(answersStyle, STYLE_QUESTIONS, STYLE_TYPES);
+      const ts = computeScores(answersTopic, TOPIC_QUESTIONS, TOPIC_TYPES);
+      const [s1,s2] = top2(ss), [t1,t2] = top2(ts);
+
+      $("styleSummary").innerHTML = s1[0] ? `주성향: <b>${s1[0]}</b><span class="tag">보조: ${s2[0]||"-"}</span>` : "-";
+      $("topicSummary").innerHTML = t1[0] ? `주성향: <b>${t1[0]}</b><span class="tag">보조: ${t2[0]||"-"}</span>` : "-";
+      $("styleSub").textContent = explainStyle(s1[0]);
+      $("topicSub").textContent = explainTopic(t1[0]);
+
+      setPhase("result");
+      // 각 유형 6문항 × 5점 = 최대 30
+      const sVals = STYLE_TYPES.map(k=>ss[k]||0);
+      const tVals = TOPIC_TYPES.map(k=>ts[k]||0);
+      drawRadar($("styleChart"), STYLE_TYPES, sVals, "#7aa2ff", 30);
+      drawRadar($("topicChart"), TOPIC_TYPES, tVals, "#37d6b5", 30);
+    }
+  }
+};
+$("restartBtn").onclick=()=>{ setPhase("intro"); $("fill").style.width="0%"; };
+setPhase("intro");
+</script>
+</body>
+</html>
