@@ -3,45 +3,134 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MCI DTx – HF(4×4) 공식문항 기반 설문</title>
+<title>MCI DTx – HF(4×4) 공식문항 기반 설문 – 라이트 테마</title>
 <style>
-  :root{--bg:#0b1220;--card:#121a2a;--fg:#eaf2ff;--muted:#9fb3d1;--accent:#7aa2ff;--accent2:#37d6b5;}
+  /* ===== 컬러 & 타이포 ===== */
+  :root{
+    --base: 18px;               /* 글자 기본 크기(조절 버튼이 바꿈) */
+    --bg: #eef3ff;              /* 밝은 배경 */
+    --card: #ffffff;            /* 카드 배경 */
+    --fg: #102039;              /* 본문 텍스트(짙은 남색) */
+    --muted: #5a6b85;           /* 보조 텍스트 */
+    --line: #e5e9f3;            /* 경계선 */
+    --accent: #3a72ff;          /* 포인트 파랑 */
+    --accent2: #2dc5a6;         /* 포인트 민트 */
+    --chip: #eef2fb;            /* 칩/배지 배경 */
+    --chipText: #3b4a6b;
+  }
+
   *{box-sizing:border-box}
   html,body{height:100%;margin:0}
-  body{background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,Segoe UI,Roboto,Noto Sans,Arial,sans-serif;font-size:18px}
-  body.large{font-size:20px}
+  body{
+    background:var(--bg);
+    color:var(--fg);
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Noto Sans,Arial,sans-serif;
+    font-size:var(--base);
+  }
+
+  /* ===== 레이아웃 ===== */
   .wrap{max-width:1000px;margin:24px auto;padding:16px}
-  .card{background:var(--card);border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.35);overflow:hidden}
-  header{padding:20px 24px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;justify-content:space-between;align-items:center;gap:12px}
-  h1{margin:0;font-size:24px}
+  .card{
+    background:var(--card);
+    border-radius:16px;
+    box-shadow:0 10px 30px rgba(16,32,57,.08);
+    overflow:hidden;
+    border:1px solid var(--line);
+  }
+  header{
+    padding:16px 20px;
+    border-bottom:1px solid var(--line);
+    display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;
+  }
+  h1{margin:0;font-size:clamp(18px,2.2vw,24px);font-weight:800;color:#0e1a36}
   .muted{color:var(--muted)}
+
   .controls{display:flex;gap:8px}
-  .controls button{border:0;border-radius:10px;padding:8px 12px;font-weight:700;cursor:pointer;background:#223050;color:#b9c7e6}
-  .progress{padding:16px 24px;border-bottom:1px solid rgba(255,255,255,.06)}
-  .bar{height:14px;background:#24304a;border-radius:8px;overflow:hidden}
-  .fill{height:100%;background:linear-gradient(90deg,var(--accent),#b388ff);width:0%;transition:width .35s ease}
-  .meta{display:flex;gap:18px;margin-top:12px;font-size:16px;color:var(--muted)}
-  .stage{padding:22px 24px}
-  .qid{display:inline-block;padding:8px 14px;border-radius:999px;background:#1b253a;color:#9fb3d1;font-weight:700;font-size:15px;margin-bottom:16px}
-  .qtext{font-size:26px;line-height:1.6;font-weight:800;margin:8px 0 20px}
-  .help{font-size:16px;color:#cbd8ef;margin:0 0 14px}
-  .opts{display:flex;flex-wrap:wrap;gap:12px}
-  .opt{background:#1a2439;border:3px solid #2a3858;border-radius:14px;padding:14px 16px;cursor:pointer;font-weight:800;min-width:180px;text-align:center}
-  .opt.selected{border-color:var(--accent);background:#1f2e4e;box-shadow:0 0 0 3px rgba(122,162,255,.18) inset}
-  .nav{display:flex;justify-content:space-between;gap:12px;padding:20px 24px;border-top:1px solid rgba(255,255,255,.06)}
-  button.big{border:0;border-radius:12px;padding:14px 18px;font-weight:900;cursor:pointer;font-size:18px}
-  .ghost{background:#223050;color:#b9c7e6}
-  .primary{background:linear-gradient(90deg,var(--accent),#b388ff);color:#0c1235}
-  .primary:disabled,.ghost:disabled{opacity:.45;cursor:not-allowed}
+  .controls button{
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:8px 12px;
+    font-weight:700;cursor:pointer;
+    background:#f3f6ff;color:#1b2a4d;
+  }
+
+  .progress{padding:14px 20px;border-bottom:1px solid var(--line)}
+  .bar{height:12px;background:#e9eefc;border-radius:8px;overflow:hidden}
+  .fill{
+    height:100%;
+    background:linear-gradient(90deg,var(--accent),#8ea9ff);
+    width:0%;
+    transition:width .35s ease;
+  }
+  .meta{display:flex;gap:18px;margin-top:10px;font-size:14px;color:var(--muted);flex-wrap:wrap}
+
+  .stage{padding:20px}
+  .qid{
+    display:inline-block;padding:6px 12px;border-radius:999px;
+    background:var(--chip);color:var(--chipText);
+    font-weight:800;font-size:13px;margin-bottom:14px;border:1px solid var(--line)
+  }
+  .qtext{font-size:clamp(20px,2.6vw,26px);line-height:1.55;font-weight:900;margin:6px 0 14px}
+  .help{font-size:15px;color:#3c4d75;margin:0 0 12px}
+
+  /* ===== 선택 박스(그리드) — 5개 1줄 정렬 목표 ===== */
+  .opts{
+    display:grid;gap:10px;
+    grid-template-columns: repeat(5, 1fr);
+  }
+  @media (max-width: 900px){
+    .opts{grid-template-columns: repeat(3, 1fr);}
+  }
+  @media (max-width: 560px){
+    .opts{grid-template-columns: repeat(2, 1fr);}
+  }
+
+  .opt{
+    background:#f5f7ff;
+    border:2px solid #d7def1;
+    border-radius:12px;
+    padding:10px 8px;       /* ✔ 패딩 축소로 버튼 크기 최적화 */
+    cursor:pointer;font-weight:900;
+    text-align:center;
+    user-select:none;
+    transition:transform .05s ease, border-color .15s ease, background .15s ease;
+  }
+  .opt:active{transform:scale(.99)}
+  .opt.selected{
+    border-color:var(--accent);
+    background:#ebf1ff;
+    box-shadow:0 0 0 2px rgba(58,114,255,.12) inset;
+  }
+
+  .nav{
+    display:flex;justify-content:space-between;gap:12px;
+    padding:16px 20px;border-top:1px solid var(--line)
+  }
+  button.big{
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:12px 16px;
+    font-weight:900;cursor:pointer;font-size:16px;
+    background:#f6f8ff;color:#0f224a;
+  }
+  .primary{
+    background:linear-gradient(90deg,var(--accent),#8ea9ff);
+    color:#ffffff;border:0
+  }
+  .primary:disabled, .ghost:disabled{opacity:.45;cursor:not-allowed}
+
   .hidden{display:none}
-  .result{padding:22px 24px}
-  .grid{display:grid;grid-template-columns:1fr;gap:18px}
+
+  /* ===== 결과 ===== */
+  .result{padding:20px}
+  .grid{display:grid;grid-template-columns:1fr;gap:16px}
   @media(min-width:960px){.grid{grid-template-columns:1fr 1fr}}
-  .panel{background:#0f1626;border:1px solid #27324e;border-radius:14px;padding:16px}
-  .panel h3{margin:0 0 10px;font-size:20px}
-  .bigline{font-size:20px;margin-bottom:6px}
-  .tag{display:inline-block;margin-left:10px;padding:5px 10px;border-radius:999px;background:#1b253a;color:#9fb3d1;font-size:13px}
-  canvas{width:100%;height:340px;display:block}
+  .panel{background:#ffffff;border:1px solid var(--line);border-radius:14px;padding:14px}
+  .panel h3{margin:0 0 8px;font-size:18px;color:#14234a}
+  .bigline{font-size:18px;margin-bottom:6px}
+  .tag{display:inline-block;margin-left:8px;padding:4px 8px;border-radius:999px;background:var(--chip);color:var(--chipText);font-size:12px;border:1px solid var(--line)}
+
+  canvas{width:100%;height:320px;display:block}
 </style>
 </head>
 <body>
@@ -50,8 +139,8 @@
     <header>
       <h1>🧠 HF(4×4) 공식문항 기반 설문</h1>
       <div class="controls">
-        <button id="fontUp" aria-label="글자 크게">A+</button>
         <button id="fontDown" aria-label="글자 작게">A−</button>
+        <button id="fontUp" aria-label="글자 크게">A+</button>
       </div>
       <div class="muted" id="phaseLabel">준비</div>
     </header>
@@ -70,7 +159,7 @@
       <p class="qtext">질문을 <b>한 개씩</b> 보여드립니다. 맞는 것을 <b>눌러</b> 주세요.<br>응답은 <b>전혀 아니다 ~ 매우 그렇다(5점)</b> 중 하나를 고릅니다.</p>
       <p class="help">대화방식(4유형) 24문항 → 대화주제(4유형) 24문항, 총 48문항</p>
       <div class="nav">
-        <button class="big ghost" disabled>← 이전</button>
+        <button class="big" disabled>← 이전</button>
         <button class="big primary" id="startBtn">🟢 시작하기</button>
       </div>
     </div>
@@ -80,9 +169,11 @@
       <div class="qid" id="qid">문항</div>
       <div class="qtext" id="qtext">질문 텍스트</div>
       <p class="help" id="hint">맞는 답 하나를 눌러 주세요.</p>
+
       <div class="opts" id="opts" role="group" aria-label="응답 선택"></div>
+
       <div class="nav">
-        <button class="big ghost" id="prevBtn">← 이전</button>
+        <button class="big" id="prevBtn">← 이전</button>
         <button class="big primary" id="nextBtn" disabled>다음 →</button>
       </div>
     </div>
@@ -110,7 +201,7 @@
         </div>
       </div>
       <div class="nav">
-        <button class="big ghost" id="restartBtn">🔁 처음으로</button>
+        <button class="big" id="restartBtn">🔁 처음으로</button>
         <span></span>
       </div>
     </div>
@@ -119,12 +210,24 @@
 
 <script>
 /* =========================
-   손쉬운 보기: 글자 크기
+   강력한 글자 크기 조절
+   - 루트 CSS 변수 --base 값을 14~24px 범위로 조절
 ========================= */
 (function(){
-  const body=document.body;
-  document.getElementById('fontUp').onclick=()=>body.classList.add('large');
-  document.getElementById('fontDown').onclick=()=>body.classList.remove('large');
+  const root = document.documentElement;
+  const clamp = v => Math.max(14, Math.min(24, v));
+  function getBase(){
+    const val = getComputedStyle(root).getPropertyValue('--base').trim().replace('px','');
+    return Number(val||18);
+  }
+  document.getElementById('fontUp').onclick = ()=>{
+    const next = clamp(getBase()+2);
+    root.style.setProperty('--base', next+'px');
+  };
+  document.getElementById('fontDown').onclick = ()=>{
+    const next = clamp(getBase()-2);
+    root.style.setProperty('--base', next+'px');
+  };
 })();
 
 /* =========================
@@ -135,10 +238,6 @@ const answerToScore = label => ANSWERS.indexOf(label)+1; // 1~5
 
 /* =========================
    1) 대화방식 4유형 (공식 검사지 참조)
-   - 공감형: IRI 기반
-   - 인지형: CERQ 기반
-   - 동기형: SRQ/MITI 기반
-   - 행동형: BADS 기반
 ========================= */
 const STYLE_TYPES = ["공감형","인지형","동기형","행동형"];
 const STYLE_QUESTIONS = [
@@ -174,10 +273,6 @@ const STYLE_QUESTIONS = [
 
 /* =========================
    2) 대화주제 4유형 (공식 검사지 참조)
-   - 자기인식·정서조절: DERS/CERQ
-   - 관계·소통: ICQ
-   - 회복·적응: CD-RISC
-   - 행동·습관: BADS
 ========================= */
 const TOPIC_TYPES = ["자기인식·정서조절","관계·소통","회복·적응","행동·습관"];
 const TOPIC_QUESTIONS = [
@@ -283,7 +378,7 @@ function renderQuestion(){
 function computeScores(ansMap,list,types){
   const sums={}; types.forEach(t=>sums[t]=0);
   Object.entries(ansMap).forEach(([i,label])=>{
-    const s = answerToScore(label);
+    const s = ANSWERS.indexOf(label)+1;
     const cat = list[i][1];
     sums[cat] += s;
   });
@@ -311,7 +406,7 @@ function explainTopic(k){
 }
 
 /* =========================
-   레이더 차트(Canvas)
+   레이더 차트(Canvas) – 라이트 테마 최적화
 ========================= */
 function drawRadar(canvas, labels, values, color, max){
   const ctx=canvas.getContext('2d');
@@ -321,8 +416,8 @@ function drawRadar(canvas, labels, values, color, max){
   const cx=W/2, cy=H/2, r=Math.min(W,H)*0.38;
   const N=labels.length;
 
-  // 격자
-  ctx.strokeStyle="#2b395a"; ctx.lineWidth=1.5;
+  // 격자 (연한 회색)
+  ctx.strokeStyle="#d6def0"; ctx.lineWidth=1.5;
   for(let ring=1; ring<=5; ring++){
     const rr=r*ring/5; ctx.beginPath();
     for(let i=0;i<N;i++){
@@ -332,13 +427,13 @@ function drawRadar(canvas, labels, values, color, max){
     }
     ctx.closePath(); ctx.stroke();
   }
-  // 축 + 라벨
+  // 축 + 라벨 (짙은 남색)
   for(let i=0;i<N;i++){
     const ang=-Math.PI/2 + i*2*Math.PI/N;
     const x=cx+r*Math.cos(ang), y=cy+r*Math.sin(ang);
     ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(x,y); ctx.stroke();
-    const lx=cx+(r+22)*Math.cos(ang), ly=cy+(r+22)*Math.sin(ang);
-    ctx.fillStyle="#d8e4ff"; ctx.font="16px system-ui";
+    const lx=cx+(r+20)*Math.cos(ang), ly=cy+(r+20)*Math.sin(ang);
+    ctx.fillStyle="#102039"; ctx.font="14px system-ui";
     ctx.textAlign = Math.cos(ang)>0.3 ? "left" : (Math.cos(ang)<-0.3 ? "right" : "center");
     ctx.textBaseline = Math.sin(ang)>0.3 ? "top" : (Math.sin(ang)<-0.3 ? "bottom" : "middle");
     ctx.fillText(labels[i], lx, ly);
@@ -354,9 +449,9 @@ function drawRadar(canvas, labels, values, color, max){
     pts.push([cx+rr*Math.cos(ang), cy+rr*Math.sin(ang)]);
   }
   ctx.beginPath(); pts.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));
-  ctx.closePath(); ctx.fillStyle=rgba(color,0.25); ctx.fill();
+  ctx.closePath(); ctx.fillStyle=rgba(color,0.22); ctx.fill();
   ctx.strokeStyle=color; ctx.lineWidth=2.5; ctx.stroke();
-  ctx.fillStyle=color; pts.forEach(([x,y])=>{ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fill();});
+  ctx.fillStyle=color; pts.forEach(([x,y])=>{ctx.beginPath();ctx.arc(x,y,3.5,0,Math.PI*2);ctx.fill();});
 }
 
 /* =========================
@@ -364,7 +459,7 @@ function drawRadar(canvas, labels, values, color, max){
 ========================= */
 function renderAndUpdate(){
   const total=(phase==="style")?orderStyle.length:orderTopic.length;
-  $("total").textContent=total;
+  document.getElementById("total").textContent=total;
   renderQuestion();
 }
 document.getElementById("startBtn").onclick=()=>{
@@ -394,8 +489,8 @@ document.getElementById("nextBtn").onclick=()=>{
       // 각 유형 6문항 × 5점 = 최대 30
       const sVals = STYLE_TYPES.map(k=>ss[k]||0);
       const tVals = TOPIC_TYPES.map(k=>ts[k]||0);
-      drawRadar(document.getElementById("styleChart"), STYLE_TYPES, sVals, "#7aa2ff", 30);
-      drawRadar(document.getElementById("topicChart"), TOPIC_TYPES, tVals, "#37d6b5", 30);
+      drawRadar(document.getElementById("styleChart"), STYLE_TYPES, sVals, "#3a72ff", 30);
+      drawRadar(document.getElementById("topicChart"), TOPIC_TYPES, tVals, "#2dc5a6", 30);
     }
   }
 };
@@ -404,4 +499,3 @@ setPhase("intro");
 </script>
 </body>
 </html>
-
