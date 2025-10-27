@@ -3,22 +3,20 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MCI DTx – HF(4×4) 공식문항 기반 설문 – 라이트 테마</title>
+<title>MCI DTx – HF(4×4) 설문 + 회원/히스토리</title>
 <style>
-  /* ===== 컬러 & 타이포 ===== */
   :root{
-    --base: 18px;               /* 글자 기본 크기(조절 버튼이 바꿈) */
-    --bg: #eef3ff;              /* 밝은 배경 */
-    --card: #ffffff;            /* 카드 배경 */
-    --fg: #102039;              /* 본문 텍스트(짙은 남색) */
-    --muted: #5a6b85;           /* 보조 텍스트 */
-    --line: #e5e9f3;            /* 경계선 */
-    --accent: #3a72ff;          /* 포인트 파랑 */
-    --accent2: #2dc5a6;         /* 포인트 민트 */
-    --chip: #eef2fb;            /* 칩/배지 배경 */
+    --base: 18px;
+    --bg: #eef3ff;
+    --card: #ffffff;
+    --fg: #102039;
+    --muted: #5a6b85;
+    --line: #e5e9f3;
+    --accent: #3a72ff;
+    --accent2: #2dc5a6;
+    --chip: #eef2fb;
     --chipText: #3b4a6b;
   }
-
   *{box-sizing:border-box}
   html,body{height:100%;margin:0}
   body{
@@ -27,9 +25,7 @@
     font-family:system-ui,-apple-system,Segoe UI,Roboto,Noto Sans,Arial,sans-serif;
     font-size:var(--base);
   }
-
-  /* ===== 레이아웃 ===== */
-  .wrap{max-width:1000px;margin:24px auto;padding:16px}
+  .wrap{max-width:1100px;margin:24px auto;padding:16px}
   .card{
     background:var(--card);
     border-radius:16px;
@@ -38,180 +34,209 @@
     border:1px solid var(--line);
   }
   header{
-    padding:16px 20px;
-    border-bottom:1px solid var(--line);
+    padding:16px 20px;border-bottom:1px solid var(--line);
     display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;
   }
   h1{margin:0;font-size:clamp(18px,2.2vw,24px);font-weight:800;color:#0e1a36}
   .muted{color:var(--muted)}
-
   .controls{display:flex;gap:8px}
   .controls button{
-    border:1px solid var(--line);
-    border-radius:10px;
-    padding:8px 12px;
-    font-weight:700;cursor:pointer;
-    background:#f3f6ff;color:#1b2a4d;
+    border:1px solid var(--line);border-radius:10px;padding:8px 12px;
+    font-weight:700;cursor:pointer;background:#f3f6ff;color:#1b2a4d;
   }
+  .userbox{display:flex;align-items:center;gap:10px}
+  .chip{background:var(--chip);color:var(--chipText);border:1px solid var(--line);border-radius:999px;padding:6px 10px;font-weight:800;font-size:12px}
+
+  /* 탭 */
+  .tabs{display:flex;gap:10px;padding:10px 20px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .tab{border:1px solid var(--line);border-radius:999px;padding:8px 12px;font-weight:900;background:#f6f8ff;color:#0f224a;cursor:pointer}
+  .tab.active{background:linear-gradient(90deg,var(--accent),#8ea9ff);color:#fff;border:0}
 
   .progress{padding:14px 20px;border-bottom:1px solid var(--line)}
   .bar{height:12px;background:#e9eefc;border-radius:8px;overflow:hidden}
-  .fill{
-    height:100%;
-    background:linear-gradient(90deg,var(--accent),#8ea9ff);
-    width:0%;
-    transition:width .35s ease;
-  }
+  .fill{height:100%;background:linear-gradient(90deg,var(--accent),#8ea9ff);width:0%;transition:width .35s ease}
   .meta{display:flex;gap:18px;margin-top:10px;font-size:14px;color:var(--muted);flex-wrap:wrap}
 
   .stage{padding:20px}
-  .qid{
-    display:inline-block;padding:6px 12px;border-radius:999px;
-    background:var(--chip);color:var(--chipText);
-    font-weight:800;font-size:13px;margin-bottom:14px;border:1px solid var(--line)
-  }
+  .qid{display:inline-block;padding:6px 12px;border-radius:999px;background:var(--chip);color:var(--chipText);font-weight:800;font-size:13px;margin-bottom:14px;border:1px solid var(--line)}
   .qtext{font-size:clamp(20px,2.6vw,26px);line-height:1.55;font-weight:900;margin:6px 0 14px}
   .help{font-size:15px;color:#3c4d75;margin:0 0 12px}
 
-  /* ===== 선택 박스(그리드) — 5개 1줄 정렬 목표 ===== */
-  .opts{
-    display:grid;gap:10px;
-    grid-template-columns: repeat(5, 1fr);
-  }
-  @media (max-width: 900px){
-    .opts{grid-template-columns: repeat(3, 1fr);}
-  }
-  @media (max-width: 560px){
-    .opts{grid-template-columns: repeat(2, 1fr);}
-  }
-
+  .opts{display:grid;gap:10px;grid-template-columns:repeat(5,1fr)}
+  @media (max-width: 900px){.opts{grid-template-columns:repeat(3,1fr)}}
+  @media (max-width: 560px){.opts{grid-template-columns:repeat(2,1fr)}}
   .opt{
-    background:#f5f7ff;
-    border:2px solid #d7def1;
-    border-radius:12px;
-    padding:10px 8px;       /* ✔ 패딩 축소로 버튼 크기 최적화 */
-    cursor:pointer;font-weight:900;
-    text-align:center;
-    user-select:none;
-    transition:transform .05s ease, border-color .15s ease, background .15s ease;
+    background:#f5f7ff;border:2px solid #d7def1;border-radius:12px;padding:10px 8px;
+    cursor:pointer;font-weight:900;text-align:center;user-select:none;transition:transform .05s, border-color .15s, background .15s;
   }
   .opt:active{transform:scale(.99)}
-  .opt.selected{
-    border-color:var(--accent);
-    background:#ebf1ff;
-    box-shadow:0 0 0 2px rgba(58,114,255,.12) inset;
-  }
+  .opt.selected{border-color:var(--accent);background:#ebf1ff;box-shadow:0 0 0 2px rgba(58,114,255,.12) inset}
 
-  .nav{
-    display:flex;justify-content:space-between;gap:12px;
-    padding:16px 20px;border-top:1px solid var(--line)
-  }
+  .nav{display:flex;justify-content:space-between;gap:12px;padding:16px 20px;border-top:1px solid var(--line)}
   button.big{
-    border:1px solid var(--line);
-    border-radius:12px;
-    padding:12px 16px;
-    font-weight:900;cursor:pointer;font-size:16px;
-    background:#f6f8ff;color:#0f224a;
+    border:1px solid var(--line);border-radius:12px;padding:12px 16px;font-weight:900;cursor:pointer;font-size:16px;background:#f6f8ff;color:#0f224a;
   }
-  .primary{
-    background:linear-gradient(90deg,var(--accent),#8ea9ff);
-    color:#ffffff;border:0
-  }
-  .primary:disabled, .ghost:disabled{opacity:.45;cursor:not-allowed}
-
+  .primary{background:linear-gradient(90deg,var(--accent),#8ea9ff);color:#fff;border:0}
+  .primary:disabled,.ghost:disabled{opacity:.45;cursor:not-allowed}
   .hidden{display:none}
 
-  /* ===== 결과 ===== */
-  .result{padding:20px}
+  /* 결과/히스토리 레이아웃 */
   .grid{display:grid;grid-template-columns:1fr;gap:16px}
-  @media(min-width:960px){.grid{grid-template-columns:1fr 1fr}}
+  @media(min-width:1000px){.grid{grid-template-columns:1fr 1fr}}
   .panel{background:#ffffff;border:1px solid var(--line);border-radius:14px;padding:14px}
   .panel h3{margin:0 0 8px;font-size:18px;color:#14234a}
   .bigline{font-size:18px;margin-bottom:6px}
   .tag{display:inline-block;margin-left:8px;padding:4px 8px;border-radius:999px;background:var(--chip);color:var(--chipText);font-size:12px;border:1px solid var(--line)}
-
   canvas{width:100%;height:320px;display:block}
+
+  /* 로그인 다이얼로그 */
+  dialog{border:1px solid var(--line);border-radius:14px;padding:20px;max-width:420px;width:92%}
+  dialog::backdrop{background:rgba(0,0,0,.35)}
+  .row{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+  input,select{border:1px solid #cfd7eb;border-radius:10px;padding:10px 12px;font-size:16px}
+  .subtle{font-size:13px;color:#5b6b89}
+  .table{width:100%;border-collapse:collapse;font-size:14px}
+  .table th,.table td{border-bottom:1px solid var(--line);padding:8px 10px;text-align:left}
+  .actions{display:flex;gap:8px;flex-wrap:wrap}
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="card" id="app" role="application">
     <header>
-      <h1>🧠 HF(4×4) 공식문항 기반 설문</h1>
+      <h1>🧠 HF(4×4) 설문 · 회원/히스토리</h1>
       <div class="controls">
         <button id="fontDown" aria-label="글자 작게">A−</button>
         <button id="fontUp" aria-label="글자 크게">A+</button>
       </div>
-      <div class="muted" id="phaseLabel">준비</div>
+      <div class="userbox">
+        <span class="chip" id="userBadge">로그인 필요</span>
+        <button id="btnLogin" class="tab">로그인/가입</button>
+        <button id="btnLogout" class="tab hidden">로그아웃</button>
+      </div>
     </header>
 
-    <div class="progress" aria-live="polite">
-      <div class="bar" aria-hidden="true"><div class="fill" id="fill"></div></div>
-      <div class="meta">
-        <div>단계: <span id="stageName">Intro</span></div>
-        <div>진행: <span id="count">0</span>/<span id="total">0</span></div>
-      </div>
+    <div class="tabs">
+      <button class="tab active" data-tab="assess">설문</button>
+      <button class="tab" data-tab="history">히스토리</button>
     </div>
 
-    <!-- 안내 -->
-    <div class="stage" id="stageIntro">
-      <div class="qid">안내</div>
-      <p class="qtext">질문을 <b>한 개씩</b> 보여드립니다. 맞는 것을 <b>눌러</b> 주세요.<br>응답은 <b>전혀 아니다 ~ 매우 그렇다(5점)</b> 중 하나를 고릅니다.</p>
-      <p class="help">대화방식(4유형) 24문항 → 대화주제(4유형) 24문항, 총 48문항</p>
-      <div class="nav">
-        <button class="big" disabled>← 이전</button>
-        <button class="big primary" id="startBtn">🟢 시작하기</button>
-      </div>
-    </div>
-
-    <!-- 질문 -->
-    <div class="stage hidden" id="stageQ">
-      <div class="qid" id="qid">문항</div>
-      <div class="qtext" id="qtext">질문 텍스트</div>
-      <p class="help" id="hint">맞는 답 하나를 눌러 주세요.</p>
-
-      <div class="opts" id="opts" role="group" aria-label="응답 선택"></div>
-
-      <div class="nav">
-        <button class="big" id="prevBtn">← 이전</button>
-        <button class="big primary" id="nextBtn" disabled>다음 →</button>
-      </div>
-    </div>
-
-    <!-- 결과 -->
-    <div class="result hidden" id="stageResult">
-      <div class="grid">
-        <div class="panel">
-          <h3>🗣️ 대화방식 결과</h3>
-          <div class="bigline" id="styleSummary">-</div>
-          <div class="muted" id="styleSub">-</div>
-        </div>
-        <div class="panel">
-          <h3>💭 대화주제 결과</h3>
-          <div class="bigline" id="topicSummary">-</div>
-          <div class="muted" id="topicSub">-</div>
-        </div>
-        <div class="panel">
-          <h3>📈 레이더 차트 – 대화방식</h3>
-          <canvas id="styleChart"></canvas>
-        </div>
-        <div class="panel">
-          <h3>📈 레이더 차트 – 대화주제</h3>
-          <canvas id="topicChart"></canvas>
+    <!-- 설문 진행 영역 -->
+    <section id="tab_assess">
+      <div class="progress" aria-live="polite">
+        <div class="bar" aria-hidden="true"><div class="fill" id="fill"></div></div>
+        <div class="meta">
+          <div>단계: <span id="stageName">Intro</span></div>
+          <div>진행: <span id="count">0</span>/<span id="total">0</span></div>
         </div>
       </div>
-      <div class="nav">
-        <button class="big" id="restartBtn">🔁 처음으로</button>
-        <span></span>
+
+      <div class="stage" id="stageIntro">
+        <div class="qid">안내</div>
+        <p class="qtext">질문을 <b>한 개씩</b> 보여드립니다. 맞는 것을 <b>눌러</b> 주세요.<br>응답은 <b>전혀 아니다 ~ 매우 그렇다(5점)</b> 중 하나를 고릅니다.</p>
+        <p class="help">대화방식(4유형) 24문항 → 대화주제(4유형) 24문항, 총 48문항</p>
+        <div class="nav">
+          <button class="big" disabled>← 이전</button>
+          <button class="big primary" id="startBtn">🟢 시작하기</button>
+        </div>
       </div>
-    </div>
+
+      <div class="stage hidden" id="stageQ">
+        <div class="qid" id="qid">문항</div>
+        <div class="qtext" id="qtext">질문 텍스트</div>
+        <p class="help" id="hint">맞는 답 하나를 눌러 주세요.</p>
+        <div class="opts" id="opts" role="group" aria-label="응답 선택"></div>
+        <div class="nav">
+          <button class="big" id="prevBtn">← 이전</button>
+          <button class="big primary" id="nextBtn" disabled>다음 →</button>
+        </div>
+      </div>
+
+      <div class="stage hidden" id="stageResult">
+        <div class="grid">
+          <div class="panel">
+            <h3>🗣️ 대화방식 결과</h3>
+            <div class="bigline" id="styleSummary">-</div>
+            <div class="muted" id="styleSub">-</div>
+          </div>
+          <div class="panel">
+            <h3>💭 대화주제 결과</h3>
+            <div class="bigline" id="topicSummary">-</div>
+            <div class="muted" id="topicSub">-</div>
+          </div>
+          <div class="panel">
+            <h3>📈 레이더 차트 – 대화방식</h3>
+            <canvas id="styleChart"></canvas>
+          </div>
+          <div class="panel">
+            <h3>📈 레이더 차트 – 대화주제</h3>
+            <canvas id="topicChart"></canvas>
+          </div>
+          <div class="panel">
+            <h3>💾 저장 및 내보내기</h3>
+            <div class="actions">
+              <button class="big primary" id="saveSessionBtn">프로필에 저장</button>
+              <button class="big" id="exportCsvBtn">CSV 내보내기</button>
+            </div>
+            <p class="subtle">※ 데모 버전은 이 브라우저의 <b>localStorage</b>에 저장됩니다(같은 기기/브라우저에서만 조회).</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 히스토리 -->
+    <section id="tab_history" class="hidden">
+      <div class="stage">
+        <div class="grid">
+          <div class="panel">
+            <h3>📜 내 세션 목록</h3>
+            <table class="table" id="sessionTable">
+              <thead><tr><th>#</th><th>일시</th><th>주성향(방식)</th><th>주성향(주제)</th></tr></thead>
+              <tbody></tbody>
+            </table>
+            <div class="actions" style="margin-top:10px">
+              <button class="big" id="exportAllCsvBtn">전체 CSV 내보내기</button>
+              <button class="big" id="clearAllBtn">모든 기록 삭제</button>
+            </div>
+          </div>
+          <div class="panel">
+            <h3>📈 대화방식 추이(라인)</h3>
+            <canvas id="styleTrend"></canvas>
+          </div>
+          <div class="panel">
+            <h3>📈 대화주제 추이(라인)</h3>
+            <canvas id="topicTrend"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
   </div>
 </div>
+
+<!-- 로그인 다이얼로그 -->
+<dialog id="authDlg">
+  <form method="dialog">
+    <h3 style="margin:0 0 8px">로그인 / 회원가입</h3>
+    <div class="row">
+      <label>아이디(이메일 아님 가능)</label>
+      <input id="auth_user" required>
+    </div>
+    <div class="row">
+      <label>비밀번호(데모용, 암호화 없음)</label>
+      <input id="auth_pass" type="password" required>
+      <div class="subtle">※ 실제 서비스용이 아니므로 간단히 저장됩니다.</div>
+    </div>
+    <div class="actions" style="margin-top:8px">
+      <button id="btnDoLogin" class="tab">로그인</button>
+      <button id="btnDoSignup" class="tab">회원가입</button>
+      <button value="cancel" class="tab">닫기</button>
+    </div>
+  </form>
+</dialog>
 
 <script>
 /* =========================
    강력한 글자 크기 조절
-   - 루트 CSS 변수 --base 값을 14~24px 범위로 조절
 ========================= */
 (function(){
   const root = document.documentElement;
@@ -231,38 +256,93 @@
 })();
 
 /* =========================
-   응답 라벨
+   탭
 ========================= */
-const ANSWERS = ["전혀 아니다","대체로 아니다","보통이다","대체로 그렇다","매우 그렇다"];
-const answerToScore = label => ANSWERS.indexOf(label)+1; // 1~5
+document.querySelectorAll('.tab:not(#btnLogin):not(#btnLogout)').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.tabs .tab').forEach(t=>t.classList.remove('active'));
+    btn.classList.add('active');
+    const tab = btn.dataset.tab;
+    document.getElementById('tab_assess').classList.toggle('hidden', tab!=='assess');
+    document.getElementById('tab_history').classList.toggle('hidden', tab!=='history');
+    if(tab==='history'){ renderHistory(); drawTrends(); }
+  });
+});
 
 /* =========================
-   1) 대화방식 4유형 (공식 검사지 참조)
+   Auth (localStorage)
+   구조: hf_users = { username: { pass: "pw", sessions: [ {ts, styleScores, topicScores, styleTop, topicTop} ] } }
 ========================= */
+const LS_USERS_KEY = 'hf_users';
+let currentUser = null;
+
+function loadUsers(){
+  try{ return JSON.parse(localStorage.getItem(LS_USERS_KEY)||'{}'); }catch(e){ return {}; }
+}
+function saveUsers(obj){
+  localStorage.setItem(LS_USERS_KEY, JSON.stringify(obj));
+}
+function setLoggedInUI(name){
+  currentUser = name;
+  document.getElementById('userBadge').textContent = name ? `로그인: ${name}` : '로그인 필요';
+  document.getElementById('btnLogin').classList.toggle('hidden', !!name);
+  document.getElementById('btnLogout').classList.toggle('hidden', !name);
+}
+document.getElementById('btnLogin').onclick = ()=> document.getElementById('authDlg').showModal();
+document.getElementById('btnLogout').onclick = ()=>{
+  setLoggedInUI(null);
+  alert('로그아웃되었습니다.');
+};
+document.getElementById('btnDoSignup').onclick = (e)=>{
+  e.preventDefault();
+  const u = document.getElementById('auth_user').value.trim();
+  const p = document.getElementById('auth_pass').value;
+  if(!u || !p){ alert('아이디와 비밀번호를 입력하세요.'); return; }
+  const db = loadUsers();
+  if(db[u]){ alert('이미 존재하는 아이디입니다.'); return; }
+  db[u] = { pass: p, sessions: [] };
+  saveUsers(db);
+  setLoggedInUI(u);
+  document.getElementById('authDlg').close();
+  alert('회원가입 완료! 로그인되었습니다.');
+};
+document.getElementById('btnDoLogin').onclick = (e)=>{
+  e.preventDefault();
+  const u = document.getElementById('auth_user').value.trim();
+  const p = document.getElementById('auth_pass').value;
+  const db = loadUsers();
+  if(!db[u] || db[u].pass !== p){ alert('아이디 또는 비밀번호가 올바르지 않습니다.'); return; }
+  setLoggedInUI(u);
+  document.getElementById('authDlg').close();
+  alert('로그인되었습니다.');
+};
+
+/* =========================
+   설문 데이터 (공식문항 기반 4×4)
+========================= */
+const ANSWERS = ["전혀 아니다","대체로 아니다","보통이다","대체로 그렇다","매우 그렇다"];
+const answerToScore = label => ANSWERS.indexOf(label)+1;
+
 const STYLE_TYPES = ["공감형","인지형","동기형","행동형"];
 const STYLE_QUESTIONS = [
-  // 공감형(IRI)
   ["다른 사람의 입장에서 생각하려고 노력합니다.","공감형"],
   ["누군가 속상해 보이면 저도 마음이 아픕니다.","공감형"],
   ["이야기를 들을 때, 상대의 감정을 먼저 살핍니다.","공감형"],
   ["누가 어려움을 겪으면 도와주고 싶습니다.","공감형"],
   ["사람들의 감정을 잘 알아차리는 편입니다.","공감형"],
   ["말을 할 때 상대가 상처받지 않도록 조심합니다.","공감형"],
-  // 인지형(CERQ)
   ["힘든 일이 생기면 그 이유를 논리적으로 생각합니다.","인지형"],
   ["문제를 객관적으로 분석하려고 합니다.","인지형"],
   ["감정보다 생각으로 판단하는 편입니다.","인지형"],
   ["같은 일을 다른 각도에서 생각해 보려 합니다.","인지형"],
   ["문제를 단계적으로 해결하려고 합니다.","인지형"],
   ["일어난 일을 머릿속으로 정리하면 마음이 안정됩니다.","인지형"],
-  // 동기형(SRQ/MITI)
   ["내가 목표를 세우면 스스로 동기를 유지하려 노력합니다.","동기형"],
   ["다른 사람의 칭찬보다 스스로의 의지가 더 중요하다고 생각합니다.","동기형"],
   ["어려워도 ‘왜 이걸 하는지’를 떠올리면 포기하지 않습니다.","동기형"],
   ["변화는 내 선택으로부터 온다고 믿습니다.","동기형"],
   ["누가 ‘잘할 수 있다’고 격려하면 의욕이 생깁니다.","동기형"],
   ["힘든 일도 의미가 있으면 꾸준히 합니다.","동기형"],
-  // 행동형(BADS)
   ["작은 일이라도 직접 실천하면 기분이 나아집니다.","행동형"],
   ["해야 할 일을 미루기보다 바로 하는 편입니다.","행동형"],
   ["하루 일과를 미리 정해두면 편안합니다.","행동형"],
@@ -271,33 +351,26 @@ const STYLE_QUESTIONS = [
   ["행동으로 옮길 때 자신감이 생깁니다.","행동형"]
 ];
 
-/* =========================
-   2) 대화주제 4유형 (공식 검사지 참조)
-========================= */
 const TOPIC_TYPES = ["자기인식·정서조절","관계·소통","회복·적응","행동·습관"];
 const TOPIC_QUESTIONS = [
-  // 자기인식·정서조절(DERS/CERQ)
   ["화가 날 때 내 감정을 알아차릴 수 있습니다.","자기인식·정서조절"],
   ["기분이 나쁠 때, 왜 그런지 곰곰이 생각합니다.","자기인식·정서조절"],
   ["마음이 불안할 때 숨을 고르며 진정하려고 합니다.","자기인식·정서조절"],
   ["감정을 말로 표현하는 게 어렵지 않습니다.","자기인식·정서조절"],
   ["속상한 기분이 들어도 너무 오래 끌지 않습니다.","자기인식·정서조절"],
   ["감정이 너무 강할 땐 잠시 멈추고 진정합니다.","자기인식·정서조절"],
-  // 관계·소통(ICQ)
   ["상대가 말할 때 끝까지 듣는 편입니다.","관계·소통"],
   ["부드럽게 거절하는 말을 할 수 있습니다.","관계·소통"],
   ["갈등이 생기면 먼저 풀어보려 합니다.","관계·소통"],
   ["관계에서 내 생각을 솔직히 표현할 수 있습니다.","관계·소통"],
   ["다른 사람의 입장을 이해하려 노력합니다.","관계·소통"],
   ["불편한 관계도 대화를 통해 개선하려 합니다.","관계·소통"],
-  // 회복·적응(CD-RISC)
   ["힘든 일을 겪어도 다시 일어설 수 있습니다.","회복·적응"],
   ["어려운 일을 겪을 때 배우는 점이 있습니다.","회복·적응"],
   ["문제가 생기면 긍정적으로 해결책을 찾습니다.","회복·적응"],
   ["나쁜 일도 결국 지나간다고 생각합니다.","회복·적응"],
   ["위기 상황에서도 침착하려고 합니다.","회복·적응"],
   ["실패를 통해 더 강해질 수 있다고 믿습니다.","회복·적응"],
-  // 행동·습관(BADS)
   ["규칙적인 생활을 하려고 노력합니다.","행동·습관"],
   ["매일 같은 시간에 자고 일어납니다.","행동·습관"],
   ["집안일이나 산책 같은 활동을 꾸준히 합니다.","행동·습관"],
@@ -307,14 +380,13 @@ const TOPIC_QUESTIONS = [
 ];
 
 /* =========================
-   상태 & 유틸
+   설문 상태 & 유틸
 ========================= */
 let phase="intro"; // intro -> style -> topic -> result
 let orderStyle=[], orderTopic=[], idx=0;
 let answersStyle={}, answersTopic={};
 
 const $ = id => document.getElementById(id);
-
 function shuffle(n){
   const a=[...Array(n).keys()];
   for(let i=n-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];}
@@ -322,11 +394,10 @@ function shuffle(n){
 }
 function setPhase(p){
   phase=p;
-  $("phaseLabel").textContent=(p==="style"?"대화방식":p==="topic"?"대화주제":p==="result"?"결과":"준비");
   $("stageName").textContent=(p==="style"?"Style":p==="topic"?"Topic":p==="result"?"Result":"Intro");
-  $("stageIntro").classList.toggle("hidden",p!=="intro");
-  $("stageQ").classList.toggle("hidden",!(p==="style"||p==="topic"));
-  $("stageResult").classList.toggle("hidden",p!=="result");
+  $("stageIntro").classList.toggle('hidden',p!=='intro');
+  $("stageQ").classList.toggle('hidden',!(p==='style'||p==='topic'));
+  $("stageResult").classList.toggle('hidden',p!=='result');
   const total=(p==="style")?orderStyle.length:(p==="topic")?orderTopic.length:0;
   $("total").textContent=total; updateProgress();
 }
@@ -339,7 +410,7 @@ function updateProgress(){
 }
 
 /* =========================
-   질문 렌더링
+   렌더 질문
 ========================= */
 function renderQuestion(){
   const list=(phase==="style")?STYLE_QUESTIONS:TOPIC_QUESTIONS;
@@ -373,12 +444,12 @@ function renderQuestion(){
 }
 
 /* =========================
-   점수/결과
+   점수/결과 계산
 ========================= */
 function computeScores(ansMap,list,types){
   const sums={}; types.forEach(t=>sums[t]=0);
   Object.entries(ansMap).forEach(([i,label])=>{
-    const s = ANSWERS.indexOf(label)+1;
+    const s = answerToScore(label);
     const cat = list[i][1];
     sums[cat] += s;
   });
@@ -406,7 +477,7 @@ function explainTopic(k){
 }
 
 /* =========================
-   레이더 차트(Canvas) – 라이트 테마 최적화
+   레이더 차트
 ========================= */
 function drawRadar(canvas, labels, values, color, max){
   const ctx=canvas.getContext('2d');
@@ -415,8 +486,6 @@ function drawRadar(canvas, labels, values, color, max){
   ctx.clearRect(0,0,W,H);
   const cx=W/2, cy=H/2, r=Math.min(W,H)*0.38;
   const N=labels.length;
-
-  // 격자 (연한 회색)
   ctx.strokeStyle="#d6def0"; ctx.lineWidth=1.5;
   for(let ring=1; ring<=5; ring++){
     const rr=r*ring/5; ctx.beginPath();
@@ -427,7 +496,6 @@ function drawRadar(canvas, labels, values, color, max){
     }
     ctx.closePath(); ctx.stroke();
   }
-  // 축 + 라벨 (짙은 남색)
   for(let i=0;i<N;i++){
     const ang=-Math.PI/2 + i*2*Math.PI/N;
     const x=cx+r*Math.cos(ang), y=cy+r*Math.sin(ang);
@@ -438,7 +506,6 @@ function drawRadar(canvas, labels, values, color, max){
     ctx.textBaseline = Math.sin(ang)>0.3 ? "top" : (Math.sin(ang)<-0.3 ? "bottom" : "middle");
     ctx.fillText(labels[i], lx, ly);
   }
-  // 다각형
   const rgba=(hex,a)=>{const m=hex.match(/^#?([a-f\\d]{2})([a-f\\d]{2})([a-f\\d]{2})$/i);if(!m)return hex;
     const r=parseInt(m[1],16),g=parseInt(m[2],16),b=parseInt(m[3],16);return `rgba(${r},${g},${b},${a})`;};
   const pts=[];
@@ -455,26 +522,66 @@ function drawRadar(canvas, labels, values, color, max){
 }
 
 /* =========================
-   이벤트
+   라인 차트(트렌드)
 ========================= */
-function renderAndUpdate(){
-  const total=(phase==="style")?orderStyle.length:orderTopic.length;
-  document.getElementById("total").textContent=total;
-  renderQuestion();
+function drawLineChart(canvas, series, labels){
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width=canvas.clientWidth, H=canvas.height=canvas.clientHeight;
+  ctx.clearRect(0,0,W,H);
+  const padding = 40;
+  const plotW = W - padding*2, plotH = H - padding*2;
+  // x: session index, y: 0..max
+  let maxY=0;
+  series.forEach(s=>{ s.data.forEach(v=>{ if(v>maxY) maxY=v; }); });
+  maxY = Math.max(10, Math.ceil(maxY/5)*5);
+  // grid
+  ctx.strokeStyle="#e1e7f7"; ctx.lineWidth=1;
+  for(let gy=0; gy<=5; gy++){
+    const y = padding + plotH*(1-gy/5);
+    ctx.beginPath(); ctx.moveTo(padding,y); ctx.lineTo(padding+plotW,y); ctx.stroke();
+    ctx.fillStyle="#546385"; ctx.font="12px system-ui";
+    ctx.fillText(String(Math.round(maxY*gy/5)), 6, y+4);
+  }
+  // x labels
+  const n = labels.length||1;
+  ctx.fillStyle="#546385"; ctx.font="12px system-ui";
+  for(let i=0;i<n;i++){
+    const x = padding + plotW*(n===1?0.5:i/(n-1));
+    ctx.fillText(String(i+1), x-3, H-padding+16);
+  }
+  // lines
+  const colors=["#3a72ff","#2dc5a6","#f08c2b","#c04dd8"];
+  series.forEach((s,si)=>{
+    ctx.strokeStyle=colors[si%colors.length]; ctx.lineWidth=2;
+    ctx.beginPath();
+    s.data.forEach((v,i)=>{
+      const x = padding + plotW*(labels.length===1?0.5:i/(labels.length-1));
+      const y = padding + plotH*(1 - (v/maxY));
+      i?ctx.lineTo(x,y):ctx.moveTo(x,y);
+    });
+    ctx.stroke();
+    // legend
+    ctx.fillStyle=colors[si%colors.length]; ctx.fillRect(W-140, 12+si*18, 10,10);
+    ctx.fillStyle="#102039"; ctx.fillText(s.name, W-124, 21+si*18);
+  });
 }
-document.getElementById("startBtn").onclick=()=>{
+
+/* =========================
+   이벤트 바인딩
+========================= */
+document.getElementById('startBtn').onclick=()=>{
   orderStyle = shuffle(STYLE_QUESTIONS.length);
   orderTopic = shuffle(TOPIC_QUESTIONS.length);
   answersStyle = {}; answersTopic = {}; idx=0;
-  setPhase("style"); renderAndUpdate();
+  setPhase("style"); renderQuestion();
 };
-document.getElementById("prevBtn").onclick=()=>{ if(idx>0){idx--; renderQuestion();} };
-document.getElementById("nextBtn").onclick=()=>{
+document.getElementById('prevBtn').onclick=()=>{ if(idx>0){idx--; renderQuestion();} };
+document.getElementById('nextBtn').onclick=()=>{
   const order=(phase==="style")?orderStyle:orderTopic;
   if(idx < order.length-1){
     idx++; renderQuestion();
   }else{
-    if(phase==="style"){ idx=0; setPhase("topic"); renderAndUpdate(); }
+    if(phase==="style"){ idx=0; setPhase("topic"); renderQuestion(); }
     else{
       const ss = computeScores(answersStyle, STYLE_QUESTIONS, STYLE_TYPES);
       const ts = computeScores(answersTopic, TOPIC_QUESTIONS, TOPIC_TYPES);
@@ -486,16 +593,114 @@ document.getElementById("nextBtn").onclick=()=>{
       document.getElementById("topicSub").textContent = explainTopic(t1[0]);
 
       setPhase("result");
-      // 각 유형 6문항 × 5점 = 최대 30
       const sVals = STYLE_TYPES.map(k=>ss[k]||0);
       const tVals = TOPIC_TYPES.map(k=>ts[k]||0);
       drawRadar(document.getElementById("styleChart"), STYLE_TYPES, sVals, "#3a72ff", 30);
       drawRadar(document.getElementById("topicChart"), TOPIC_TYPES, tVals, "#2dc5a6", 30);
+
+      // 저장 버튼 활성화
+      document.getElementById('saveSessionBtn').onclick = ()=>{
+        if(!currentUser){ alert('먼저 로그인하세요.'); return; }
+        const db = loadUsers();
+        const user = db[currentUser];
+        const now = new Date();
+        const rec = {
+          ts: now.toISOString(),
+          styleScores: ss, topicScores: ts,
+          styleTop: s1[0], topicTop: t1[0]
+        };
+        user.sessions.push(rec);
+        saveUsers(db);
+        alert('현재 결과가 프로필에 저장되었습니다.');
+      };
+
+      // CSV 내보내기(이번 세션)
+      document.getElementById('exportCsvBtn').onclick = ()=>{
+        const rows = [];
+        rows.push(['Kind','Type','Score']);
+        STYLE_TYPES.forEach(k=>rows.push(['Style',k, ss[k]||0]));
+        TOPIC_TYPES.forEach(k=>rows.push(['Topic',k, ts[k]||0]));
+        const csv = rows.map(r=>r.join(',')).join('\n');
+        downloadText(csv, `HF_session_${new Date().toISOString().slice(0,19)}.csv`);
+      };
     }
   }
 };
-document.getElementById("restartBtn").onclick=()=>{ setPhase("intro"); document.getElementById("fill").style.width="0%"; };
-setPhase("intro");
+
+/* =========================
+   히스토리 렌더링/내보내기/초기화
+========================= */
+function renderHistory(){
+  const tbody = document.querySelector('#sessionTable tbody');
+  tbody.innerHTML='';
+  if(!currentUser){ tbody.innerHTML = `<tr><td colspan="4">로그인하세요.</td></tr>`; return; }
+  const db = loadUsers(); const user = db[currentUser];
+  if(!user || !user.sessions.length){ tbody.innerHTML = `<tr><td colspan="4">저장된 세션이 없습니다.</td></tr>`; return; }
+  user.sessions.forEach((s, i)=>{
+    const tr=document.createElement('tr');
+    const d=new Date(s.ts);
+    tr.innerHTML = `<td>${i+1}</td><td>${d.toLocaleString()}</td><td>${s.styleTop||'-'}</td><td>${s.topicTop||'-'}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+function drawTrends(){
+  const canvasS = document.getElementById('styleTrend');
+  const canvasT = document.getElementById('topicTrend');
+  const W = canvasS.clientWidth, H = 320;
+  canvasS.width=W; canvasS.height=H; canvasT.width=W; canvasT.height=H;
+
+  if(!currentUser){ drawLineChart(canvasS, [{name:'데이터 없음', data:[0]}], [0]); drawLineChart(canvasT, [{name:'데이터 없음', data:[0]}],[0]); return; }
+  const db = loadUsers(); const user = db[currentUser];
+  const sessions = (user && user.sessions)||[];
+  if(!sessions.length){ drawLineChart(canvasS, [{name:'데이터 없음', data:[0]}],[0]); drawLineChart(canvasT, [{name:'데이터 없음', data:[0]}],[0]); return; }
+
+  const labels = sessions.map((_,i)=>i+1);
+  const seriesS = STYLE_TYPES.map(k=>({ name:k, data:sessions.map(s=>(s.styleScores[k]||0)) }));
+  const seriesT = TOPIC_TYPES.map(k=>({ name:k, data:sessions.map(s=>(s.topicScores[k]||0)) }));
+  drawLineChart(canvasS, seriesS, labels);
+  drawLineChart(canvasT, seriesT, labels);
+}
+
+// 전체 CSV
+document.getElementById('exportAllCsvBtn').onclick=()=>{
+  if(!currentUser){ alert('로그인하세요.'); return; }
+  const db=loadUsers(); const user=db[currentUser];
+  if(!user || !user.sessions.length){ alert('내보낼 기록이 없습니다.'); return; }
+  const rows=[['Index','Timestamp','StyleTop','TopicTop',...STYLE_TYPES.map(s=>'S_'+s),...TOPIC_TYPES.map(t=>'T_'+t)]];
+  user.sessions.forEach((s,i)=>{
+    rows.push([
+      i+1, s.ts, s.styleTop||'', s.topicTop||'',
+      ...STYLE_TYPES.map(k=>s.styleScores[k]||0),
+      ...TOPIC_TYPES.map(k=>s.topicScores[k]||0),
+    ]);
+  });
+  const csv = rows.map(r=>r.join(',')).join('\n');
+  downloadText(csv, `HF_all_${currentUser}.csv`);
+};
+
+// 전체 삭제
+document.getElementById('clearAllBtn').onclick=()=>{
+  if(!currentUser){ alert('로그인하세요.'); return; }
+  if(!confirm('정말 모든 기록을 삭제할까요? 이 작업은 되돌릴 수 없습니다.')) return;
+  const db=loadUsers(); if(db[currentUser]) db[currentUser].sessions=[];
+  saveUsers(db);
+  renderHistory(); drawTrends();
+  alert('모든 기록이 삭제되었습니다.');
+};
+
+/* =========================
+   도우미
+========================= */
+function downloadText(text, filename){
+  const blob = new Blob([text], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download=filename; a.click();
+  URL.revokeObjectURL(url);
+}
+
+// 초기 UI
+setLoggedInUI(null);
+setPhase('intro');
 </script>
 </body>
 </html>
