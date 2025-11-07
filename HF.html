@@ -1,398 +1,411 @@
 <!doctype html>
 <html lang="ko">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MCI DTx – HF(4×4) 설문 · 히스토리 (안정화 버전)</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;800&display=swap" rel="stylesheet">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>MCI DTx – HF(4×4) 설문 (경량/저장·로그인 제거)</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;800&display=swap" rel="stylesheet">
 <style>
-  :root{--base:18px;--bg:#eef3ff;--card:#fff;--fg:#0e1a36;--muted:#5a6b85;--line:#e5e9f3;--accent:#3a72ff;--accent2:#2dc5a6}
-  *{box-sizing:border-box}html,body{height:100%;margin:0}
-  body{background:var(--bg);color:var(--fg);font-family:"Noto Sans KR",system-ui,Segoe UI,Roboto,Arial,sans-serif;font-size:var(--base)}
-  .wrap{max-width:1100px;margin:24px auto;padding:16px}
-  .card{background:var(--card);border-radius:16px;box-shadow:0 10px 30px rgba(16,32,57,.08);overflow:hidden;border:1px solid var(--line)}
-  header{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
-  h1{margin:0;font-size:clamp(18px,2.2vw,24px);font-weight:800}
-  .controls{display:flex;gap:8px}
-  .controls button{border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-weight:700;cursor:pointer;background:#f3f6ff;color:#0f224a}
-  .userbox{display:flex;align-items:center;gap:10px}
-  .chip{background:#eef2fb;color:#3b4a6b;border:1px solid var(--line);border-radius:999px;padding:6px 10px;font-weight:800;font-size:12px}
-  .tabs{display:flex;gap:10px;padding:10px 20px;border-bottom:1px solid var(--line);flex-wrap:wrap}
-  .tab{border:1px solid var(--line);border-radius:999px;padding:8px 12px;font-weight:800;background:#f6f8ff;color:#0f224a;cursor:pointer}
-  .tab.active{background:linear-gradient(90deg,var(--accent),#8ea9ff);color:#fff;border:0}
-  .progress{padding:14px 20px;border-bottom:1px solid var(--line)}
-  .bar{height:12px;background:#e9eefc;border-radius:8px;overflow:hidden}
-  .fill{height:100%;background:linear-gradient(90deg,var(--accent),#8ea9ff);width:0%;transition:width .35s}
-  .meta{display:flex;gap:18px;margin-top:10px;font-size:14px;color:var(--muted);flex-wrap:wrap}
+  :root{
+    --base:18px; --bg:#eef3ff; --card:#fff; --fg:#0e1a36;
+    --muted:#5a6b85; --line:#e5e9f3; --accent:#3a72ff; --accent2:#2dc5a6;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0}
+  body{
+    background:var(--bg); color:var(--fg);
+    font-family:"Noto Sans KR",system-ui,Segoe UI,Roboto,Arial,sans-serif;
+    font-size:var(--base);
+  }
+  .wrap{max-width:1000px;margin:28px auto;padding:16px}
+  .card{
+    background:var(--card); border-radius:16px; overflow:hidden;
+    border:1px solid var(--line); box-shadow:0 10px 26px rgba(16,32,57,.08);
+  }
+  header{
+    padding:16px 20px; border-bottom:1px solid var(--line);
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+  }
+  h1{margin:0; font-size:clamp(18px,2.2vw,24px); font-weight:800}
+  .controls{display:flex; gap:8px}
+  .controls button{
+    border:1px solid var(--line); border-radius:10px; padding:8px 12px;
+    font-weight:800; background:#f3f6ff; color:#0f224a; cursor:pointer;
+  }
+
+  /* 진행바 */
+  .progress{padding:14px 20px; border-bottom:1px solid var(--line)}
+  .bar{height:12px; background:#e9eefc; border-radius:8px; overflow:hidden}
+  .fill{height:100%; background:linear-gradient(90deg,var(--accent),#8ea9ff); width:0%; transition:width .35s}
+  .meta{display:flex; gap:18px; margin-top:10px; font-size:14px; color:var(--muted); flex-wrap:wrap}
+
+  /* 본문 */
   .stage{padding:20px}
-  .qid{display:inline-block;padding:6px 12px;border-radius:999px;background:#eef2fb;color:#3b4a6b;font-weight:800;font-size:13px;margin-bottom:14px;border:1px solid var(--line)}
-  .qtext{font-size:clamp(20px,2.6vw,26px);line-height:1.55;font-weight:800;margin:6px 0 14px}
-  .help{font-size:15px;color:#3c4d75;margin:0 0 12px}
-  .opts{display:grid;gap:10px;grid-template-columns:repeat(5,1fr)}
-  @media(max-width:900px){.opts{grid-template-columns:repeat(3,1fr)}}
+  .qid{
+    display:inline-block; padding:6px 12px; border-radius:999px; margin-bottom:14px;
+    background:#eef2fb; color:#3b4a6b; font-weight:800; font-size:13px; border:1px solid var(--line)
+  }
+  .qtext{font-size:clamp(20px,2.6vw,26px); line-height:1.55; font-weight:800; margin:6px 0 14px}
+  .help{font-size:15px; color:#3c4d75; margin:0 0 12px}
+  .opts{display:grid; gap:10px; grid-template-columns:repeat(5,1fr)}
+  @media(max-width:840px){.opts{grid-template-columns:repeat(3,1fr)}}
   @media(max-width:560px){.opts{grid-template-columns:repeat(2,1fr)}}
-  .opt{background:#f5f7ff;border:2px solid #d7def1;border-radius:12px;padding:10px 8px;cursor:pointer;font-weight:800;text-align:center;user-select:none;color:#0f224a}
-  .opt.selected{border-color:var(--accent);background:#ebf1ff;box-shadow:0 0 0 2px rgba(58,114,255,.12) inset}
-  .nav{display:flex;justify-content:space-between;gap:12px;padding:16px 20px;border-top:1px solid var(--line)}
-  button.big{border:1px solid var(--line);border-radius:12px;padding:12px 16px;font-weight:800;cursor:pointer;font-size:16px;background:#f6f8ff;color:#0f224a}
-  .primary{background:linear-gradient(90deg,var(--accent),#8ea9ff);color:#0f224a !important;border:0;font-weight:800}
+  .opt{
+    background:#f5f7ff; border:2px solid #d7def1; border-radius:12px; padding:10px 8px;
+    font-weight:800; text-align:center; user-select:none; cursor:pointer; color:#0f224a
+  }
+  .opt.selected{border-color:var(--accent); background:#ebf1ff; box-shadow:0 0 0 2px rgba(58,114,255,.12) inset}
+
+  /* 버튼 */
+  .nav{display:flex; justify-content:space-between; gap:12px; padding:16px 20px; border-top:1px solid var(--line)}
+  button.big{
+    border:1px solid var(--line); border-radius:12px; padding:12px 16px;
+    font-weight:800; font-size:16px; background:#f6f8ff; color:#0f224a; cursor:pointer;
+  }
+  .primary{
+    background:linear-gradient(90deg,var(--accent),#8ea9ff);
+    color:#0f224a !important; border:0; font-weight:800;
+  }
   .hidden{display:none}
-  .grid{display:grid;grid-template-columns:1fr;gap:16px}
-  @media(min-width:1000px){.grid{grid-template-columns:1fr 1fr}}
-  .panel{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px}
-  .panel h3{margin:0 0 8px;font-size:18px;color:#14234a}
-  .bigline{font-size:18px;margin-bottom:6px}
-  .tag{display:inline-block;margin-left:8px;padding:4px 8px;border-radius:999px;background:#eef2fb;color:#3b4a6b;font-size:12px;border:1px solid var(--line)}
-  /* ✅ 고정 크기 캔버스 (멈춤 방지) */
-  canvas{display:block;background:#fff;border-radius:8px;border:1px solid var(--line)}
-  dialog{border:1px solid var(--line);border-radius:14px;padding:20px;max-width:420px;width:92%}
-  dialog::backdrop{background:rgba(0,0,0,.35)}
-  .row{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
-  input{border:1px solid #cfd7eb;border-radius:10px;padding:10px 12px;font-size:16px;font-family:"Noto Sans KR"}
-  .subtle{font-size:13px;color:#5b6b89}
-  .table{width:100%;border-collapse:collapse;font-size:14px}
-  .table th,.table td{border-bottom:1px solid var(--line);padding:8px 10px;text-align:left}
-  .actions{display:flex;gap:8px;flex-wrap:wrap}
+
+  /* 결과 레이아웃 */
+  .grid{display:grid; grid-template-columns:1fr; gap:16px}
+  @media(min-width:980px){.grid{grid-template-columns:1fr 1fr}}
+  .panel{background:#fff; border:1px solid var(--line); border-radius:14px; padding:14px}
+  .panel h3{margin:0 0 8px; font-size:18px; color:#14234a}
+  .bigline{font-size:18px; margin-bottom:6px}
+  .tag{display:inline-block; margin-left:8px; padding:4px 8px; border-radius:999px; background:#eef2fb; color:#3b4a6b; font-size:12px; border:1px solid var(--line)}
+  canvas{display:block; border:1px solid var(--line); border-radius:8px; background:#fff}
+  .subtle{font-size:13px; color:#5b6b89}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="card" id="app">
+  <div class="card">
     <header>
-      <h1>🧠 HF(4×4) 설문 · 회원/히스토리</h1>
-      <div class="controls"><button id="fontDown">A−</button><button id="fontUp">A+</button></div>
-      <div class="userbox">
-        <span class="chip" id="userBadge">로그인 필요</span>
-        <button id="btnLogin" class="tab">로그인/가입</button>
-        <button id="btnLogout" class="tab hidden">로그아웃</button>
+      <h1>🧠 HF(4×4) 설문 – 대화방식·주제 성향 진단</h1>
+      <div class="controls">
+        <button id="fontDown">A−</button>
+        <button id="fontUp">A+</button>
       </div>
     </header>
 
-    <div class="tabs">
-      <button class="tab active" data-tab="assess">설문</button>
-      <button class="tab" data-tab="history">히스토리</button>
+    <!-- 진행 바 -->
+    <div class="progress">
+      <div class="bar"><div class="fill" id="fill"></div></div>
+      <div class="meta">
+        <div>단계: <span id="stageName">Intro</span></div>
+        <div>진행: <span id="count">0</span>/<span id="total">0</span></div>
+      </div>
     </div>
 
-    <!-- 설문 -->
-    <section id="tab_assess">
-      <div class="progress"><div class="bar"><div class="fill" id="fill"></div></div>
-        <div class="meta"><div>단계: <span id="stageName">Intro</span></div><div>진행: <span id="count">0</span>/<span id="total">0</span></div></div>
-      </div>
-
-      <div class="stage" id="stageIntro">
-        <div class="qid">안내</div>
-        <p class="qtext">질문을 <b>한 개씩</b> 보여드립니다. 응답은 <b>전혀 아니다 ~ 매우 그렇다(5점)</b> 중 하나를 고릅니다.</p>
-        <p class="help">대화방식 24 → 대화주제 24 (총 48문항)</p>
-        <div class="nav"><button class="big" disabled>← 이전</button><button class="big primary" id="startBtn">🟢 시작하기</button></div>
-      </div>
-
-      <div class="stage hidden" id="stageQ">
-        <div class="qid" id="qid">문항</div>
-        <div class="qtext" id="qtext">질문 텍스트</div>
-        <p class="help" id="hint">맞는 답 하나를 눌러 주세요.</p>
-        <div class="opts" id="opts"></div>
-        <div class="nav"><button class="big" id="prevBtn">← 이전</button><button class="big primary" id="nextBtn" disabled>다음 →</button></div>
-      </div>
-
-      <div class="stage hidden" id="stageResult">
-        <div class="grid">
-          <div class="panel"><h3>🗣️ 대화방식 결과</h3><div class="bigline" id="styleSummary">-</div><div class="muted" id="styleSub">-</div></div>
-          <div class="panel"><h3>💭 대화주제 결과</h3><div class="bigline" id="topicSummary">-</div><div class="muted" id="topicSub">-</div></div>
-          <div class="panel"><h3>📈 레이더(방식)</h3><canvas id="styleChart" width="520" height="360"></canvas></div>
-          <div class="panel"><h3>📈 레이더(주제)</h3><canvas id="topicChart" width="520" height="360"></canvas></div>
-          <div class="panel">
-            <h3>💾 저장/내보내기</h3>
-            <div class="actions">
-              <button class="big primary" id="saveSessionBtn">프로필에 저장</button>
-              <button class="big primary" id="exportCsvBtn">CSV 내보내기</button>
-              <button class="big primary" id="restartBtn">🔁 다시 검사하기</button>
-            </div>
-            <p class="subtle">※ 데모는 이 브라우저의 localStorage에 저장됩니다.</p>
-          </div>
-        </div>
+    <!-- 소개 -->
+    <section class="stage" id="stageIntro">
+      <div class="qid">안내</div>
+      <p class="qtext">질문을 <b>한 개씩</b> 보여드립니다.<br>응답은 <b>전혀 아니다 ~ 매우 그렇다(5점)</b> 중 하나를 고릅니다.</p>
+      <p class="help">대화방식 24 → 대화주제 24 (총 48문항)</p>
+      <div class="nav">
+        <button class="big" disabled>← 이전</button>
+        <button class="big primary" id="startBtn">🟢 시작하기</button>
       </div>
     </section>
 
-    <!-- 히스토리 -->
-    <section id="tab_history" class="hidden">
-      <div class="stage">
-        <div class="grid">
-          <div class="panel">
-            <h3>📜 내 세션 목록</h3>
-            <table class="table" id="sessionTable">
-              <thead><tr><th>#</th><th>일시</th><th>주성향(방식)</th><th>주성향(주제)</th></tr></thead>
-              <tbody></tbody>
-            </table>
-            <div class="actions" style="margin-top:10px">
-              <button class="big" id="exportAllCsvBtn">전체 CSV 내보내기</button>
-              <button class="big" id="clearAllBtn">모든 기록 삭제</button>
-            </div>
-          </div>
+    <!-- 문항 -->
+    <section class="stage hidden" id="stageQ">
+      <div class="qid" id="qid">문항</div>
+      <div class="qtext" id="qtext">질문 텍스트</div>
+      <p class="help" id="hint">맞는 답 하나를 눌러 주세요.</p>
+      <div class="opts" id="opts"></div>
+      <div class="nav">
+        <button class="big" id="prevBtn">← 이전</button>
+        <button class="big primary" id="nextBtn" disabled>다음 →</button>
+      </div>
+    </section>
 
-          <div class="panel"><h3>↗️ 슬로프그래프(방식) — 첫 회차 ↔ 마지막</h3><canvas id="slopeStyle" width="520" height="320"></canvas></div>
-          <div class="panel"><h3>↗️ 슬로프그래프(주제) — 첫 회차 ↔ 마지막</h3><canvas id="slopeTopic" width="520" height="320"></canvas></div>
-          <div class="panel"><h3>📈 대화방식 추이(라인)</h3><canvas id="styleTrend" width="520" height="320"></canvas></div>
-          <div class="panel"><h3>📈 대화주제 추이(라인)</h3><canvas id="topicTrend" width="520" height="320"></canvas></div>
+    <!-- 결과 -->
+    <section class="stage hidden" id="stageResult">
+      <div class="grid">
+        <div class="panel">
+          <h3>🗣️ 대화방식 결과</h3>
+          <div class="bigline" id="styleSummary">-</div>
+          <div class="subtle" id="styleSub">-</div>
         </div>
+        <div class="panel">
+          <h3>💭 대화주제 결과</h3>
+          <div class="bigline" id="topicSummary">-</div>
+          <div class="subtle" id="topicSub">-</div>
+        </div>
+        <div class="panel">
+          <h3>📈 성향 분포(대화방식)</h3>
+          <canvas id="styleChart" width="520" height="360"></canvas>
+        </div>
+        <div class="panel">
+          <h3>📈 성향 분포(대화주제)</h3>
+          <canvas id="topicChart" width="520" height="360"></canvas>
+        </div>
+      </div>
+
+      <div class="nav">
+        <button class="big" id="restartBtn">🔁 처음으로</button>
+        <button class="big primary" id="printBtn">🖨️ 인쇄/저장</button>
       </div>
     </section>
   </div>
 </div>
 
-<!-- 로그인 다이얼로그 -->
-<dialog id="authDlg">
-  <form method="dialog">
-    <h3 style="margin:0 0 8px">로그인 / 회원가입</h3>
-    <div class="row"><label>아이디</label><input id="auth_user" required></div>
-    <div class="row"><label>비밀번호(데모)</label><input id="auth_pass" type="password" required><div class="subtle">※ 데모용으로 단순 저장됩니다.</div></div>
-    <div class="actions" style="margin-top:8px">
-      <button id="btnDoLogin" class="tab">로그인</button>
-      <button id="btnDoSignup" class="tab">회원가입</button>
-      <button value="cancel" class="tab">닫기</button>
-    </div>
-  </form>
-</dialog>
-
 <script>
-/* ========= 공통 ========= */
-(() => { // 글자 크기
+/* ========== 글자 크기 ========== */
+(() => {
   const root=document.documentElement, clamp=v=>Math.max(14,Math.min(24,v));
   const get=()=>+getComputedStyle(root).getPropertyValue('--base').replace('px','')||18;
   document.getElementById('fontUp').onclick=()=>root.style.setProperty('--base',clamp(get()+2)+'px');
   document.getElementById('fontDown').onclick=()=>root.style.setProperty('--base',clamp(get()-2)+'px');
 })();
-const $=id=>document.getElementById(id);
-document.querySelectorAll('.tabs .tab').forEach(btn=>{
-  btn.addEventListener('click',()=>{
-    document.querySelectorAll('.tabs .tab').forEach(t=>t.classList.remove('active'));
-    btn.classList.add('active');
-    const tab=btn.dataset.tab;
-    $('tab_assess').classList.toggle('hidden',tab!=='assess');
-    $('tab_history').classList.toggle('hidden',tab!=='history');
-    if(tab==='history'){
-      renderHistory();
-      // ✅ DOM 레이아웃 완료 후 그리기 (멈춤 방지)
-      setTimeout(()=>{ drawTrends(); drawSlopes(); },150);
-    }
-  });
-});
 
-const LS_USERS_KEY='hf_users';
-const LS_CUR_USER_KEY='hf_current_user';
-let currentUser=null;
-const loadUsers=()=>{try{return JSON.parse(localStorage.getItem(LS_USERS_KEY)||'{}')}catch(e){return{}}};
-const saveUsers=o=>localStorage.setItem(LS_USERS_KEY,JSON.stringify(o));
+/* ========== 데이터 ========== */
+const ANSWERS = ["전혀 아니다","대체로 아니다","보통이다","대체로 그렇다","매우 그렇다"];
+const STYLE_TYPES = ["공감형","인지형","동기형","행동형"];
+const TOPIC_TYPES = ["자기인식·정서조절","관계·소통","회복·적응","행동·습관"];
 
-function setLoggedInUI(name){
-  currentUser=name;
-  $('userBadge').textContent=name?`로그인: ${name}`:'로그인 필요';
-  $('btnLogin').classList.toggle('hidden',!!name);
-  $('btnLogout').classList.toggle('hidden',!name);
-  if(name) localStorage.setItem(LS_CUR_USER_KEY,name); else localStorage.removeItem(LS_CUR_USER_KEY);
+const STYLE_QUESTIONS = [
+  ["다른 사람의 입장에서 생각하려고 노력합니다.","공감형"],
+  ["누군가 속상해 보이면 저도 마음이 아픕니다.","공감형"],
+  ["이야기를 들을 때, 상대의 감정을 먼저 살핍니다.","공감형"],
+  ["누가 어려움을 겪으면 도와주고 싶습니다.","공감형"],
+  ["사람들의 감정을 잘 알아차리는 편입니다.","공감형"],
+  ["말을 할 때 상대가 상처받지 않도록 조심합니다.","공감형"],
+
+  ["힘든 일이 생기면 그 이유를 논리적으로 생각합니다.","인지형"],
+  ["문제를 객관적으로 분석하려고 합니다.","인지형"],
+  ["감정보다 생각으로 판단하는 편입니다.","인지형"],
+  ["같은 일을 다른 각도에서 생각해 보려 합니다.","인지형"],
+  ["문제를 단계적으로 해결하려고 합니다.","인지형"],
+  ["일어난 일을 머릿속으로 정리하면 마음이 안정됩니다.","인지형"],
+
+  ["내가 목표를 세우면 스스로 동기를 유지하려 노력합니다.","동기형"],
+  ["다른 사람의 칭찬보다 스스로의 의지가 더 중요하다고 생각합니다.","동기형"],
+  ["어려워도 ‘왜 이걸 하는지’를 떠올리면 포기하지 않습니다.","동기형"],
+  ["변화는 내 선택으로부터 온다고 믿습니다.","동기형"],
+  ["누가 ‘잘할 수 있다’고 격려하면 의욕이 생깁니다.","동기형"],
+  ["힘든 일도 의미가 있으면 꾸준히 합니다.","동기형"],
+
+  ["작은 일이라도 직접 실천하면 기분이 나아집니다.","행동형"],
+  ["해야 할 일을 미루기보다 바로 하는 편입니다.","행동형"],
+  ["하루 일과를 미리 정해두면 편안합니다.","행동형"],
+  ["구체적인 목표를 세워두면 실천이 쉬워집니다.","행동형"],
+  ["계획대로 하지 못하면 불편합니다.","행동형"],
+  ["행동으로 옮길 때 자신감이 생깁니다.","행동형"]
+];
+
+const TOPIC_QUESTIONS = [
+  ["화가 날 때 내 감정을 알아차릴 수 있습니다.","자기인식·정서조절"],
+  ["기분이 나쁠 때, 왜 그런지 곰곰이 생각합니다.","자기인식·정서조절"],
+  ["마음이 불안할 때 숨을 고르며 진정하려고 합니다.","자기인식·정서조절"],
+  ["감정을 말로 표현하는 게 어렵지 않습니다.","자기인식·정서조절"],
+  ["속상한 기분이 들어도 너무 오래 끌지 않습니다.","자기인식·정서조절"],
+  ["감정이 너무 강할 땐 잠시 멈추고 진정합니다.","자기인식·정서조절"],
+
+  ["상대가 말할 때 끝까지 듣는 편입니다.","관계·소통"],
+  ["부드럽게 거절하는 말을 할 수 있습니다.","관계·소통"],
+  ["갈등이 생기면 먼저 풀어보려 합니다.","관계·소통"],
+  ["관계에서 내 생각을 솔직히 표현할 수 있습니다.","관계·소통"],
+  ["다른 사람의 입장을 이해하려 노력합니다.","관계·소통"],
+  ["불편한 관계도 대화를 통해 개선하려 합니다.","관계·소통"],
+
+  ["힘든 일을 겪어도 다시 일어설 수 있습니다.","회복·적응"],
+  ["어려운 일을 겪을 때 배우는 점이 있습니다.","회복·적응"],
+  ["문제가 생기면 긍정적으로 해결책을 찾습니다.","회복·적응"],
+  ["나쁜 일도 결국 지나간다고 생각합니다.","회복·적응"],
+  ["위기 상황에서도 침착하려고 합니다.","회복·적응"],
+  ["실패를 통해 더 강해질 수 있다고 믿습니다.","회복·적응"],
+
+  ["규칙적인 생활을 하려고 노력합니다.","행동·습관"],
+  ["매일 같은 시간에 자고 일어납니다.","행동·습관"],
+  ["집안일이나 산책 같은 활동을 꾸준히 합니다.","행동·습관"],
+  ["활동을 하면 기분이 좋아집니다.","행동·습관"],
+  ["하루 목표를 세우면 도움이 됩니다.","행동·습관"],
+  ["스스로 생활을 관리할 수 있습니다.","행동·습관"]
+];
+
+/* ========== 상태 ========== */
+let phase='intro', idx=0;
+let orderStyle=[], orderTopic=[];
+let answersStyle={}, answersTopic={};
+const fill = document.getElementById('fill');
+
+/* ========== 유틸 ========== */
+function shuffle(n){
+  const a=[...Array(n).keys()];
+  for(let i=n-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];}
+  return a;
 }
-$('btnLogin').onclick=()=>$('authDlg').showModal();
-$('btnLogout').onclick=()=>{ setLoggedInUI(null); alert('로그아웃되었습니다.'); };
-$('btnDoSignup').onclick=e=>{
-  e.preventDefault(); const u=$('auth_user').value.trim(), p=$('auth_pass').value;
-  if(!u||!p) return alert('아이디/비밀번호를 입력하세요.');
-  const db=loadUsers(); if(db[u]) return alert('이미 존재하는 아이디입니다.');
-  db[u]={pass:p,sessions:[]}; saveUsers(db); setLoggedInUI(u); $('authDlg').close(); alert('회원가입 완료');
-};
-$('btnDoLogin').onclick=e=>{
-  e.preventDefault(); const u=$('auth_user').value.trim(), p=$('auth_pass').value;
-  const db=loadUsers(); if(!db[u] || db[u].pass!==p) return alert('아이디 또는 비밀번호가 올바르지 않습니다.');
-  setLoggedInUI(u); $('authDlg').close(); alert('로그인되었습니다.');
-};
-(function autoLogin(){ const last=localStorage.getItem(LS_CUR_USER_KEY); if(last && loadUsers()[last]) setLoggedInUI(last); })();
-
-/* ========= 설문 데이터 ========= */
-const ANSWERS=["전혀 아니다","대체로 아니다","보통이다","대체로 그렇다","매우 그렇다"];
-const answerToScore=l=>ANSWERS.indexOf(l)+1;
-const STYLE_TYPES=["공감형","인지형","동기형","행동형"];
-const TOPIC_TYPES=["자기인식·정서조절","관계·소통","회복·적응","행동·습관"];
-const STYLE_QUESTIONS=[["다른 사람의 입장에서 생각하려고 노력합니다.","공감형"],["누군가 속상해 보이면 저도 마음이 아픕니다.","공감형"],["이야기를 들을 때, 상대의 감정을 먼저 살핍니다.","공감형"],["누가 어려움을 겪으면 도와주고 싶습니다.","공감형"],["사람들의 감정을 잘 알아차리는 편입니다.","공감형"],["말을 할 때 상대가 상처받지 않도록 조심합니다.","공감형"],["힘든 일이 생기면 그 이유를 논리적으로 생각합니다.","인지형"],["문제를 객관적으로 분석하려고 합니다.","인지형"],["감정보다 생각으로 판단하는 편입니다.","인지형"],["같은 일을 다른 각도에서 생각해 보려 합니다.","인지형"],["문제를 단계적으로 해결하려고 합니다.","인지형"],["일어난 일을 머릿속으로 정리하면 마음이 안정됩니다.","인지형"],["내가 목표를 세우면 스스로 동기를 유지하려 노력합니다.","동기형"],["다른 사람의 칭찬보다 스스로의 의지가 더 중요하다고 생각합니다.","동기형"],["어려워도 ‘왜 이걸 하는지’를 떠올리면 포기하지 않습니다.","동기형"],["변화는 내 선택으로부터 온다고 믿습니다.","동기형"],["누가 ‘잘할 수 있다’고 격려하면 의욕이 생깁니다.","동기형"],["힘든 일도 의미가 있으면 꾸준히 합니다.","동기형"],["작은 일이라도 직접 실천하면 기분이 나아집니다.","행동형"],["해야 할 일을 미루기보다 바로 하는 편입니다.","행동형"],["하루 일과를 미리 정해두면 편안합니다.","행동형"],["구체적인 목표를 세워두면 실천이 쉬워집니다.","행동형"],["계획대로 하지 못하면 불편합니다.","행동형"],["행동으로 옮길 때 자신감이 생깁니다.","행동형"]];
-const TOPIC_QUESTIONS=[["화가 날 때 내 감정을 알아차릴 수 있습니다.","자기인식·정서조절"],["기분이 나쁠 때, 왜 그런지 곰곰이 생각합니다.","자기인식·정서조절"],["마음이 불안할 때 숨을 고르며 진정하려고 합니다.","자기인식·정서조절"],["감정을 말로 표현하는 게 어렵지 않습니다.","자기인식·정서조절"],["속상한 기분이 들어도 너무 오래 끌지 않습니다.","자기인식·정서조절"],["감정이 너무 강할 땐 잠시 멈추고 진정합니다.","자기인식·정서조절"],["상대가 말할 때 끝까지 듣는 편입니다.","관계·소통"],["부드럽게 거절하는 말을 할 수 있습니다.","관계·소통"],["갈등이 생기면 먼저 풀어보려 합니다.","관계·소통"],["관계에서 내 생각을 솔직히 표현할 수 있습니다.","관계·소통"],["다른 사람의 입장을 이해하려 노력합니다.","관계·소통"],["불편한 관계도 대화를 통해 개선하려 합니다.","관계·소통"],["힘든 일을 겪어도 다시 일어설 수 있습니다.","회복·적응"],["어려운 일을 겪을 때 배우는 점이 있습니다.","회복·적응"],["문제가 생기면 긍정적으로 해결책을 찾습니다.","회복·적응"],["나쁜 일도 결국 지나간다고 생각합니다.","회복·적응"],["위기 상황에서도 침착하려고 합니다.","회복·적응"],["실패를 통해 더 강해질 수 있다고 믿습니다.","회복·적응"],["규칙적인 생활을 하려고 노력합니다.","행동·습관"],["매일 같은 시간에 자고 일어납니다.","행동·습관"],["집안일이나 산책 같은 활동을 꾸준히 합니다.","행동·습관"],["활동을 하면 기분이 좋아집니다.","행동·습관"],["하루 목표를 세우면 도움이 됩니다.","행동·습관"],["스스로 생활을 관리할 수 있습니다.","행동·습관"]];
-
-/* 설문 상태 */
-let phase='intro', orderStyle=[], orderTopic=[], idx=0, answersStyle={}, answersTopic={};
-const fill=document.getElementById('fill');
-function shuffle(n){const a=[...Array(n).keys()]; for(let i=n-1;i>0;i++){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a;}
-function stage(p){
-  $('stageIntro').classList.toggle('hidden',p!=='intro');
-  $('stageQ').classList.toggle('hidden',!(p==='style'||p==='topic'));
-  $('stageResult').classList.toggle('hidden',p!=='result');
+function answerToScore(label){ return ANSWERS.indexOf(label)+1; }
+function stage(name){
+  document.getElementById('stageIntro').classList.toggle('hidden', name!=='intro');
+  document.getElementById('stageQ').classList.toggle('hidden', !(name==='style'||name==='topic'));
+  document.getElementById('stageResult').classList.toggle('hidden', name!=='result');
+  document.getElementById('stageName').textContent = name==='style'?'대화방식':name==='topic'?'대화주제':name==='result'?'결과':'Intro';
 }
 function updateProgress(){
-  const total=(phase==="style")?orderStyle.length:(phase==="topic")?orderTopic.length:1;
-  const cur=(phase==="style"||phase==="topic")?idx+1:total;
-  $('count').textContent=(phase==="style"||phase==="topic")?cur:0;
-  $('total').textContent=total;
-  fill.style.width=((phase==="style"||phase==="topic")?Math.round(cur/total*100):(phase==="result"?100:0))+'%';
+  const total=(phase==="style")?orderStyle.length:(phase==="topic")?orderTopic.length:0;
+  const cur=(phase==="style"||phase==="topic")?(idx+1):0;
+  document.getElementById('count').textContent=cur;
+  document.getElementById('total').textContent=total;
+  const pct=(phase==="style"||phase==="topic")? Math.round(cur/Math.max(1,total)*100) : (phase==="result"?100:0);
+  fill.style.width = pct+'%';
 }
 function renderQ(){
-  const list=(phase==="style")?STYLE_QUESTIONS:TOPIC_QUESTIONS, order=(phase==="style")?orderStyle:orderTopic;
+  const list=(phase==="style")?STYLE_QUESTIONS:TOPIC_QUESTIONS;
+  const order=(phase==="style")?orderStyle:orderTopic;
   const [text]=list[order[idx]];
-  $('qid').textContent=`${phase==="style"?"대화방식":"대화주제"} ${idx+1}/${order.length}`;
-  $('qtext').textContent=text;
+  document.getElementById('qid').textContent=`${phase==="style"?"대화방식":"대화주제"} ${idx+1}/${order.length}`;
+  document.getElementById('qtext').textContent=text;
+
   const stored=(phase==="style"?answersStyle:answersTopic)[order[idx]];
-  $('opts').innerHTML=ANSWERS.map(a=>`<div class="opt ${stored===a?"selected":""}" data-val="${a}" role="button" tabindex="0">${a}</div>`).join("");
-  [...document.querySelectorAll('#opts .opt')].forEach(el=>{
-    const pick=()=>{document.querySelectorAll('#opts .opt').forEach(x=>x.classList.remove('selected')); el.classList.add('selected'); if(phase==="style") answersStyle[order[idx]]=el.dataset.val; else answersTopic[order[idx]]=el.dataset.val; $('nextBtn').disabled=false;};
-    el.onclick=pick; el.onkeydown=(e)=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();pick();}}
+  const opts = document.getElementById('opts');
+  opts.innerHTML = ANSWERS.map(a=>`<div class="opt ${stored===a?"selected":""}" data-val="${a}" role="button" tabindex="0">${a}</div>`).join("");
+  [...opts.querySelectorAll('.opt')].forEach(el=>{
+    const pick=()=>{
+      opts.querySelectorAll('.opt').forEach(x=>x.classList.remove('selected'));
+      el.classList.add('selected');
+      if(phase==="style") answersStyle[order[idx]]=el.dataset.val;
+      else answersTopic[order[idx]]=el.dataset.val;
+      document.getElementById('nextBtn').disabled=false;
+    };
+    el.onclick=pick;
+    el.onkeydown=(e)=>{if(e.key==="Enter"||e.key===" "){e.preventDefault(); pick();}}
   });
-  $('prevBtn').disabled=(idx===0);
-  $('nextBtn').textContent=(idx===order.length-1)?(phase==="style"?"다음 단계 →":"결과 보기"):"다음 →";
-  $('nextBtn').disabled=!stored;
+
+  document.getElementById('prevBtn').disabled = (idx===0);
+  const isLast = (idx===order.length-1);
+  document.getElementById('nextBtn').textContent = isLast ? (phase==="style"?"다음 단계 →":"결과 보기") : "다음 →";
+  document.getElementById('nextBtn').disabled = !stored;
+
   updateProgress();
 }
-$('startBtn').onclick=()=>{orderStyle=shuffle(STYLE_QUESTIONS.length); orderTopic=shuffle(TOPIC_QUESTIONS.length); answersStyle={}; answersTopic={}; idx=0; phase='style'; stage(phase); renderQ();};
-$('prevBtn').onclick=()=>{if(idx>0){idx--; renderQ();}};
-$('nextBtn').onclick=()=>{
-  const order=(phase==="style")?orderStyle:orderTopic;
-  if(idx<order.length-1){idx++; renderQ();}
-  else if(phase==='style'){idx=0; phase='topic'; stage(phase); renderQ();}
-  else{
-    const ss=scoreMap(answersStyle,STYLE_QUESTIONS,STYLE_TYPES), ts=scoreMap(answersTopic,TOPIC_QUESTIONS,TOPIC_TYPES);
-    const [s1,s2]=top2(ss), [t1,t2]=top2(ts);
-    $('styleSummary').innerHTML = s1[0]?`주 성향: <b>${s1[0]}</b><span class="tag">보조: ${s2[0]||"-"}</span>`:"-";
-    $('topicSummary').innerHTML = t1[0]?`주 성향: <b>${t1[0]}</b><span class="tag">보조: ${t2[0]||"-"}</span>`:"-";
-    $('styleSub').textContent = explainStyle(s1[0]); $('topicSub').textContent = explainTopic(t1[0]);
-    phase='result'; stage(phase);
-    drawRadar($('styleChart'),STYLE_TYPES,STYLE_TYPES.map(k=>ss[k]||0),'#3a72ff',30);
-    drawRadar($('topicChart'),TOPIC_TYPES,TOPIC_TYPES.map(k=>ts[k]||0),'#2dc5a6',30);
 
-    $('saveSessionBtn').onclick=()=>{
-      if(!currentUser) return alert('로그인 후 저장하세요.');
-      let db=loadUsers(); if(!db[currentUser]) db[currentUser]={pass:'',sessions:[]}; if(!Array.isArray(db[currentUser].sessions)) db[currentUser].sessions=[];
-      db[currentUser].sessions.push({ts:new Date().toISOString(),styleScores:ss,topicScores:ts,styleTop:s1[0],topicTop:t1[0]});
-      saveUsers(db);
-      alert('저장 완료! 히스토리에서 확인할 수 있어요.');
-      document.querySelector('.tabs .tab[data-tab="history"]').click();
-    };
-    $('exportCsvBtn').onclick=()=>{
-      const rows=[['Kind','Type','Score'],...STYLE_TYPES.map(k=>['Style',k,ss[k]||0]),...TOPIC_TYPES.map(k=>['Topic',k,ts[k]||0])];
-      downloadText(rows.map(r=>r.join(',')).join('\n'),`HF_session_${new Date().toISOString().slice(0,19)}.csv`);
-    };
-    $('restartBtn').onclick=()=>{
-      orderStyle=shuffle(STYLE_QUESTIONS.length); orderTopic=shuffle(TOPIC_QUESTIONS.length); answersStyle={}; answersTopic={}; idx=0; phase='style';
-      document.querySelector('.tabs .tab[data-tab="assess"]').click(); stage(phase); renderQ();
-    };
+/* ========== 결과 계산/설명 ========== */
+function scoreMap(ans, list, types){
+  const sums={}; types.forEach(t=>sums[t]=0);
+  Object.entries(ans).forEach(([i,label])=>{
+    const s=answerToScore(label); const cat=list[i][1];
+    sums[cat]+=s;
+  });
+  return sums;
+}
+function top2(scores){
+  const arr=Object.entries(scores).sort((a,b)=>b[1]-a[1]);
+  return [arr[0]||[null,0], arr[1]||[null,0]];
+}
+function explainStyle(k){
+  return ({
+    "공감형":"따뜻한 경청과 공감을 선호합니다.",
+    "인지형":"이유를 파악하고 차근차근 정리하는 대화를 선호합니다.",
+    "동기형":"격려와 의미 찾기로 의욕을 높이는 대화를 선호합니다.",
+    "행동형":"구체적 계획과 점검이 있는 실천 중심 대화를 선호합니다."
+  }[k]||"-");
+}
+function explainTopic(k){
+  return ({
+    "자기인식·정서조절":"감정을 알아차리고 조절하는 주제를 선호합니다.",
+    "관계·소통":"가족·친구와 소통을 다루는 주제를 선호합니다.",
+    "회복·적응":"어려움을 이겨내는 방법을 선호합니다.",
+    "행동·습관":"생활 루틴과 작은 목표를 실천하는 주제를 선호합니다."
+  }[k]||"-");
+}
+
+/* ========== 레이더(스파이더) 차트 ========== */
+/* 요청하신 ‘육각형’ 표현은 일반적으로 스파이더/레이더 차트를 의미해서
+   여기서는 각 축 개수(4축)에 맞춘 레이더 폴리곤을 그립니다. */
+function drawRadar(canvas, labels, vals, color, maxVal){
+  const ctx=canvas.getContext('2d'), W=canvas.width, H=canvas.height;
+  ctx.clearRect(0,0,W,H);
+  const cx=W/2, cy=H/2, r=Math.min(W,H)*0.38, N=labels.length;
+
+  // 그리드(동심, 축)
+  ctx.strokeStyle="#d6def0"; ctx.lineWidth=1.5;
+  for(let ring=1; ring<=5; ring++){
+    const rr=r*ring/5; ctx.beginPath();
+    for(let i=0;i<N;i++){
+      const a=-Math.PI/2 + i*2*Math.PI/N;
+      const x=cx+rr*Math.cos(a), y=cy+rr*Math.sin(a);
+      i?ctx.lineTo(x,y):ctx.moveTo(x,y);
+    }
+    ctx.closePath(); ctx.stroke();
+  }
+  for(let i=0;i<N;i++){
+    const a=-Math.PI/2 + i*2*Math.PI/N;
+    ctx.beginPath(); ctx.moveTo(cx,cy);
+    ctx.lineTo(cx+r*Math.cos(a), cy+r*Math.sin(a)); ctx.stroke();
+  }
+
+  // 라벨
+  for(let i=0;i<N;i++){
+    const a=-Math.PI/2 + i*2*Math.PI/N;
+    const lx=cx+(r+20)*Math.cos(a), ly=cy+(r+20)*Math.sin(a);
+    ctx.fillStyle="#0e1a36"; ctx.font="14px Noto Sans KR";
+    ctx.textAlign = Math.cos(a)>0.3 ? "left" : (Math.cos(a)<-0.3 ? "right" : "center");
+    ctx.textBaseline = Math.sin(a)>0.3 ? "top" : (Math.sin(a)<-0.3 ? "bottom" : "middle");
+    ctx.fillText(labels[i], lx, ly);
+  }
+
+  // 데이터
+  const rgba=(hex,a)=>{const m=hex.match(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i); if(!m) return hex;
+    const r=parseInt(m[1],16), g=parseInt(m[2],16), b=parseInt(m[3],16); return `rgba(${r},${g},${b},${a})`;};
+  const pts=[];
+  for(let i=0;i<N;i++){
+    const v=vals[i]||0, rr=r*(v/maxVal);
+    const a=-Math.PI/2 + i*2*Math.PI/N;
+    pts.push([cx+rr*Math.cos(a), cy+rr*Math.sin(a)]);
+  }
+  ctx.beginPath(); pts.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));
+  ctx.closePath(); ctx.fillStyle=rgba(color,.22); ctx.fill();
+  ctx.strokeStyle=color; ctx.lineWidth=2.5; ctx.stroke();
+  ctx.fillStyle=color; pts.forEach(([x,y])=>{ctx.beginPath(); ctx.arc(x,y,3.5,0,Math.PI*2); ctx.fill();});
+}
+
+/* ========== 이벤트 바인딩 ========== */
+document.getElementById('startBtn').onclick=()=>{
+  orderStyle = shuffle(STYLE_QUESTIONS.length);
+  orderTopic = shuffle(TOPIC_QUESTIONS.length);
+  answersStyle = {}; answersTopic = {};
+  idx=0; phase='style'; stage(phase); renderQ();
+};
+document.getElementById('prevBtn').onclick=()=>{ if(idx>0){ idx--; renderQ(); } };
+document.getElementById('nextBtn').onclick=()=>{
+  const order=(phase==="style")?orderStyle:orderTopic;
+  if(idx < order.length-1){ idx++; renderQ(); }
+  else if(phase==='style'){ idx=0; phase='topic'; stage(phase); renderQ(); }
+  else{
+    // 결과 계산
+    const ss = scoreMap(answersStyle, STYLE_QUESTIONS, STYLE_TYPES);
+    const ts = scoreMap(answersTopic, TOPIC_QUESTIONS, TOPIC_TYPES);
+    const [s1,s2] = top2(ss), [t1,t2] = top2(ts);
+
+    document.getElementById('styleSummary').innerHTML =
+      s1[0] ? `주 성향: <b>${s1[0]}</b><span class="tag">보조: ${s2[0]||"-"}</span>` : "-";
+    document.getElementById('topicSummary').innerHTML =
+      t1[0] ? `주 성향: <b>${t1[0]}</b><span class="tag">보조: ${t2[0]||"-"}</span>` : "-";
+    document.getElementById('styleSub').textContent = explainStyle(s1[0]);
+    document.getElementById('topicSub').textContent = explainTopic(t1[0]);
+
+    phase='result'; stage(phase);
+    drawRadar(document.getElementById('styleChart'), STYLE_TYPES, STYLE_TYPES.map(k=>ss[k]||0), '#3a72ff', 30);
+    drawRadar(document.getElementById('topicChart'), TOPIC_TYPES, TOPIC_TYPES.map(k=>ts[k]||0), '#2dc5a6', 30);
   }
 };
-
-/* ========= 점수/설명/레이더 ========= */
-function scoreMap(ans,list,types){const sums={}; types.forEach(t=>sums[t]=0); Object.entries(ans).forEach(([i,l])=>{const s=answerToScore(l), cat=list[i][1]; sums[cat]+=s;}); return sums;}
-function top2(scores){const a=Object.entries(scores).sort((x,y)=>y[1]-x[1]); return [a[0]||[null,0],a[1]||[null,0]];}
-function explainStyle(k){return({"공감형":"따뜻한 경청과 공감을 선호합니다.","인지형":"이유를 파악하고 차근차근 정리하는 대화를 선호합니다.","동기형":"격려와 의미 찾기로 의욕을 높이는 대화를 선호합니다.","행동형":"구체적 계획과 점검이 있는 실천 중심 대화를 선호합니다."}[k]||"-");}
-function explainTopic(k){return({"자기인식·정서조절":"감정을 알아차리고 조절하는 주제를 선호합니다.","관계·소통":"가족·친구와 소통을 다루는 주제를 선호합니다.","회복·적응":"어려움을 이겨내는 방법을 선호합니다.","행동·습관":"생활 루틴과 작은 목표를 실천하는 주제를 선호합니다."}[k]||"-");}
-function drawRadar(c, labels, vals, color, max){
-  const ctx=c.getContext('2d'); const W=c.width, H=c.height; ctx.clearRect(0,0,W,H);
-  const cx=W/2, cy=H/2, r=Math.min(W,H)*.38, N=labels.length;
-  ctx.strokeStyle="#d6def0"; ctx.lineWidth=1.5;
-  for(let ring=1; ring<=5; ring++){const rr=r*ring/5; ctx.beginPath(); for(let i=0;i<N;i++){const a=-Math.PI/2+i*2*Math.PI/N; const x=cx+rr*Math.cos(a), y=cy+rr*Math.sin(a); i?ctx.lineTo(x,y):ctx.moveTo(x,y);} ctx.closePath(); ctx.stroke();}
-  for(let i=0;i<N;i++){const a=-Math.PI/2+i*2*Math.PI/N; const x=cx+r*Math.cos(a), y=cy+r*Math.sin(a); ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(x,y); ctx.stroke(); const lx=cx+(r+20)*Math.cos(a), ly=cy+(r+20)*Math.sin(a); ctx.fillStyle="#0e1a36"; ctx.font="14px Noto Sans KR"; ctx.textAlign=Math.cos(a)>0.3?"left":(Math.cos(a)<-0.3?"right":"center"); ctx.textBaseline=Math.sin(a)>0.3?"top":(Math.sin(a)<-0.3?"bottom":"middle"); ctx.fillText(labels[i],lx,ly);}
-  const rgba=(hex,a)=>{const m=hex.match(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i); if(!m) return hex; const r=parseInt(m[1],16),g=parseInt(m[2],16),b=parseInt(m[3],16); return `rgba(${r},${g},${b},${a})`;};
-  const pts=[]; for(let i=0;i<N;i++){const v=vals[i]||0; const rr=r*(v/max); const a=-Math.PI/2+i*2*Math.PI/N; pts.push([cx+rr*Math.cos(a), cy+rr*Math.sin(a)]);}
-  ctx.beginPath(); pts.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y)); ctx.closePath(); ctx.fillStyle=rgba(color,.22); ctx.fill(); ctx.strokeStyle=color; ctx.lineWidth=2.5; ctx.stroke(); ctx.fillStyle=color; pts.forEach(([x,y])=>{ctx.beginPath();ctx.arc(x,y,3.5,0,Math.PI*2);ctx.fill();});
-}
-
-/* ========= 라인 차트 ========= */
-function drawLineChart(canvas, series, labels){
-  const ctx=canvas.getContext('2d'), W=canvas.width, H=canvas.height; ctx.clearRect(0,0,W,H);
-  const padL=50, padR=20, padT=20, padB=40, pw=W-padL-padR, ph=H-padT-padB;
-  let maxY=0; series.forEach(s=>s.data.forEach(v=>maxY=Math.max(maxY,Number.isFinite(v)?v:0))); maxY=Math.max(10,Math.ceil(maxY/5)*5);
-  ctx.strokeStyle="#e1e7f7"; ctx.lineWidth=1;
-  for(let gy=0; gy<=5; gy++){const y=padT+ph*(1-gy/5); ctx.beginPath(); ctx.moveTo(padL,y); ctx.lineTo(padL+pw,y); ctx.stroke(); ctx.fillStyle="#546385"; ctx.font="12px Noto Sans KR"; ctx.fillText(String(Math.round(maxY*gy/5)),10,y+4);}
-  const n=labels.length||1; ctx.fillStyle="#546385"; ctx.font="12px Noto Sans KR";
-  for(let i=0;i<n;i++){const x=padL+pw*(n===1?0.5:i/(n-1)); ctx.fillText(String(i+1),x-3,H-padB+18);}
-  const colors=["#3a72ff","#2dc5a6","#f08c2b","#c04dd8"];
-  series.forEach((s,si)=>{ctx.strokeStyle=colors[si%colors.length]; ctx.lineWidth=2.5; ctx.beginPath();
-    s.data.forEach((v,i)=>{const vv=Number.isFinite(v)?v:0; const x=padL+pw*(n===1?0.5:i/(n-1)), y=padT+ph*(1-(vv/maxY)); i?ctx.lineTo(x,y):ctx.moveTo(x,y);});
-    ctx.stroke(); ctx.fillStyle=colors[si%colors.length]; ctx.fillRect(W-150,14+si*18,10,10); ctx.fillStyle="#0e1a36"; ctx.font="12px Noto Sans KR"; ctx.fillText(s.name,W-134,23+si*18);
-  });
-}
-
-/* ========= 슬로프 그래프(라벨 충돌 회피) ========= */
-function drawSlope(canvas, labels, firstScores, lastScores){
-  const ctx=canvas.getContext('2d'), W=canvas.width, H=canvas.height; ctx.clearRect(0,0,W,H);
-  const pad=80, top=28, bot=H-28, x1=pad, x2=W-pad;
-  const min=0,max=30, y=v=> top+(1-(v-min)/(max-min))*(bot-top);
-  ctx.fillStyle="#546385"; ctx.font="12px Noto Sans KR"; ctx.fillText("첫 회차", x1-10, 16); ctx.fillText("마지막", x2-40, 16);
-  const usedLeft=[], usedRight=[]; const minGap=14;
-  const avoid=(y0,used)=>{let yy=y0; for(let i=0;i<used.length;i++){ if(Math.abs(yy-used[i])<minGap){ yy = used[i]+(yy-used[i]>=0?minGap:-minGap); i=-1; } } used.push(yy); return yy; };
-  labels.forEach((lab,i)=>{
-    const a=Number.isFinite(firstScores[i])?firstScores[i]:0;
-    const b=Number.isFinite(lastScores[i])?lastScores[i]:0;
-    const yA=y(a), yB=y(b), inc=b-a;
-    const yAL=avoid(yA, usedLeft), yBR=avoid(yB, usedRight);
-    ctx.strokeStyle = inc>=0 ? "#3a72ff" : "#f08c2b"; ctx.lineWidth=2.5; ctx.beginPath(); ctx.moveTo(x1,yAL); ctx.lineTo(x2,yBR); ctx.stroke();
-    ctx.fillStyle="#0e1a36"; ctx.beginPath(); ctx.arc(x1,yAL,4,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(x2,yBR,4,0,Math.PI*2); ctx.fill();
-    ctx.textAlign="right"; ctx.fillText(`${lab} ${a.toFixed(1)}`, x1-10, yAL+4);
-    ctx.textAlign="left";  ctx.fillText(`${b.toFixed(1)} (${inc>=0?"+":""}${inc.toFixed(1)})`, x2+10, yBR+4);
-  });
-}
-
-/* ========= 히스토리/추이 ========= */
-function renderHistory(){
-  const tbody=document.querySelector('#sessionTable tbody'); tbody.innerHTML='';
-  if(!currentUser){ tbody.innerHTML=`<tr><td colspan="4">로그인하세요.</td></tr>`; return; }
-  const db=loadUsers(), u=db[currentUser];
-  if(!u || !Array.isArray(u.sessions) || !u.sessions.length){ tbody.innerHTML=`<tr><td colspan="4">저장된 세션이 없습니다.</td></tr>`; return; }
-  u.sessions.forEach((s,i)=>{const tr=document.createElement('tr'); const d=new Date(s.ts); tr.innerHTML=`<td>${i+1}</td><td>${d.toLocaleString()}</td><td>${s.styleTop||'-'}</td><td>${s.topicTop||'-'}</td>`; tbody.appendChild(tr);});
-}
-function drawLineChartWrapper(canvasId, types, pick){
-  const c=$(canvasId);
-  if(!c) return;
-  if(!currentUser){ drawLineChart(c,[{name:'데이터 없음',data:[0]}],[0]); return; }
-  const db=loadUsers(), u=db[currentUser], sessions=(u&&Array.isArray(u.sessions))?u.sessions:[];
-  if(!sessions.length){ drawLineChart(c,[{name:'데이터 없음',data:[0]}],[0]); return; }
-  const labels=sessions.map((_,i)=>i+1);
-  const series=types.map(k=>({name:k,data:sessions.map(s=>{const v=pick(s,k); return Number.isFinite(v)?v:0;})}));
-  drawLineChart(c,series,labels);
-}
-function drawTrends(){
-  if(!currentUser) return;
-  const db=loadUsers(); const u=db[currentUser];
-  if(!u || !Array.isArray(u.sessions) || u.sessions.length===0) return;
-  drawLineChartWrapper('styleTrend', STYLE_TYPES, (s,k)=>s.styleScores?.[k]);
-  drawLineChartWrapper('topicTrend', TOPIC_TYPES, (s,k)=>s.topicScores?.[k]);
-}
-function drawSlopes(){
-  if(!currentUser) return;
-  const db=loadUsers(); const u=db[currentUser]; const S=(u&&Array.isArray(u.sessions))?u.sessions:[];
-  if(S.length<1) return;
-  const first=S[0], last=S[S.length-1];
-  const cSS=$('slopeStyle'), cST=$('slopeTopic');
-  if(!cSS || !cST) return;
-  const fS=STYLE_TYPES.map(k=>Number(first.styleScores?.[k]||0));
-  const lS=STYLE_TYPES.map(k=>Number(last.styleScores?.[k]||0));
-  const fT=TOPIC_TYPES.map(k=>Number(first.topicScores?.[k]||0));
-  const lT=TOPIC_TYPES.map(k=>Number(last.topicScores?.[k]||0));
-  drawSlope(cSS, STYLE_TYPES, fS, lS);
-  drawSlope(cST, TOPIC_TYPES, fT, lT);
-}
-
-/* ========= 내보내기/초기화 ========= */
-$('exportAllCsvBtn').onclick=()=>{
-  if(!currentUser) return alert('로그인하세요.');
-  const db=loadUsers(), u=db[currentUser]; if(!u||!u.sessions||!u.sessions.length) return alert('기록이 없습니다.');
-  const rows=[['Index','Timestamp','StyleTop','TopicTop',...STYLE_TYPES.map(s=>'S_'+s),...TOPIC_TYPES.map(t=>'T_'+t)]];
-  u.sessions.forEach((s,i)=>rows.push([i+1,s.ts,s.styleTop||'',s.topicTop||'',...STYLE_TYPES.map(k=>s.styleScores?.[k]||0),...TOPIC_TYPES.map(k=>s.topicScores?.[k]||0)]));
-  downloadText(rows.map(r=>r.join(',')).join('\n'),`HF_all_${currentUser}.csv`);
+document.getElementById('restartBtn').onclick=()=>{
+  phase='intro'; stage(phase);
+  document.getElementById('count').textContent='0';
+  document.getElementById('total').textContent='0';
+  document.getElementById('fill').style.width='0%';
+  window.scrollTo({top:0,behavior:'smooth'});
 };
-$('clearAllBtn').onclick=()=>{
-  if(!currentUser) return alert('로그인하세요.');
-  if(!confirm('모든 기록을 삭제할까요?')) return;
-  const db=loadUsers(); if(db[currentUser]) db[currentUser].sessions=[]; saveUsers(db);
-  renderHistory(); drawTrends(); drawSlopes();
-};
+document.getElementById('printBtn').onclick=()=>window.print();
 
-/* ========= 도우미 ========= */
-function downloadText(text,filename){const blob=new Blob([text],{type:'text/csv;charset=utf-8;'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=filename; a.click(); URL.revokeObjectURL(url);}
-
-/* 초기 진입 */
-function stageIntro(){ stage('intro'); }
-stageIntro();
+/* 초기화 */
+stage('intro');
 </script>
 </body>
 </html>
+
