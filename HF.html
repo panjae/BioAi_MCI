@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>HF(4×4) 설문 – 결과+신뢰도</title>
+<title>HF(4×4) 설문 – 대화방식·주제 성향 + 신뢰도</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;800&display=swap" rel="stylesheet">
 <style>
 :root{--base:18px;--bg:#eef3ff;--card:#fff;--fg:#0e1a36;--muted:#5a6b85;--line:#e5e9f3;--accent:#3a72ff;--accent2:#2dc5a6}
@@ -162,7 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const STYLE_TYPES=["공감형","인지형","동기형","행동형"];
   const TOPIC_TYPES=["자기인식·정서조절","관계·소통","회복·적응","행동·습관"];
 
-  /* 핵심 32문항 (4×4×2) */
+  /* 핵심 32문항 */
   const STYLE_QUESTIONS=[
     ["다른 사람의 입장에서 생각하려고 노력합니다.","공감형"],
     ["누군가 속상해 보이면 저도 마음이 아픕니다.","공감형"],
@@ -234,13 +234,11 @@ document.addEventListener('DOMContentLoaded', () => {
   /* 시작 */
   const startBtn=document.getElementById('startBtn');
   startBtn.addEventListener('click', ()=>{
-    try{
-      const coreStyleIdx = shuffle(STYLE_QUESTIONS.length).map(i=>({kind:"style",i}));
-      const coreTopicIdx = shuffle(TOPIC_QUESTIONS.length).map(i=>({kind:"topic",i}));
-      const relIdx = shuffle(RELIABILITY_ITEMS.length).map(i=>({kind:"rel",i}));
-      combined=[...coreStyleIdx, ...coreTopicIdx, ...relIdx];
-      answers={}; idx=0; phase='q'; stage(phase); renderQ();
-    }catch(e){ alert("초기화 중 오류가 발생했습니다."); console.error(e); }
+    const coreStyleIdx = shuffle(STYLE_QUESTIONS.length).map(i=>({kind:"style",i}));
+    const coreTopicIdx = shuffle(TOPIC_QUESTIONS.length).map(i=>({kind:"topic",i}));
+    const relIdx = shuffle(RELIABILITY_ITEMS.length).map(i=>({kind:"rel",i}));
+    combined=[...coreStyleIdx, ...coreTopicIdx, ...relIdx];
+    answers={}; idx=0; phase='q'; stage(phase); renderQ();
   });
 
   /* 문항 렌더 */
@@ -264,7 +262,6 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="opt ${stored===k+1?"selected":""}" data-val="${k+1}" role="button" tabindex="0">${a}</div>
     `).join("");
 
-    // 선택 이벤트
     optsBox.querySelectorAll('.opt').forEach(el=>{
       const pick=()=>{
         optsBox.querySelectorAll('.opt').forEach(x=>x.classList.remove('selected'));
@@ -308,31 +305,85 @@ document.addEventListener('DOMContentLoaded', () => {
     return EI+SN+TF+JP;
   }
 
-  /* 레이더 */
-  function sizeCanvasOnce(canvas){ const w=Math.max(320, canvas.parentElement.clientWidth-16); canvas.width=w; canvas.height=Math.max(300, Math.min(420, Math.round(w*0.66))); }
+  /* 캔버스 크기(라벨 여백 고려) */
+  function sizeCanvasOnce(canvas){
+    const pw = canvas.parentElement ? canvas.parentElement.clientWidth : 600;
+    const w  = Math.max(380, Math.floor(pw - 12));
+    const h  = Math.max(360, Math.round(w * 0.80));
+    canvas.width  = w;
+    canvas.height = h;
+  }
+  /* 라벨 줄바꿈 유틸(· 또는 공백 기준 1~2줄) */
+  function drawWrappedLabel(ctx, text, x, y, baseFontPx, align, baseline){
+    const parts = text.includes("·") ? text.split("·") : [text];
+    const lines = parts.length > 1 ? parts : [text];
+    ctx.textAlign = align;
+    ctx.textBaseline = baseline;
+    const lh = baseFontPx + 2;
+    if (lines.length === 1){
+      ctx.fillText(lines[0], x, y);
+    } else {
+      ctx.fillText(lines[0], x, y - lh/2);
+      ctx.fillText(lines[1], x, y + lh/2);
+    }
+  }
+  /* 레이더 (라벨 패딩 + 줄바꿈) */
   function drawRadar(canvas, labels, vals, color, maxVal){
-    const ctx=canvas.getContext('2d'), W=canvas.width, H=canvas.height;
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
     ctx.clearRect(0,0,W,H);
-    const cx=W/2, cy=H/2, r=Math.min(W,H)*0.32, N=labels.length;
-    ctx.strokeStyle="#d6def0"; ctx.lineWidth=1.5;
-    for(let ring=1; ring<=5; ring++){ const rr=r*ring/5; ctx.beginPath();
-      for(let i=0;i<N;i++){ const a=-Math.PI/2+i*2*Math.PI/N; const x=cx+rr*Math.cos(a), y=cy+rr*Math.sin(a); i?ctx.lineTo(x,y):ctx.moveTo(x,y); }
+
+    const labelMargin = 64;
+    const cx = W/2, cy = H/2;
+    const r  = Math.min(W - 2*labelMargin, H - 2*labelMargin)/2;
+    const N  = labels.length;
+
+    ctx.strokeStyle = "#d6def0";
+    ctx.lineWidth = 1.5;
+    for (let ring=1; ring<=5; ring++){
+      const rr = r * ring/5;
+      ctx.beginPath();
+      for (let i=0;i<N;i++){
+        const a = -Math.PI/2 + i*2*Math.PI/N;
+        const x = cx + rr*Math.cos(a), y = cy + rr*Math.sin(a);
+        i ? ctx.lineTo(x,y) : ctx.moveTo(x,y);
+      }
       ctx.closePath(); ctx.stroke();
     }
-    for(let i=0;i<N;i++){const a=-Math.PI/2+i*2*Math.PI/N; ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+r*Math.cos(a), cy+r*Math.sin(a)); ctx.stroke();}
-    for(let i=0;i<N;i++){ const a=-Math.PI/2+i*2*Math.PI/N; const lx=cx+(r+26)*Math.cos(a), ly=cy+(r+26)*Math.sin(a);
-      ctx.fillStyle="#0e1a36"; ctx.font="14px Noto Sans KR";
-      ctx.textAlign = Math.cos(a)>0.3?"left":(Math.cos(a)<-0.3?"right":"center");
-      ctx.textBaseline = Math.sin(a)>0.3?"top":(Math.sin(a)<-0.3?"bottom":"middle");
-      ctx.fillText(labels[i], lx, ly);
+    for (let i=0;i<N;i++){
+      const a = -Math.PI/2 + i*2*Math.PI/N;
+      ctx.beginPath(); ctx.moveTo(cx,cy);
+      ctx.lineTo(cx + r*Math.cos(a), cy + r*Math.sin(a)); ctx.stroke();
     }
-    const rgba=(hex,a)=>{const m=hex.match(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i); if(!m) return hex; const r=parseInt(m[1],16),g=parseInt(m[2],16),b=parseInt(m[3],16); return `rgba(${r},${g},${b},${a})`;};
-    const pts=[]; for(let i=0;i<N;i++){ const v=vals[i]||0, rr=r*(v/maxVal); const a=-Math.PI/2+i*2*Math.PI/N; pts.push([cx+rr*Math.cos(a), cy+rr*Math.sin(a)]); }
-    ctx.beginPath(); pts.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y)); ctx.closePath(); ctx.fillStyle=rgba(color,.22); ctx.fill(); ctx.strokeStyle=color; ctx.lineWidth=2.5; ctx.stroke();
-    ctx.fillStyle=color; pts.forEach(([x,y])=>{ctx.beginPath(); ctx.arc(x,y,3.5,0,Math.PI*2); ctx.fill();});
+
+    const extra = 18, fontPx = 14;
+    ctx.fillStyle = "#0e1a36";
+    ctx.font = `${fontPx}px Noto Sans KR`;
+    for (let i=0;i<N;i++){
+      const a  = -Math.PI/2 + i*2*Math.PI/N;
+      const lx = cx + (r + extra) * Math.cos(a);
+      const ly = cy + (r + extra) * Math.sin(a);
+      const cos = Math.cos(a), sin = Math.sin(a);
+      let align = "center"; if (cos > 0.35) align = "left"; else if (cos < -0.35) align = "right";
+      let baseline = "middle"; if (sin > 0.35) baseline = "top"; else if (sin < -0.35) baseline = "bottom";
+      drawWrappedLabel(ctx, labels[i], lx, ly, fontPx, align, baseline);
+    }
+
+    const rgba = (hex,a)=>{const m=hex.match(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i); if(!m) return hex; const r=parseInt(m[1],16),g=parseInt(m[2],16),b=parseInt(m[3],16); return `rgba(${r},${g},${b},${a})`;};
+    const pts=[];
+    for (let i=0;i<N;i++){
+      const v = vals[i]||0;
+      const rr = r * (v / maxVal);
+      const a  = -Math.PI/2 + i*2*Math.PI/N;
+      pts.push([cx + rr*Math.cos(a), cy + rr*Math.sin(a)]);
+    }
+    ctx.beginPath(); pts.forEach(([x,y],i)=> i?ctx.lineTo(x,y):ctx.moveTo(x,y)); ctx.closePath();
+    ctx.fillStyle = rgba(color, .22); ctx.fill();
+    ctx.strokeStyle = color; ctx.lineWidth = 2.5; ctx.stroke();
+    ctx.fillStyle = color; pts.forEach(([x,y])=>{ctx.beginPath(); ctx.arc(x,y,3.5,0,Math.PI*2); ctx.fill();});
   }
 
-  /* 신뢰도 계산 */
+  /* 신뢰도 계산 보조 */
   function getAnswerOfReliability(id){
     for(let pos=0; pos<combined.length; pos++){
       const c=combined[pos];
@@ -357,7 +408,6 @@ document.addEventListener('DOMContentLoaded', () => {
     return cnt?sum/cnt:0;
   }
   function computeReliability(){
-    // 중복(2쌍)
     const dup1_a=getAnswerOfReliability("dup_empathy");
     const dup1_b=getAnswerAtCore("style", RELIABILITY_ITEMS.find(r=>r.id==='dup_empathy').ref);
     const dup2_a=getAnswerOfReliability("dup_action");
@@ -365,14 +415,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const sim=v=>1-Math.min(4,Math.abs(v))/4;
     const dupScore=(sim(dup1_a-dup1_b)+sim(dup2_a-dup2_b))/2;
 
-    // 역문항(정채점 평균 vs 역채점값)
     const empathMean=traitMean("공감형","style");
     const habitMean =traitMean("행동·습관","topic");
     const revEmp = 6 - getAnswerOfReliability("rev_empathy");
     const revHab = 6 - getAnswerOfReliability("rev_habit");
     const revScore=(sim(revEmp - empathMean)+sim(revHab - habitMean))/2;
 
-    // SDS
     const sds1=getAnswerOfReliability("sds1"), sds2=getAnswerOfReliability("sds2");
     const sdsSum=sds1+sds2; // 2~10
     const sdsPenalty = Math.max(0, (sdsSum-2)/8*0.4);
