@@ -68,7 +68,7 @@ canvas{display:block;width:100%;height:auto;border:1px solid var(--line);border-
     <section class="stage" id="stageIntro">
       <div class="qid">안내</div>
       <p class="qtext">질문을 <b>한 개씩</b> 보여드립니다.<br>응답은 <b>전혀 아니다 ~ 매우 그렇다(5점)</b> 중 하나를 고릅니다.</p>
-      <p class="help">핵심 32문항 + 신뢰도(은밀) 6문항 = 총 38문항</p>
+      <p class="help">검사가 끝나면 결과와 신뢰도 요약을 함께 보여드립니다.</p>
       <div class="nav">
         <button class="big" disabled>← 이전</button>
         <button class="big primary" id="startBtn">🟢 시작하기</button>
@@ -117,7 +117,7 @@ canvas{display:block;width:100%;height:auto;border:1px solid var(--line);border-
         </div>
 
         <div class="panel">
-          <h3>🧪 신뢰도 요약(은밀 문항 기반)</h3>
+          <h3>🧪 신뢰도 요약</h3>
           <div class="kpi">
             <div class="box"><div>중복 일관성</div><div class="big" id="kDup">-</div></div>
             <div class="box"><div>역문항 일관성</div><div class="big" id="kRev">-</div></div>
@@ -147,248 +147,208 @@ canvas{display:block;width:100%;height:auto;border:1px solid var(--line);border-
 </div>
 
 <script>
-/* 글자 크기 */
-(()=>{const root=document.documentElement,clamp=v=>Math.max(14,Math.min(24,v));
-const get=()=>+getComputedStyle(root).getPropertyValue('--base').replace('px','')||18;
-document.getElementById('fontUp').onclick=()=>root.style.setProperty('--base',clamp(get()+2)+'px');
-document.getElementById('fontDown').onclick=()=>root.style.setProperty('--base',clamp(get()-2)+'px');})();
+document.addEventListener('DOMContentLoaded', () => {
+  /* 글자 크기 */
+  (()=>{
+    const root=document.documentElement,clamp=v=>Math.max(14,Math.min(24,v));
+    const get=()=>+getComputedStyle(root).getPropertyValue('--base').replace('px','')||18;
+    const up=document.getElementById('fontUp'), down=document.getElementById('fontDown');
+    if(up) up.onclick=()=>root.style.setProperty('--base',clamp(get()+2)+'px');
+    if(down) down.onclick=()=>root.style.setProperty('--base',clamp(get()-2)+'px');
+  })();
 
-/* 공통 */
-const ANSWERS=["전혀 아니다","대체로 아니다","보통이다","대체로 그렇다","매우 그렇다"];
-const STYLE_TYPES=["공감형","인지형","동기형","행동형"];
-const TOPIC_TYPES=["자기인식·정서조절","관계·소통","회복·적응","행동·습관"];
+  /* 공통 데이터 */
+  const ANSWERS=["전혀 아니다","대체로 아니다","보통이다","대체로 그렇다","매우 그렇다"];
+  const STYLE_TYPES=["공감형","인지형","동기형","행동형"];
+  const TOPIC_TYPES=["자기인식·정서조절","관계·소통","회복·적응","행동·습관"];
 
-/* 핵심 문항(각 4개씩: 32개) */
-const STYLE_QUESTIONS=[
-  // 공감형(4)
-  ["다른 사람의 입장에서 생각하려고 노력합니다.","공감형"],
-  ["누군가 속상해 보이면 저도 마음이 아픕니다.","공감형"],
-  ["이야기를 들을 때, 상대의 감정을 먼저 살핍니다.","공감형"],
-  ["말을 할 때 상대가 상처받지 않도록 조심합니다.","공감형"],
-  // 인지형(4)
-  ["힘든 일이 생기면 그 이유를 논리적으로 생각합니다.","인지형"],
-  ["문제를 객관적으로 분석하려고 합니다.","인지형"],
-  ["감정보다 생각으로 판단하는 편입니다.","인지형"],
-  ["문제를 단계적으로 해결하려고 합니다.","인지형"],
-  // 동기형(4)
-  ["내가 목표를 세우면 스스로 동기를 유지하려 노력합니다.","동기형"],
-  ["어려워도 ‘왜 이걸 하는지’를 떠올리면 포기하지 않습니다.","동기형"],
-  ["변화는 내 선택으로부터 온다고 믿습니다.","동기형"],
-  ["힘든 일도 의미가 있으면 꾸준히 합니다.","동기형"],
-  // 행동형(4)
-  ["작은 일이라도 직접 실천하면 기분이 나아집니다.","행동형"],
-  ["해야 할 일을 미루기보다 바로 하는 편입니다.","행동형"],
-  ["하루 일과를 미리 정해두면 편안합니다.","행동형"],
-  ["구체적인 목표를 세워두면 실천이 쉬워집니다.","행동형"]
-];
+  /* 핵심 32문항 (4×4×2) */
+  const STYLE_QUESTIONS=[
+    ["다른 사람의 입장에서 생각하려고 노력합니다.","공감형"],
+    ["누군가 속상해 보이면 저도 마음이 아픕니다.","공감형"],
+    ["이야기를 들을 때, 상대의 감정을 먼저 살핍니다.","공감형"],
+    ["말을 할 때 상대가 상처받지 않도록 조심합니다.","공감형"],
+    ["힘든 일이 생기면 그 이유를 논리적으로 생각합니다.","인지형"],
+    ["문제를 객관적으로 분석하려고 합니다.","인지형"],
+    ["감정보다 생각으로 판단하는 편입니다.","인지형"],
+    ["문제를 단계적으로 해결하려고 합니다.","인지형"],
+    ["내가 목표를 세우면 스스로 동기를 유지하려 노력합니다.","동기형"],
+    ["어려워도 ‘왜 이걸 하는지’를 떠올리면 포기하지 않습니다.","동기형"],
+    ["변화는 내 선택으로부터 온다고 믿습니다.","동기형"],
+    ["힘든 일도 의미가 있으면 꾸준히 합니다.","동기형"],
+    ["작은 일이라도 직접 실천하면 기분이 나아집니다.","행동형"],
+    ["해야 할 일을 미루기보다 바로 하는 편입니다.","행동형"],
+    ["하루 일과를 미리 정해두면 편안합니다.","행동형"],
+    ["구체적인 목표를 세워두면 실천이 쉬워집니다.","행동형"]
+  ];
+  const TOPIC_QUESTIONS=[
+    ["화가 날 때 내 감정을 알아차릴 수 있습니다.","자기인식·정서조절"],
+    ["기분이 나쁠 때, 왜 그런지 곰곰이 생각합니다.","자기인식·정서조절"],
+    ["마음이 불안할 때 숨을 고르며 진정하려고 합니다.","자기인식·정서조절"],
+    ["속상한 기분이 들어도 너무 오래 끌지 않습니다.","자기인식·정서조절"],
+    ["상대가 말할 때 끝까지 듣는 편입니다.","관계·소통"],
+    ["부드럽게 거절하는 말을 할 수 있습니다.","관계·소통"],
+    ["갈등이 생기면 먼저 풀어보려 합니다.","관계·소통"],
+    ["관계에서 내 생각을 솔직히 표현할 수 있습니다.","관계·소통"],
+    ["힘든 일을 겪어도 다시 일어설 수 있습니다.","회복·적응"],
+    ["어려운 일을 겪을 때 배우는 점이 있습니다.","회복·적응"],
+    ["문제가 생기면 긍정적으로 해결책을 찾습니다.","회복·적응"],
+    ["나쁜 일도 결국 지나간다고 생각합니다.","회복·적응"],
+    ["규칙적인 생활을 하려고 노력합니다.","행동·습관"],
+    ["집안일이나 산책 같은 활동을 꾸준히 합니다.","행동·습관"],
+    ["활동을 하면 기분이 좋아집니다.","행동·습관"],
+    ["하루 목표를 세우면 도움이 됩니다.","행동·습관"]
+  ];
 
-const TOPIC_QUESTIONS=[
-  // 자기인식·정서조절(4)
-  ["화가 날 때 내 감정을 알아차릴 수 있습니다.","자기인식·정서조절"],
-  ["기분이 나쁠 때, 왜 그런지 곰곰이 생각합니다.","자기인식·정서조절"],
-  ["마음이 불안할 때 숨을 고르며 진정하려고 합니다.","자기인식·정서조절"],
-  ["속상한 기분이 들어도 너무 오래 끌지 않습니다.","자기인식·정서조절"],
-  // 관계·소통(4)
-  ["상대가 말할 때 끝까지 듣는 편입니다.","관계·소통"],
-  ["부드럽게 거절하는 말을 할 수 있습니다.","관계·소통"],
-  ["갈등이 생기면 먼저 풀어보려 합니다.","관계·소통"],
-  ["관계에서 내 생각을 솔직히 표현할 수 있습니다.","관계·소통"],
-  // 회복·적응(4)
-  ["힘든 일을 겪어도 다시 일어설 수 있습니다.","회복·적응"],
-  ["어려운 일을 겪을 때 배우는 점이 있습니다.","회복·적응"],
-  ["문제가 생기면 긍정적으로 해결책을 찾습니다.","회복·적응"],
-  ["나쁜 일도 결국 지나간다고 생각합니다.","회복·적응"],
-  // 행동·습관(4)
-  ["규칙적인 생활을 하려고 노력합니다.","행동·습관"],
-  ["집안일이나 산책 같은 활동을 꾸준히 합니다.","행동·습관"],
-  ["활동을 하면 기분이 좋아집니다.","행동·습관"],
-  ["하루 목표를 세우면 도움이 됩니다.","행동·습관"]
-];
+  /* 신뢰도 공통 6문항 */
+  function findIndexByText(arr, text){for(let i=0;i<arr.length;i++){if(arr[i][0]===text) return i;} return -1;}
+  const RELIABILITY_ITEMS=[
+    {id:"dup_empathy", text:"속상해 보이는 사람을 그냥 지나치기 어렵습니다.", kind:"dup", target:"공감형",
+     ref: findIndexByText(STYLE_QUESTIONS,"누군가 속상해 보이면 저도 마음이 아픕니다.") },
+    {id:"dup_action", text:"계획에 따라 움직이면 마음이 편안합니다.", kind:"dup", target:"행동형",
+     ref: findIndexByText(STYLE_QUESTIONS,"하루 일과를 미리 정해두면 편안합니다.") },
+    {id:"rev_empathy", text:"남의 기분까지 살피는 건 내겐 중요하지 않습니다.", kind:"rev", target:"공감형"},
+    {id:"rev_habit", text:"하루를 정해진 대로 보내는 건 번거롭기만 합니다.", kind:"rev", target:"행동·습관"},
+    {id:"sds1", text:"나는 거의 늘 남을 먼저 배려합니다.", kind:"sds"},
+    {id:"sds2", text:"나는 화를 낸 적이 거의 없습니다.", kind:"sds"}
+  ];
 
-/* 공통 신뢰도 문항(6개) */
-const RELIABILITY_ITEMS=[
-  // 중복(2)
-  {id:"dup_empathy", text:"속상해 보이는 사람을 그냥 지나치기 어렵습니다.", kind:"dup", target:"공감형",
-   ref: findIndex(STYLE_QUESTIONS,"누군가 속상해 보이면 저도 마음이 아픕니다.") },
-  {id:"dup_action", text:"계획에 따라 움직이면 마음이 편안합니다.", kind:"dup", target:"행동형",
-   ref: findIndex(STYLE_QUESTIONS,"하루 일과를 미리 정해두면 편안합니다.") },
-  // 역문항(2)
-  {id:"rev_empathy", text:"남의 기분까지 살피는 건 내겐 중요하지 않습니다.", kind:"rev", target:"공감형"},
-  {id:"rev_habit", text:"하루를 정해진 대로 보내는 건 번거롭기만 합니다.", kind:"rev", target:"행동·습관"},
-  // 사회적 바람직성(2)
-  {id:"sds1", text:"나는 거의 늘 남을 먼저 배려합니다.", kind:"sds"},
-  {id:"sds2", text:"나는 화를 낸 적이 거의 없습니다.", kind:"sds"}
-];
+  /* 상태 */
+  let phase='intro', idx=0, combined=[], answers={};
+  const fill=document.getElementById('fill');
 
-function findIndex(arr, text){ for(let i=0;i<arr.length;i++){ if(arr[i][0]===text) return i; } return -1; }
+  /* 유틸 */
+  function shuffle(n){const a=[...Array(n).keys()]; for(let i=n-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a;}
+  function stage(name){
+    document.getElementById('stageIntro').classList.toggle('hidden',name!=='intro');
+    document.getElementById('stageQ').classList.toggle('hidden',name!=='q');
+    document.getElementById('stageResult').classList.toggle('hidden',name!=='result');
+    document.getElementById('stageName').textContent=(name==='q'?'검사':name==='result'?'결과':'Intro');
+  }
+  function setProgress(cur,total){
+    document.getElementById('count').textContent=cur;
+    document.getElementById('total').textContent=total;
+    fill.style.width=(total?Math.round(cur/total*100):0)+'%';
+  }
 
-/* 상태 */
-let phase='intro', idx=0;
-let combined=[];          // 전체 문항(핵심+신뢰도) 셔플
-let answers={};           // 문항 인덱스 → 1..5
-const fill=document.getElementById('fill');
-
-/* 유틸 */
-function shuffle(n){const a=[...Array(n).keys()]; for(let i=n-1;i>0;i++){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a;}
-function stage(name){
-  document.getElementById('stageIntro').classList.toggle('hidden',name!=='intro');
-  document.getElementById('stageQ').classList.toggle('hidden',name!=='q');
-  document.getElementById('stageResult').classList.toggle('hidden',name!=='result');
-  document.getElementById('stageName').textContent=(name==='q'?'검사':name==='result'?'결과':'Intro');
-}
-function setProgress(cur,total){document.getElementById('count').textContent=cur;document.getElementById('total').textContent=total;fill.style.width=(total?Math.round(cur/total*100):0)+'%';}
-
-/* 시작 */
-document.getElementById('startBtn').onclick=()=>{
-  // 결합 배열 만들기: 핵심32 + 신뢰도6
-  const coreStyleIdx = shuffle(STYLE_QUESTIONS.length).map(i=>({kind:"style",i}));
-  const coreTopicIdx = shuffle(TOPIC_QUESTIONS.length).map(i=>({kind:"topic",i}));
-  const relIdx = shuffle(RELIABILITY_ITEMS.length).map(i=>({kind:"rel",i}));
-  combined = [...coreStyleIdx, ...coreTopicIdx, ...relIdx];
-  answers = {}; idx = 0; phase='q'; stage(phase); renderQ();
-};
-
-/* 문항 렌더 */
-function renderQ(){
-  const item = combined[idx];
-  let text, tag;
-  if(item.kind==='style'){ text = STYLE_QUESTIONS[item.i][0]; tag="대화방식"; }
-  else if(item.kind==='topic'){ text = TOPIC_QUESTIONS[item.i][0]; tag="대화주제"; }
-  else { text = RELIABILITY_ITEMS[item.i].text; tag="(추가 문항)"; }
-  document.getElementById('qid').textContent=`${tag} ${idx+1}/${combined.length}`;
-  document.getElementById('qtext').textContent=text;
-
-  const opts=document.getElementById('opts'); const stored=answers[idx];
-  opts.innerHTML=ANSWERS.map((a,k)=>`<div class="opt ${stored===k+1?"selected":""}" data-val="${k+1}" role="button" tabindex="0">${a}</div>`).join("");
-  [...opts.querySelectorAll('.opt')].forEach(el=>{
-    const pick=()=>{opts.querySelectorAll('.opt').forEach(x=>x.classList.remove('selected')); el.classList.add('selected'); answers[idx]=+el.dataset.val; document.getElementById('nextBtn').disabled=false;};
-    el.onclick=pick; el.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();pick();}}
+  /* 시작 */
+  const startBtn=document.getElementById('startBtn');
+  startBtn.addEventListener('click', ()=>{
+    try{
+      const coreStyleIdx = shuffle(STYLE_QUESTIONS.length).map(i=>({kind:"style",i}));
+      const coreTopicIdx = shuffle(TOPIC_QUESTIONS.length).map(i=>({kind:"topic",i}));
+      const relIdx = shuffle(RELIABILITY_ITEMS.length).map(i=>({kind:"rel",i}));
+      combined=[...coreStyleIdx, ...coreTopicIdx, ...relIdx];
+      answers={}; idx=0; phase='q'; stage(phase); renderQ();
+    }catch(e){ alert("초기화 중 오류가 발생했습니다."); console.error(e); }
   });
 
-  document.getElementById('prevBtn').disabled=(idx===0);
-  document.getElementById('nextBtn').textContent=(idx===combined.length-1)?"결과 보기":"다음 →";
-  document.getElementById('nextBtn').disabled = !(idx in answers);
-  setProgress(idx+1, combined.length);
-}
-document.getElementById('prevBtn').onclick=()=>{ if(idx>0){ idx--; renderQ(); } };
-document.getElementById('nextBtn').onclick=()=>{ if(idx<combined.length-1){ idx++; renderQ(); } else { computeResult(); } };
+  /* 문항 렌더 */
+  const prevBtn=document.getElementById('prevBtn');
+  const nextBtn=document.getElementById('nextBtn');
+  const optsBox=document.getElementById('opts');
 
-/* 점수 계산 */
-function sumBy(items, typeList, kind){
-  const sums={}; typeList.forEach(t=>sums[t]=0);
-  items.forEach((obj,pos)=>{
-    if(obj.kind!==kind) return;
-    const idxIn= (kind==='style')?STYLE_QUESTIONS[obj.i][1] : TOPIC_QUESTIONS[obj.i][1];
-    sums[idxIn]+=answers[pos]||0;
+  function renderQ(){
+    const item = combined[idx];
+    if(!item){ alert("문항이 준비되지 않았습니다."); return; }
+    let text, tag;
+    if(item.kind==='style'){ text=STYLE_QUESTIONS[item.i][0]; tag="대화방식"; }
+    else if(item.kind==='topic'){ text=TOPIC_QUESTIONS[item.i][0]; tag="대화주제"; }
+    else { text=RELIABILITY_ITEMS[item.i].text; tag="추가 문항"; }
+
+    document.getElementById('qid').textContent=`${tag} ${idx+1}/${combined.length}`;
+    document.getElementById('qtext').textContent=text;
+
+    const stored=answers[idx]||0;
+    optsBox.innerHTML = ANSWERS.map((a,k)=>`
+      <div class="opt ${stored===k+1?"selected":""}" data-val="${k+1}" role="button" tabindex="0">${a}</div>
+    `).join("");
+
+    // 선택 이벤트
+    optsBox.querySelectorAll('.opt').forEach(el=>{
+      const pick=()=>{
+        optsBox.querySelectorAll('.opt').forEach(x=>x.classList.remove('selected'));
+        el.classList.add('selected');
+        answers[idx]=+el.dataset.val;
+        nextBtn.disabled=false;
+      };
+      el.addEventListener('click', pick);
+      el.addEventListener('keydown', (e)=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); pick(); }});
+    });
+
+    prevBtn.disabled=(idx===0);
+    nextBtn.textContent=(idx===combined.length-1)?"결과 보기":"다음 →";
+    nextBtn.disabled = !(idx in answers);
+    setProgress(idx+1, combined.length);
+  }
+
+  prevBtn.addEventListener('click', ()=>{ if(idx>0){ idx--; renderQ(); } });
+  nextBtn.addEventListener('click', ()=>{
+    if(idx<combined.length-1){ idx++; renderQ(); }
+    else { computeResult(); }
   });
-  return sums;
-}
-function top2(scores){const arr=Object.entries(scores).sort((a,b)=>b[1]-a[1]); return [arr[0]||[null,0],arr[1]||[null,0]];}
 
-/* MBTI 매핑 */
-function mbtiFromHF(styleScores, topicScores){
-  const EI = (topicScores["관계·소통"]||0) >= (topicScores["자기인식·정서조절"]||0) ? "E":"I";
-  const SN = (topicScores["행동·습관"]||0) >= (topicScores["회복·적응"]||0) ? "S":"N";
-  const TF = (styleScores["인지형"]||0)     >= (styleScores["공감형"]||0)     ? "T":"F";
-  const JP = (styleScores["행동형"]||0)     >= (styleScores["동기형"]||0)     ? "J":"P";
-  return EI+SN+TF+JP;
-}
-
-/* 레이더 */
-function sizeCanvasOnce(canvas){ const w=Math.max(320, canvas.parentElement.clientWidth-16); canvas.width=w; canvas.height=Math.max(300, Math.min(420, Math.round(w*0.66))); }
-function drawRadar(canvas, labels, vals, color, maxVal){
-  const ctx=canvas.getContext('2d'), W=canvas.width, H=canvas.height;
-  ctx.clearRect(0,0,W,H);
-  const cx=W/2, cy=H/2, r=Math.min(W,H)*0.32, N=labels.length;
-  ctx.strokeStyle="#d6def0"; ctx.lineWidth=1.5;
-  for(let ring=1; ring<=5; ring++){ const rr=r*ring/5; ctx.beginPath();
-    for(let i=0;i<N;i++){ const a=-Math.PI/2+i*2*Math.PI/N; const x=cx+rr*Math.cos(a), y=cy+rr*Math.sin(a); i?ctx.lineTo(x,y):ctx.moveTo(x,y); }
-    ctx.closePath(); ctx.stroke();
+  /* 점수 계산 */
+  function sumBy(kind, typeList){
+    const sums={}; typeList.forEach(t=>sums[t]=0);
+    combined.forEach((obj,pos)=>{
+      if(obj.kind!==kind) return;
+      const arr=(kind==='style')?STYLE_QUESTIONS:TOPIC_QUESTIONS;
+      const trait=arr[obj.i][1];
+      sums[trait]+= (answers[pos]||0);
+    });
+    return sums;
   }
-  for(let i=0;i<N;i++){const a=-Math.PI/2+i*2*Math.PI/N; ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+r*Math.cos(a), cy+r*Math.sin(a)); ctx.stroke();}
-  for(let i=0;i<N;i++){ const a=-Math.PI/2+i*2*Math.PI/N; const lx=cx+(r+26)*Math.cos(a), ly=cy+(r+26)*Math.sin(a);
-    ctx.fillStyle="#0e1a36"; ctx.font="14px Noto Sans KR";
-    ctx.textAlign = Math.cos(a)>0.3?"left":(Math.cos(a)<-0.3?"right":"center");
-    ctx.textBaseline = Math.sin(a)>0.3?"top":(Math.sin(a)<-0.3?"bottom":"middle");
-    ctx.fillText(labels[i], lx, ly);
+  function top2(scores){const arr=Object.entries(scores).sort((a,b)=>b[1]-a[1]); return [arr[0]||[null,0],arr[1]||[null,0]];}
+  function mbtiFromHF(styleScores, topicScores){
+    const EI = (topicScores["관계·소통"]||0) >= (topicScores["자기인식·정서조절"]||0) ? "E":"I";
+    const SN = (topicScores["행동·습관"]||0) >= (topicScores["회복·적응"]||0) ? "S":"N";
+    const TF = (styleScores["인지형"]||0)     >= (styleScores["공감형"]||0)     ? "T":"F";
+    const JP = (styleScores["행동형"]||0)     >= (styleScores["동기형"]||0)     ? "J":"P";
+    return EI+SN+TF+JP;
   }
-  const rgba=(hex,a)=>{const m=hex.match(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i); if(!m) return hex; const r=parseInt(m[1],16),g=parseInt(m[2],16),b=parseInt(m[3],16); return `rgba(${r},${g},${b},${a})`;};
-  const pts=[]; for(let i=0;i<N;i++){ const v=vals[i]||0, rr=r*(v/maxVal); const a=-Math.PI/2+i*2*Math.PI/N; pts.push([cx+rr*Math.cos(a), cy+rr*Math.sin(a)]); }
-  ctx.beginPath(); pts.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y)); ctx.closePath(); ctx.fillStyle=rgba(color,.22); ctx.fill(); ctx.strokeStyle=color; ctx.lineWidth=2.5; ctx.stroke();
-  ctx.fillStyle=color; pts.forEach(([x,y])=>{ctx.beginPath(); ctx.arc(x,y,3.5,0,Math.PI*2); ctx.fill();});
-}
 
-/* 결과 계산 & 화면 */
-function computeResult(){
-  const styleScores = sumBy(combined, STYLE_TYPES,'style');
-  const topicScores = sumBy(combined, TOPIC_TYPES,'topic');
-  const [s1,s2]=top2(styleScores), [t1,t2]=top2(topicScores);
-
-  document.getElementById('styleSummary').innerHTML = `주 성향: <b>${s1[0]||"-"}</b><span class="badge">보조: ${s2[0]||"-"}</span>`;
-  document.getElementById('topicSummary').innerHTML = `주 성향: <b>${t1[0]||"-"}</b><span class="badge">보조: ${t2[0]||"-"}</span>`;
-  document.getElementById('styleSub').textContent = ({"공감형":"따뜻한 경청과 공감을 선호합니다.","인지형":"이유를 파악하고 차근차근 정리하는 대화를 선호합니다.","동기형":"격려와 의미 찾기로 의욕을 높이는 대화를 선호합니다.","행동형":"구체적 계획과 점검이 있는 실천 중심 대화를 선호합니다."}[s1[0]]||"-");
-  document.getElementById('topicSub').textContent = ({"자기인식·정서조절":"감정을 알아차리고 조절하는 주제를 선호합니다.","관계·소통":"가족·친구와 소통을 다루는 주제를 선호합니다.","회복·적응":"어려움을 이겨내는 방법을 선호합니다.","행동·습관":"생활 루틴과 작은 목표를 실천하는 주제를 선호합니다."}[t1[0]]||"-");
-
-  // MBTI
-  const mbti = mbtiFromHF(styleScores, topicScores);
-  document.getElementById('mbtiLine').textContent = `HF→MBTI 추정: ${mbti}`;
-
-  // 그래프
-  const sc=document.getElementById('styleChart'), tc=document.getElementById('topicChart');
-  sizeCanvasOnce(sc); sizeCanvasOnce(tc);
-  drawRadar(sc, STYLE_TYPES, STYLE_TYPES.map(k=>styleScores[k]||0), '#3a72ff', 20); // 4문항×최대5=20
-  drawRadar(tc, TOPIC_TYPES, TOPIC_TYPES.map(k=>topicScores[k]||0), '#2dc5a6', 20);
-
-  // 신뢰도 계산
-  const rel = computeReliability(styleScores, topicScores);
-  document.getElementById('kDup').textContent = rel.dupTxt;
-  document.getElementById('kRev').textContent = rel.revTxt;
-  document.getElementById('kSds').textContent = rel.sdsTxt;
-  document.getElementById('kOverall').textContent = `${rel.overall}`;
-  document.getElementById('relNote').textContent = rel.note;
-
-  // 직접 타당도 폼
-  renderFaceForm(s1[0], t1[0], s2[0], mbti);
-
-  phase='result'; stage(phase); setProgress(combined.length, combined.length);
-}
-
-/* 신뢰도 계산 로직 */
-function getAnswerByItem(obj){ // 반환: 1..5
-  // combined에서 해당 문항의 절대 위치 찾아 응답값 꺼내기
-  for(let pos=0; pos<combined.length; pos++){
-    const c=combined[pos];
-    if(obj.kind==='dup' && c.kind==='rel' && RELIABILITY_ITEMS[c.i].id===obj.id) return answers[pos]||0;
-  }
-  return 0;
-}
-function computeReliability(styleScores, topicScores){
-  // 1) 중복 일관성: 두 쌍의 절대차 기반 (0~1)
-  const dup1_a = getAnswerByItem({kind:'dup',id:'dup_empathy'});
-  const dup1_b = (()=>{
-    // 참조(core) 위치의 응답
-    const refIdx = RELIABILITY_ITEMS.find(r=>r.id==='dup_empathy').ref;
-    let val=0;
-    for(let pos=0; pos<combined.length; pos++){ const c=combined[pos];
-      if(c.kind==='style' && c.i===refIdx){ val=answers[pos]||0; break; }
+  /* 레이더 */
+  function sizeCanvasOnce(canvas){ const w=Math.max(320, canvas.parentElement.clientWidth-16); canvas.width=w; canvas.height=Math.max(300, Math.min(420, Math.round(w*0.66))); }
+  function drawRadar(canvas, labels, vals, color, maxVal){
+    const ctx=canvas.getContext('2d'), W=canvas.width, H=canvas.height;
+    ctx.clearRect(0,0,W,H);
+    const cx=W/2, cy=H/2, r=Math.min(W,H)*0.32, N=labels.length;
+    ctx.strokeStyle="#d6def0"; ctx.lineWidth=1.5;
+    for(let ring=1; ring<=5; ring++){ const rr=r*ring/5; ctx.beginPath();
+      for(let i=0;i<N;i++){ const a=-Math.PI/2+i*2*Math.PI/N; const x=cx+rr*Math.cos(a), y=cy+rr*Math.sin(a); i?ctx.lineTo(x,y):ctx.moveTo(x,y); }
+      ctx.closePath(); ctx.stroke();
     }
-    return val;
-  })();
-  const dup2_a = getAnswerByItem({kind:'dup',id:'dup_action'});
-  const dup2_b = (()=>{
-    const refIdx = RELIABILITY_ITEMS.find(r=>r.id==='dup_action').ref;
-    let val=0;
-    for(let pos=0; pos<combined.length; pos++){ const c=combined[pos];
-      if(c.kind==='style' && c.i===refIdx){ val=answers[pos]||0; break; }
+    for(let i=0;i<N;i++){const a=-Math.PI/2+i*2*Math.PI/N; ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+r*Math.cos(a), cy+r*Math.sin(a)); ctx.stroke();}
+    for(let i=0;i<N;i++){ const a=-Math.PI/2+i*2*Math.PI/N; const lx=cx+(r+26)*Math.cos(a), ly=cy+(r+26)*Math.sin(a);
+      ctx.fillStyle="#0e1a36"; ctx.font="14px Noto Sans KR";
+      ctx.textAlign = Math.cos(a)>0.3?"left":(Math.cos(a)<-0.3?"right":"center");
+      ctx.textBaseline = Math.sin(a)>0.3?"top":(Math.sin(a)<-0.3?"bottom":"middle");
+      ctx.fillText(labels[i], lx, ly);
     }
-    return val;
-  })();
-  const sim = v=>1-Math.min(4,Math.abs(v))/4; // 5점 Likert 간 차이 정규화
-  const dupScore = (sim(dup1_a-dup1_b)+sim(dup2_a-dup2_b))/2; // 0~1
+    const rgba=(hex,a)=>{const m=hex.match(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i); if(!m) return hex; const r=parseInt(m[1],16),g=parseInt(m[2],16),b=parseInt(m[3],16); return `rgba(${r},${g},${b},${a})`;};
+    const pts=[]; for(let i=0;i<N;i++){ const v=vals[i]||0, rr=r*(v/maxVal); const a=-Math.PI/2+i*2*Math.PI/N; pts.push([cx+rr*Math.cos(a), cy+rr*Math.sin(a)]); }
+    ctx.beginPath(); pts.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y)); ctx.closePath(); ctx.fillStyle=rgba(color,.22); ctx.fill(); ctx.strokeStyle=color; ctx.lineWidth=2.5; ctx.stroke();
+    ctx.fillStyle=color; pts.forEach(([x,y])=>{ctx.beginPath(); ctx.arc(x,y,3.5,0,Math.PI*2); ctx.fill();});
+  }
 
-  // 2) 역문항 일관성: 관련 축 평균(정채점) vs 역문항(역채점) 유사도
+  /* 신뢰도 계산 */
+  function getAnswerOfReliability(id){
+    for(let pos=0; pos<combined.length; pos++){
+      const c=combined[pos];
+      if(c.kind==='rel' && RELIABILITY_ITEMS[c.i].id===id) return answers[pos]||0;
+    }
+    return 0;
+  }
+  function getAnswerAtCore(kind, idxInCore){
+    for(let pos=0; pos<combined.length; pos++){
+      const c=combined[pos];
+      if(c.kind===kind && c.i===idxInCore){ return answers[pos]||0; }
+    }
+    return 0;
+  }
   function traitMean(trait, kind){
-    let sum=0, cnt=0;
+    let sum=0,cnt=0;
     combined.forEach((c,pos)=>{
       if(c.kind!==kind) return;
       const arr=(kind==='style')?STYLE_QUESTIONS:TOPIC_QUESTIONS;
@@ -396,84 +356,121 @@ function computeReliability(styleScores, topicScores){
     });
     return cnt?sum/cnt:0;
   }
-  const empathMean = traitMean("공감형","style");
-  const habitMean  = traitMean("행동·습관","topic");
-  // 역문항 응답(원점수) → 역채점(6-x)
-  const revEmp = 6 - (()=>{
-    let val=0;
-    for(let pos=0; pos<combined.length; pos++){ const c=combined[pos];
-      if(c.kind==='rel' && RELIABILITY_ITEMS[c.i].id==='rev_empathy'){ val=answers[pos]||0; break;}
-    } return val;
-  })();
-  const revHab = 6 - (()=>{
-    let val=0;
-    for(let pos=0; pos<combined.length; pos++){ const c=combined[pos];
-      if(c.kind==='rel' && RELIABILITY_ITEMS[c.i].id==='rev_habit'){ val=answers[pos]||0; break;}
-    } return val;
-  })();
-  const revScore = (sim(revEmp - empathMean) + sim(revHab - habitMean)) / 2; // 0~1
+  function computeReliability(){
+    // 중복(2쌍)
+    const dup1_a=getAnswerOfReliability("dup_empathy");
+    const dup1_b=getAnswerAtCore("style", RELIABILITY_ITEMS.find(r=>r.id==='dup_empathy').ref);
+    const dup2_a=getAnswerOfReliability("dup_action");
+    const dup2_b=getAnswerAtCore("style", RELIABILITY_ITEMS.find(r=>r.id==='dup_action').ref);
+    const sim=v=>1-Math.min(4,Math.abs(v))/4;
+    const dupScore=(sim(dup1_a-dup1_b)+sim(dup2_a-dup2_b))/2;
 
-  // 3) 사회적 바람직성(SDS) 보정: 높을수록 벌점
-  let sdsSum=0;
-  combined.forEach((c,pos)=>{
-    if(c.kind==='rel'){
-      const id = RELIABILITY_ITEMS[c.i].id;
-      if(id==='sds1'||id==='sds2') sdsSum += (answers[pos]||0);
+    // 역문항(정채점 평균 vs 역채점값)
+    const empathMean=traitMean("공감형","style");
+    const habitMean =traitMean("행동·습관","topic");
+    const revEmp = 6 - getAnswerOfReliability("rev_empathy");
+    const revHab = 6 - getAnswerOfReliability("rev_habit");
+    const revScore=(sim(revEmp - empathMean)+sim(revHab - habitMean))/2;
+
+    // SDS
+    const sds1=getAnswerOfReliability("sds1"), sds2=getAnswerOfReliability("sds2");
+    const sdsSum=sds1+sds2; // 2~10
+    const sdsPenalty = Math.max(0, (sdsSum-2)/8*0.4);
+
+    let overall01 = 0.4*dupScore + 0.4*revScore + 0.2*(1-sdsPenalty);
+    overall01 = Math.max(0, Math.min(1, overall01));
+    const overall = Math.round(overall01*100);
+    const band = overall>=80 ? "높음" : (overall>=60 ? "보통" : "낮음");
+    const note = `중복:${(dupScore*100).toFixed(0)} / 역문항:${(revScore*100).toFixed(0)} / SDS벌점:${(sdsPenalty*100).toFixed(0)} → 종합:${overall} (${band})`;
+
+    return {
+      dupTxt:`${(dupScore*100).toFixed(0)}`,
+      revTxt:`${(revScore*100).toFixed(0)}`,
+      sdsTxt:`-${Math.round(sdsPenalty*100)/100}`,
+      overall,
+      note
+    };
+  }
+
+  /* 직접 타당도 폼 */
+  function renderFaceForm(mainStyle, mainTopic, auxStyle, mbti){
+    const qs=[
+      {id:'f1',text:`대화방식(주 성향: ${mainStyle||"-"})이 나와 잘 맞습니다.`},
+      {id:'f2',text:`대화주제(주 성향: ${mainTopic||"-"})가 나와 잘 맞습니다.`},
+      {id:'f3',text:`보조 성향(${auxStyle||"-"})도 나에게 해당됩니다.`},
+      {id:'f4',text:`MBTI 추정(${mbti})이 나에게 가깝습니다.`},
+      {id:'f5',text:`전체 결과가 내 성향과 일치합니다.`}
+    ];
+    const el=document.getElementById('faceForm'); const picks={};
+    el.innerHTML = qs.map(q=>`
+      <div style="margin:10px 0;">
+        <div style="font-weight:700;margin:6px 0;">${q.text}</div>
+        <div class="opts" style="grid-template-columns:repeat(5,1fr);">
+          ${ANSWERS.map((a,i)=>`<div class="opt" data-q="${q.id}" data-val="${i+1}">${a}</div>`).join("")}
+        </div>
+      </div>
+    `).join("");
+    el.querySelectorAll('.opt').forEach(op=>{
+      op.addEventListener('click', ()=>{
+        const q=op.dataset.q; const v=+op.dataset.val;
+        el.querySelectorAll(`.opt[data-q="${q}"]`).forEach(x=>x.classList.remove('selected'));
+        op.classList.add('selected'); picks[q]=v;
+      });
+    });
+    document.getElementById('faceSubmit').onclick=()=>{
+      const vals=Object.values(picks); if(vals.length<qs.length){alert("모든 문항에 응답해주세요."); return;}
+      const avg = Math.round((vals.reduce((a,b)=>a+b,0)/qs.length)/5*100);
+      document.getElementById('faceAvg').textContent = `${avg}`;
+    };
+  }
+
+  /* 결과 계산 */
+  function computeResult(){
+    const styleScores = sumBy("style", STYLE_TYPES);
+    const topicScores = sumBy("topic", TOPIC_TYPES);
+    const [s1,s2]=top2(styleScores), [t1,t2]=top2(topicScores);
+
+    document.getElementById('styleSummary').innerHTML = `주 성향: <b>${s1[0]||"-"}</b><span class="badge">보조: ${s2[0]||"-"}</span>`;
+    document.getElementById('topicSummary').innerHTML = `주 성향: <b>${t1[0]||"-"}</b><span class="badge">보조: ${t2[0]||"-"}</span>`;
+    document.getElementById('styleSub').textContent = ({"공감형":"따뜻한 경청과 공감을 선호합니다.","인지형":"이유를 파악하고 차근차근 정리하는 대화를 선호합니다.","동기형":"격려와 의미 찾기로 의욕을 높이는 대화를 선호합니다.","행동형":"구체적 계획과 점검이 있는 실천 중심 대화를 선호합니다."}[s1[0]]||"-");
+    document.getElementById('topicSub').textContent = ({"자기인식·정서조절":"감정을 알아차리고 조절하는 주제를 선호합니다.","관계·소통":"가족·친구와 소통을 다루는 주제를 선호합니다.","회복·적응":"어려움을 이겨내는 방법을 선호합니다.","행동·습관":"생활 루틴과 작은 목표를 실천하는 주제를 선호합니다."}[t1[0]]||"-");
+
+    const mbti = mbtiFromHF(styleScores, topicScores);
+    document.getElementById('mbtiLine').textContent = `HF→MBTI 추정: ${mbti}`;
+
+    const sc=document.getElementById('styleChart'), tc=document.getElementById('topicChart');
+    sizeCanvasOnce(sc); sizeCanvasOnce(tc);
+    drawRadar(sc, STYLE_TYPES, STYLE_TYPES.map(k=>styleScores[k]||0), '#3a72ff', 20);
+    drawRadar(tc, TOPIC_TYPES, TOPIC_TYPES.map(k=>topicScores[k]||0), '#2dc5a6', 20);
+
+    const rel = computeReliability();
+    document.getElementById('kDup').textContent = rel.dupTxt;
+    document.getElementById('kRev').textContent = rel.revTxt;
+    document.getElementById('kSds').textContent = rel.sdsTxt;
+    document.getElementById('kOverall').textContent = `${rel.overall}`;
+    document.getElementById('relNote').textContent = rel.note;
+
+    renderFaceForm(s1[0], t1[0], s2[0], mbti);
+
+    phase='result'; stage(phase); setProgress(combined.length, combined.length);
+  }
+
+  /* 리스타트 */
+  document.getElementById('restartBtn').addEventListener('click', ()=>location.reload());
+
+  /* 초기 단계 */
+  stage('intro');
+
+  /* 키보드 단축키(선택지 1~5) */
+  document.addEventListener('keydown',(e)=>{
+    if(phase!=='q') return;
+    if(e.key>='1' && e.key<='5'){
+      const n=+e.key;
+      const opts=document.querySelectorAll('#opts .opt');
+      if(opts[n-1]) opts[n-1].click();
     }
   });
-  // 2~10 범위 → 1에서 최대 0.4까지 감점
-  const sdsPenalty = Math.max(0, (sdsSum-2)/8*0.4);
-  const sdsTxt = `-${Math.round(sdsPenalty*100)/100}`;
-
-  // 종합(가중): dup 0.4, rev 0.4, sds 0.2
-  let overall01 = 0.4*dupScore + 0.4*revScore + 0.2*(1-sdsPenalty);
-  overall01 = Math.max(0, Math.min(1, overall01));
-  const overall = Math.round(overall01*100);
-
-  const band = overall>=80 ? "높음" : (overall>=60 ? "보통" : "낮음");
-  const note = `중복:${(dupScore*100).toFixed(0)} / 역문항:${(revScore*100).toFixed(0)} / SDS벌점:${(sdsPenalty*100).toFixed(0)} → 종합:${overall} (${band})`;
-
-  return {dupTxt:`${(dupScore*100).toFixed(0)}`, revTxt:`${(revScore*100).toFixed(0)}`, sdsTxt, overall, note};
-}
-
-/* 직접 타당도 폼 */
-function renderFaceForm(mainStyle, mainTopic, auxStyle, mbti){
-  const qs=[
-    {id:'f1',text:`대화방식(주 성향: ${mainStyle||"-"})이 나와 잘 맞습니다.`},
-    {id:'f2',text:`대화주제(주 성향: ${mainTopic||"-"})가 나와 잘 맞습니다.`},
-    {id:'f3',text:`보조 성향(${auxStyle||"-"})도 나에게 해당됩니다.`},
-    {id:'f4',text:`MBTI 추정(${mbti})이 나에게 가깝습니다.`},
-    {id:'f5',text:`전체 결과가 내 성향과 일치합니다.`}
-  ];
-  const el=document.getElementById('faceForm');
-  el.innerHTML = qs.map(q=>`
-    <div style="margin:10px 0;">
-      <div style="font-weight:700;margin:6px 0;">${q.text}</div>
-      <div class="opts" style="grid-template-columns:repeat(5,1fr);">
-        ${ANSWERS.map((a,i)=>`<div class="opt" data-q="${q.id}" data-val="${i+1}">${a}</div>`).join("")}
-      </div>
-    </div>
-  `).join("");
-  const picks={};
-  el.querySelectorAll('.opt').forEach(op=>{
-    op.onclick=()=>{
-      const q=op.dataset.q; const v=+op.dataset.val;
-      el.querySelectorAll(`.opt[data-q="${q}"]`).forEach(x=>x.classList.remove('selected'));
-      op.classList.add('selected'); picks[q]=v;
-    };
-  });
-  document.getElementById('faceSubmit').onclick=()=>{
-    const vals=Object.values(picks); if(vals.length<qs.length){alert("모든 문항에 응답해주세요."); return;}
-    const avg = Math.round((vals.reduce((a,b)=>a+b,0)/qs.length)/5*100);
-    document.getElementById('faceAvg').textContent = `${avg}`;
-  };
-}
-
-/* 이벤트 */
-document.getElementById('restartBtn').onclick=()=>{location.reload();};
-
-/* 초기 */
-stage('intro');
+});
 </script>
 </body>
 </html>
