@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>무료 AI 상담 데모 (브라우저 내장 LLM / STT·TTS 옵션)</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#f6f8ff;--card:#fff;--line:#e5e9f3;--fg:#0f1a3a;--acc:#3a72ff}
+  *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--fg);font-family:"Noto Sans KR",system-ui}
+  .wrap{max-width:940px;margin:24px auto;padding:16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:0 10px 26px rgba(15,26,58,.06);overflow:hidden}
+  header{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:8px;align-items:center}
+  h1{margin:0;font-size:18px;font-weight:800}
+  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  select,button{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:#f1f4ff;color:#0f1a3a;font-weight:800;cursor:pointer}
+  button.primary{background:linear-gradient(90deg,var(--acc),#7ea0ff);border:0}
+  .pill{border:1px solid var(--line);border-radius:999px;padding:6px 10px;background:#fff;font-size:12px}
+  .chat{height:540px;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
+  .m{padding:12px 14px;border:1px solid var(--line);border-radius:12px;max-width:78%}
+  .u{align-self:flex-end;background:#eef2ff;border-color:#dfe6ff}
+  .a{align-self:flex-start;background:#fff;border-color:#e9eef8}
+  .meta{font-size:12px;color:#5a6788;margin-top:4px}
+  .input{display:flex;gap:8px;border-top:1px solid var(--line);padding:10px;background:#fafcff}
+  textarea{flex:1;resize:none;height:64px;border:1px solid var(--line);border-radius:10px;padding:10px;font-size:15px}
+  .progress{height:10px;background:#e9eefc;border-radius:8px;overflow:hidden;margin-left:8px;flex:1}
+  .bar{height:100%;width:0;background:linear-gradient(90deg,var(--acc),#9ab3ff);transition:width .2s}
+  .note{padding:10px 16px;border-top:1px solid var(--line);font-size:13px;color:#42506f;background:#fbfcff}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <header>
+      <h1>🧠 무료 AI 상담 데모 (온-브라우저 LLM)</h1>
+      <div class="row">
+        <select id="modelSel" title="모델 선택">
+          <!-- 작을수록 가볍고 호환성↑, 품질은 다소↓ -->
+          <option value="Llama-3.2-1B-Instruct-q4f32_1-MLC">Llama 3.2 1B (경량)</option>
+          <option value="Phi-3.1-mini-4k-instruct-q4f16_1-MLC">Phi-3.1 Mini (가벼움)</option>
+        </select>
+        <button id="load" class="primary">모델 불러오기</button>
+        <span class="pill" id="status">상태: 대기</span>
+        <div class="progress" style="width:200px"><div class="bar" id="bar"></div></div>
+        <button id="sttBtn">🎙️ 음성 인식</button>
+        <button id="ttsBtn">🔊 TTS 켜기</button>
+      </div>
+    </header>
+
+    <div class="chat" id="chat"></div>
+
+    <div class="input">
+      <textarea id="box" placeholder="메시지를 입력하거나 '🎙️ 음성 인식'을 누르세요. (Shift+Enter 줄바꿈)"></textarea>
+      <button id="send" class="primary">보내기</button>
+    </div>
+
+    <div class="note">
+      * 브라우저(WebGPU)에서 직접 모델을 로드합니다. PC 성능과 네트워크에 따라 초기 로딩에 시간이 걸릴 수 있어요.<br>
+      * WebGPU 미지원 환경에서는 자동으로 <b>규칙 기반 폴백</b>으로 동작합니다.
+    </div>
+  </div>
+</div>
+
+<!-- WebLLM: 브라우저 LLM 엔진 -->
+<script src="https://unpkg.com/@mlc-ai/web-llm@0.2.48/dist/webllm.min.js"></script>
+<script>
+const chat = document.getElementById('chat');
+const box  = document.getElementById('box');
+const send = document.getElementById('send');
+const modelSel = document.getElementById('modelSel');
+const loadBtn = document.getElementById('load');
+const statusEl = document.getElementById('status');
+const bar = document.getElementById('bar');
+const sttBtn = document.getElementById('sttBtn');
+const ttsBtn = document.getElementById('ttsBtn');
+
+let engine = null;          // WebLLM 엔진
+let useTTS = false;         // 음성 출력 토글
+let sttOn = false;          // 음성 인식 on/off
+let rec = null;             // STT 객체
+let webgpuOK = ('gpu' in navigator);
+let usingFallback = false;  // 규칙기반 폴백 플래그
+
+// 초기 시스템 프롬프트 (HF 컨셉 반영)
+const systemPrompt =
+`당신은 공감적이고 구조화된 MCI 상담가입니다.
+- 말투: 따뜻하고 간결하게, 한 번에 하나의 질문.
+- 주제: 감정 상태 확인 → 일상 루틴 → 관계/소통 → 회복/적응 흐름 권장.
+- 사용자가 힘들어하면 즉시 난이도를 낮추고 격려하세요.
+- 한국어로 대화하세요.`;
+
+const convo = [{ role:'system', content: systemPrompt }];
+
+function add(role, text){
+  const el = document.createElement('div');
+  el.className = 'm ' + (role === 'user' ? 'u' : 'a');
+  el.innerHTML = `<div>${sanitize(text).replace(/\n/g,'<br>')}</div>`;
+  chat.appendChild(el);
+  chat.scrollTop = chat.scrollHeight;
+  if (role === 'assistant' && useTTS) speak(text);
+}
+function sanitize(s){ return s.replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+// 규칙기반 폴백
+function ruleReply(userText){
+  const t = userText.toLowerCase();
+  if(t.includes('안녕')||t.includes('hello')||t.includes('hi')) return '안녕하세요! 오늘 기분은 어떠세요? 한 단어로 표현해볼까요?';
+  if(t.includes('힘들')||t.includes('어렵')||t.includes('불안')) return '괜찮아요. 천천히 해볼게요. 지금 마음을 0~10 중 어느 정도로 느끼시나요?';
+  if(t.includes('기억')) return '좋아요. 잠시 후 기억 과제를 가볍게 해볼 수 있어요. 우선 오늘 있었던 기분 좋은 일을 하나 떠올려보실래요?';
+  return '말씀 감사합니다. 이어서 한 가지 질문만 드릴게요: 오늘 하루 중 가장 편안했던 순간은 언제였나요?';
+}
+
+// 모델 로딩
+loadBtn.onclick = async ()=>{
+  if (!webgpuOK) {
+    statusEl.textContent = '상태: WebGPU 미지원 → 규칙기반 모드';
+    usingFallback = true;
+    return;
+  }
+  usingFallback = false;
+  const modelId = modelSel.value;
+  statusEl.textContent = '상태: 모델 준비 중…';
+  bar.style.width = '5%';
+  try{
+    engine = await webllm.CreateMLCEngine(modelId, {
+      initProgressCallback: (info)=>{
+        // info.text / info.progress
+        statusEl.textContent = '상태: ' + (info.text || '로딩 중…');
+        if (typeof info.progress === 'number') {
+          bar.style.width = Math.round(info.progress * 100) + '%';
+        }
+      }
+    });
+    statusEl.textContent = '상태: 준비 완료';
+    bar.style.width = '100%';
+    // 웰컴 메시지
+    const welcome = '안녕하세요! 저는 브라우저 안에서 동작하는 무료 AI 상담가예요. 오늘 기분은 어떠세요?';
+    add('assistant', welcome);
+    convo.push({role:'assistant', content: welcome});
+  }catch(e){
+    console.warn(e);
+    statusEl.textContent = '상태: 로딩 실패 → 규칙기반 모드';
+    usingFallback = true;
+  }
+};
+
+// 전송
+send.onclick = async ()=>{
+  const text = box.value.trim();
+  if(!text) return;
+  box.value = '';
+  add('user', text);
+  convo.push({role:'user', content:text});
+
+  // 폴백
+  if (usingFallback || !engine) {
+    const reply = ruleReply(text);
+    add('assistant', reply);
+    convo.push({role:'assistant', content:reply});
+    return;
+  }
+
+  // WebLLM 호출 (Chat Completions 호환)
+  try{
+    statusEl.textContent = '상태: 응답 생성 중…';
+    const out = await engine.chat.completions.create({
+      model: engine.getModelId?.() || 'local',
+      messages: convo,
+      temperature: 0.5,
+      max_tokens: 256
+    });
+    const reply = out?.choices?.[0]?.message?.content?.trim() || '(빈 응답)';
+    add('assistant', reply);
+    convo.push({role:'assistant', content: reply});
+    statusEl.textContent = '상태: 준비 완료';
+  }catch(err){
+    console.warn(err);
+    const reply = '(엔진 오류) 규칙기반으로 전환합니다. ' + ruleReply(text);
+    add('assistant', reply);
+    convo.push({role:'assistant', content: reply});
+    statusEl.textContent = '상태: 폴백 모드';
+    usingFallback = true;
+  }
+};
+
+// 엔터 전송
+box.addEventListener('keydown', e=>{
+  if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); send.click(); }
+});
+
+// ---- STT (브라우저 내장) ----
+function startSTT(){
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SR){ alert('이 브라우저는 음성 인식을 지원하지 않습니다(Chrome 권장).'); return; }
+  rec = new SR();
+  rec.lang='ko-KR';
+  rec.interimResults=false; rec.maxAlternatives=1;
+  rec.onresult = e=>{
+    const txt = e.results[0][0].transcript;
+    box.value = (box.value ? box.value + ' ' : '') + txt;
+  };
+  rec.onerror = e=>{ console.warn('STT error:', e.error); sttOn=false; sttBtn.textContent='🎙️ 음성 인식'; };
+  rec.onend = ()=>{ sttOn=false; sttBtn.textContent='🎙️ 음성 인식'; };
+  rec.start(); sttOn=true; sttBtn.textContent='🛑 중지';
+}
+function stopSTT(){ if(rec){ rec.stop(); } }
+sttBtn.onclick = ()=>{ sttOn ? stopSTT() : startSTT(); };
+
+// ---- TTS (브라우저 내장) ----
+function speak(text){
+  if(!('speechSynthesis' in window)) return;
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'ko-KR';
+  window.speechSynthesis.speak(u);
+}
+ttsBtn.onclick = ()=>{ useTTS = !useTTS; ttsBtn.textContent = useTTS ? '🔇 TTS 끄기' : '🔊 TTS 켜기'; };
+</script>
+</body>
+</html>
