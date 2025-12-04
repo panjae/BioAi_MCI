@@ -3,522 +3,331 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>HF(4×4) 설문 – 대화방식·주제 성향 + 신뢰도</title>
+<title>HF(6) 설문 – 대화유형/주제 6축 진단</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"></script>
 <style>
-:root{--base:18px;--bg:#eef3ff;--card:#fff;--fg:#0e1a36;--muted:#5a6b85;--line:#e5e9f3;--accent:#3a72ff;--accent2:#2dc5a6}
-*{box-sizing:border-box}html,body{height:100%;margin:0}
-body{background:var(--bg);color:var(--fg);font-family:"Noto Sans KR",system-ui,Segoe UI,Roboto,Arial,sans-serif;font-size:var(--base)}
-.wrap{max-width:1100px;margin:28px auto;padding:16px}
-.card{background:var(--card);border-radius:16px;overflow:hidden;border:1px solid var(--line);box-shadow:0 10px 26px rgba(16,32,57,.08)}
-header{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px}
-h1{margin:0;font-size:clamp(18px,2.2vw,24px);font-weight:800}
-.controls{display:flex;gap:8px}
-.controls button{border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-weight:800;background:#f3f6ff;color:#0f224a;cursor:pointer}
-
-.progress{padding:14px 20px;border-bottom:1px solid var(--line)}
-.bar{height:12px;background:#e9eefc;border-radius:8px;overflow:hidden}
-.fill{height:100%;background:linear-gradient(90deg,var(--accent),#8ea9ff);width:0%;transition:width .35s}
-.meta{display:flex;gap:18px;margin-top:10px;font-size:14px;color:var(--muted);flex-wrap:wrap}
-
-.stage{padding:20px}
-.qid{display:inline-block;padding:6px 12px;border-radius:999px;background:#eef2fb;color:#3b4a6b;font-weight:800;font-size:13px;margin-bottom:14px;border:1px solid var(--line)}
-.qtext{font-size:clamp(20px,2.6vw,26px);line-height:1.55;font-weight:800;margin:6px 0 14px}
-.help{font-size:15px;color:#3c4d75;margin:0 0 12px}
-.opts{display:grid;gap:10px;grid-template-columns:repeat(5,1fr)}
-@media(max-width:840px){.opts{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:560px){.opts{grid-template-columns:repeat(2,1fr)}}
-.opt{background:#f5f7ff;border:2px solid #d7def1;border-radius:12px;padding:10px 8px;font-weight:800;text-align:center;user-select:none;cursor:pointer;color:#0f224a}
-.opt.selected{border-color:var(--accent);background:#ebf1ff;box-shadow:0 0 0 2px rgba(58,114,255,.12) inset}
-
-.nav{display:flex;justify-content:space-between;gap:12px;padding:16px 20px;border-top:1px solid var(--line)}
-button.big{border:1px solid var(--line);border-radius:12px;padding:12px 16px;font-weight:800;font-size:16px;background:#f6f8ff;color:#0f224a;cursor:pointer}
-.primary{background:linear-gradient(90deg,var(--accent),#8ea9ff);color:#0f224a !important;border:0;font-weight:800}
-.hidden{display:none}
-
-.grid{display:grid;grid-template-columns:1fr;gap:16px}
-@media(min-width:980px){.grid{grid-template-columns:1fr 1fr}}
-.panel{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px}
-.panel h3{margin:0 0 8px;font-size:18px;color:#14234a}
-.bigline{font-size:18px;margin-bottom:6px}
-.subtle{font-size:13px;color:#5b6b89}
-.chart-wrap{padding:8px}
-canvas{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:8px;background:#fff}
-
-.badge{display:inline-block;margin-left:8px;padding:4px 8px;border-radius:999px;background:#eef2fb;color:#3b4a6b;font-size:12px;border:1px solid var(--line)}
-.kpi{display:flex;gap:12px;flex-wrap:wrap}
-.kpi .box{background:#f6f8ff;border:1px solid var(--line);border-radius:10px;padding:10px 12px}
-.kpi .big{font-size:22px;font-weight:800}
+  :root{
+    --bg:#f6f8ff; --card:#fff; --line:#e6ebf3; --fg:#0f1a3a; --acc:#3a72ff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);font-family:"Noto Sans KR",system-ui}
+  .wrap{max-width:960px;margin:24px auto;padding:14px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:0 10px 24px rgba(15,26,58,.06);overflow:hidden}
+  header{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:8px}
+  h1{margin:0;font-size:20px;font-weight:800}
+  .progress{height:10px;background:#e9eefc;border-radius:8px;overflow:hidden;margin:12px 18px}
+  .bar{height:100%;width:0;background:linear-gradient(90deg,var(--acc),#98b0ff);transition:width .2s}
+  .step{padding:18px}
+  .qhead{font-size:18px;font-weight:800;margin:6px 0 12px}
+  .qtext{font-size:20px;line-height:1.6;margin:10px 0 16px}
+  .opts{display:flex;flex-wrap:wrap;gap:12px}
+  .opt{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:#f5f7ff;cursor:pointer}
+  .opt input{transform:scale(1.2)}
+  .nav{display:flex;justify-content:space-between;gap:10px;margin-top:14px}
+  button{border:1px solid var(--line);border-radius:12px;padding:12px 16px;background:#f1f4ff;color:#0f1a3a;font-weight:800;cursor:pointer}
+  button.primary{background:linear-gradient(90deg,var(--acc),#7ea0ff);border:0}
+  .grid{display:grid;grid-template-columns:1fr;gap:14px}
+  @media(min-width:900px){ .grid{grid-template-columns:1fr 1fr} }
+  .panel{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fff}
+  .pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:6px 10px;background:#f8faff;font-size:12px;margin-left:8px}
+  .lead{margin:0 0 8px;font-weight:800}
+  .desc{margin:6px 0 0;color:#3b4a6a}
+  .footer{padding:12px 18px;border-top:1px solid var(--line);display:flex;justify-content:space-between}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="card">
+  <div class="card" id="app">
     <header>
-      <h1>🧠 HF(4×4) 설문 – 대화방식·주제 성향 진단 + 신뢰도</h1>
-      <div class="controls"><button id="fontDown">A−</button><button id="fontUp">A+</button></div>
+      <h1>🧠 HF(6) 설문 – 대화유형·주제 6축 성향 진단</h1>
+      <div class="pill">총 30문항</div>
     </header>
 
-    <div class="progress">
-      <div class="bar"><div class="fill" id="fill"></div></div>
-      <div class="meta"><div>단계: <span id="stageName">Intro</span></div><div>진행: <span id="count">0</span>/<span id="total">0</span></div></div>
-    </div>
+    <div class="progress"><div id="bar" class="bar"></div></div>
 
-    <!-- Intro -->
-    <section class="stage" id="stageIntro">
-      <div class="qid">안내</div>
-      <p class="qtext">질문을 <b>한 개씩</b> 보여드립니다.<br>응답은 <b>전혀 아니다 ~ 매우 그렇다(5점)</b> 중 하나를 고릅니다.</p>
-      <p class="help">검사가 끝나면 결과와 신뢰도 요약을 함께 보여드립니다.</p>
-      <div class="nav">
-        <button class="big" disabled>← 이전</button>
-        <button class="big primary" id="startBtn">🟢 시작하기</button>
-      </div>
-    </section>
-
-    <!-- Q&A -->
-    <section class="stage hidden" id="stageQ">
-      <div class="qid" id="qid">문항</div>
-      <div class="qtext" id="qtext">질문 텍스트</div>
-      <p class="help" id="hint">맞는 답 하나를 눌러 주세요.</p>
+    <!-- 질문 단계 -->
+    <div id="step-quiz" class="step">
+      <div class="qhead" id="qhead">문항 <span id="qIdx">1</span> / <span id="qTotal">30</span></div>
+      <div class="qtext" id="qtext">질문이 여기에 표시됩니다.</div>
       <div class="opts" id="opts"></div>
       <div class="nav">
-        <button class="big" id="prevBtn">← 이전</button>
-        <button class="big primary" id="nextBtn" disabled>다음 →</button>
+        <button id="prevBtn">← 이전</button>
+        <button id="nextBtn" class="primary">다음 →</button>
       </div>
-    </section>
+    </div>
 
-    <!-- Result -->
-    <section class="stage hidden" id="stageResult">
+    <!-- 결과 단계 -->
+    <div id="step-result" class="step" style="display:none">
       <div class="grid">
         <div class="panel">
-          <h3>🗣️ 대화방식 결과</h3>
-          <div class="bigline" id="styleSummary">-</div>
-          <div class="subtle" id="styleSub">-</div>
+          <p class="lead">🗣️ 대화 성향 결과</p>
+          <div>주 성향: <b id="mainType">-</b> <span class="pill">보조: <span id="subType">-</span></span></div>
+          <p class="desc" id="typeDesc">결과 설명이 여기에 표시됩니다.</p>
         </div>
         <div class="panel">
-          <h3>💭 대화주제 결과</h3>
-          <div class="bigline" id="topicSummary">-</div>
-          <div class="subtle" id="topicSub">-</div>
-        </div>
-
-        <div class="panel">
-          <h3>📈 성향 분포(대화방식)</h3>
-          <div class="chart-wrap"><canvas id="styleChart"></canvas></div>
-        </div>
-        <div class="panel">
-          <h3>📈 성향 분포(대화주제)</h3>
-          <div class="chart-wrap"><canvas id="topicChart"></canvas></div>
-        </div>
-
-        <div class="panel">
-          <h3>🔎 MBTI 대응(참고)</h3>
-          <div id="mbtiLine" class="bigline">-</div>
-          <div class="subtle">* HF→MBTI는 참고용 안내입니다(진단 도구 아님).</div>
-        </div>
-
-        <div class="panel">
-          <h3>🧪 신뢰도 요약</h3>
-          <div class="kpi">
-            <div class="box"><div>중복 일관성</div><div class="big" id="kDup">-</div></div>
-            <div class="box"><div>역문항 일관성</div><div class="big" id="kRev">-</div></div>
-            <div class="box"><div>사회적 바람직성 보정</div><div class="big" id="kSds">-</div></div>
-            <div class="box"><div>종합 신뢰도(0–100)</div><div class="big" id="kOverall">-</div></div>
-          </div>
-          <div class="subtle" id="relNote"></div>
-        </div>
-
-        <div class="panel">
-          <h3>🗳️ 직접 타당도(결과 일치도) 설문</h3>
-          <div id="faceForm"></div>
-          <div class="nav" style="padding:0;margin-top:8px;">
-            <button class="big primary" id="faceSubmit">타당도 제출</button>
-          </div>
-          <div class="kpi" style="margin-top:10px;">
-            <div class="box"><div>면접적 타당도 평균</div><div class="big" id="faceAvg">-</div></div>
-          </div>
+          <p class="lead">📊 총점 요약</p>
+          <div id="sumText"></div>
         </div>
       </div>
 
-      <div class="nav">
-        <button class="big" id="restartBtn">🔁 처음으로</button>
+      <div class="panel" style="margin-top:12px">
+        <p class="lead">📈 성향 분포(육각형)</p>
+        <canvas id="radar" height="340"></canvas>
       </div>
-    </section>
+
+      <div class="footer">
+        <div class="pill">이 결과는 학습·상담 시뮬레이션용이며 임상진단 도구가 아닙니다.</div>
+        <button id="resetBtn">처음으로</button>
+      </div>
+    </div>
   </div>
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-  /* 글자 크기 */
-  (()=>{
-    const root=document.documentElement,clamp=v=>Math.max(14,Math.min(24,v));
-    const get=()=>+getComputedStyle(root).getPropertyValue('--base').replace('px','')||18;
-    const up=document.getElementById('fontUp'), down=document.getElementById('fontDown');
-    if(up) up.onclick=()=>root.style.setProperty('--base',clamp(get()+2)+'px');
-    if(down) down.onclick=()=>root.style.setProperty('--base',clamp(get()-2)+'px');
-  })();
+/* =========================
+   1) 유형 정의 & 설명
+========================= */
+const TYPES = [
+  { key:'EE', name:'정서 공감형',  desc:'상대 감정 변화를 빠르게 파악하고, 말투·속도를 조절하며 공감적으로 반응합니다.' },
+  { key:'CR', name:'인지 성찰형',  desc:'문제의 원인과 논리를 우선 파악하고, 정보를 구조화해 차분히 대화합니다.' },
+  { key:'MA', name:'동기 촉진형',  desc:'의미·목표가 분명할 때 에너지가 오르며, 상대의 장점을 발견해 동기를 북돋습니다.' },
+  { key:'BE', name:'행동 실천형',  desc:'계획을 세우면 곧바로 실행하고, 작은 목표로 행동을 이어가는 실천력이 강합니다.' },
+  { key:'RR', name:'관계 조율형',  desc:'분위기를 조절해 상대가 편안하도록 돕고, 갈등 시 상호 이익이 있는 해결을 지향합니다.' },
+  { key:'RM', name:'회복 유지형',  desc:'감정이 흔들려도 자신만의 회복 기술로 균형을 되찾고, 변화에 안정적으로 적응합니다.' },
+];
+const TYPE_INDEX = TYPES.reduce((acc,t,i)=>{acc[t.key]=i;return acc;},{});
 
-  /* 공통 데이터 */
-  const ANSWERS=["전혀 아니다","대체로 아니다","보통이다","대체로 그렇다","매우 그렇다"];
-  const STYLE_TYPES=["공감형","인지형","동기형","행동형"];
-  const TOPIC_TYPES=["자기인식·정서조절","관계·소통","회복·적응","행동·습관"];
+/* =========================
+   2) 문항(6유형 × 5문항)
+     - rev: true 면 역채점(※)
+========================= */
+const QUESTIONS_RAW = [
+  // 정서 공감형 EE
+  {t:'EE', txt:'나는 상대의 기분 변화를 빠르게 알아차리는 편이다.', rev:false},
+  {t:'EE', txt:'누군가 속상한 모습을 보이면 자연스럽게 마음이 쓰인다.', rev:false},
+  {t:'EE', txt:'대화할 때 상대의 감정을 고려해 말투를 조절한다.', rev:false},
+  {t:'EE', txt:'새로운 사람을 만나도 상대의 감정을 이해하려 노력한다.', rev:false},
+  {t:'EE', txt:'다른 사람의 감정을 신경 쓰지 않는 편이다.', rev:true}, // ※
 
-  /* 핵심 32문항 */
-  const STYLE_QUESTIONS=[
-    ["다른 사람의 입장에서 생각하려고 노력합니다.","공감형"],
-    ["누군가 속상해 보이면 저도 마음이 아픕니다.","공감형"],
-    ["이야기를 들을 때, 상대의 감정을 먼저 살핍니다.","공감형"],
-    ["말을 할 때 상대가 상처받지 않도록 조심합니다.","공감형"],
-    ["힘든 일이 생기면 그 이유를 논리적으로 생각합니다.","인지형"],
-    ["문제를 객관적으로 분석하려고 합니다.","인지형"],
-    ["감정보다 생각으로 판단하는 편입니다.","인지형"],
-    ["문제를 단계적으로 해결하려고 합니다.","인지형"],
-    ["내가 목표를 세우면 스스로 동기를 유지하려 노력합니다.","동기형"],
-    ["어려워도 ‘왜 이걸 하는지’를 떠올리면 포기하지 않습니다.","동기형"],
-    ["변화는 내 선택으로부터 온다고 믿습니다.","동기형"],
-    ["힘든 일도 의미가 있으면 꾸준히 합니다.","동기형"],
-    ["작은 일이라도 직접 실천하면 기분이 나아집니다.","행동형"],
-    ["해야 할 일을 미루기보다 바로 하는 편입니다.","행동형"],
-    ["하루 일과를 미리 정해두면 편안합니다.","행동형"],
-    ["구체적인 목표를 세워두면 실천이 쉬워집니다.","행동형"]
-  ];
-  const TOPIC_QUESTIONS=[
-    ["화가 날 때 내 감정을 알아차릴 수 있습니다.","자기인식·정서조절"],
-    ["기분이 나쁠 때, 왜 그런지 곰곰이 생각합니다.","자기인식·정서조절"],
-    ["마음이 불안할 때 숨을 고르며 진정하려고 합니다.","자기인식·정서조절"],
-    ["속상한 기분이 들어도 너무 오래 끌지 않습니다.","자기인식·정서조절"],
-    ["상대가 말할 때 끝까지 듣는 편입니다.","관계·소통"],
-    ["부드럽게 거절하는 말을 할 수 있습니다.","관계·소통"],
-    ["갈등이 생기면 먼저 풀어보려 합니다.","관계·소통"],
-    ["관계에서 내 생각을 솔직히 표현할 수 있습니다.","관계·소통"],
-    ["힘든 일을 겪어도 다시 일어설 수 있습니다.","회복·적응"],
-    ["어려운 일을 겪을 때 배우는 점이 있습니다.","회복·적응"],
-    ["문제가 생기면 긍정적으로 해결책을 찾습니다.","회복·적응"],
-    ["나쁜 일도 결국 지나간다고 생각합니다.","회복·적응"],
-    ["규칙적인 생활을 하려고 노력합니다.","행동·습관"],
-    ["집안일이나 산책 같은 활동을 꾸준히 합니다.","행동·습관"],
-    ["활동을 하면 기분이 좋아집니다.","행동·습관"],
-    ["하루 목표를 세우면 도움이 됩니다.","행동·습관"]
-  ];
+  // 인지 성찰형 CR
+  {t:'CR', txt:'문제 상황이 생기면 감정보다 먼저 원인을 분석한다.', rev:false},
+  {t:'CR', txt:'대화에서 상대의 말 전체 흐름과 논리를 먼저 파악한다.', rev:false},
+  {t:'CR', txt:'새로운 정보나 관점을 접하면 생각을 깊이 정리한다.', rev:false},
+  {t:'CR', txt:'감정보다 직관에 의존해 판단하는 편이다.', rev:true}, // ※
+  {t:'CR', txt:'논리적 사고를 통해 문제를 단계적으로 해결하려고 한다.', rev:false},
 
-  /* 신뢰도 공통 6문항 */
-  function findIndexByText(arr, text){for(let i=0;i<arr.length;i++){if(arr[i][0]===text) return i;} return -1;}
-  const RELIABILITY_ITEMS=[
-    {id:"dup_empathy", text:"속상해 보이는 사람을 그냥 지나치기 어렵습니다.", kind:"dup", target:"공감형",
-     ref: findIndexByText(STYLE_QUESTIONS,"누군가 속상해 보이면 저도 마음이 아픕니다.") },
-    {id:"dup_action", text:"계획에 따라 움직이면 마음이 편안합니다.", kind:"dup", target:"행동형",
-     ref: findIndexByText(STYLE_QUESTIONS,"하루 일과를 미리 정해두면 편안합니다.") },
-    {id:"rev_empathy", text:"남의 기분까지 살피는 건 내겐 중요하지 않습니다.", kind:"rev", target:"공감형"},
-    {id:"rev_habit", text:"하루를 정해진 대로 보내는 건 번거롭기만 합니다.", kind:"rev", target:"행동·습관"},
-    {id:"sds1", text:"나는 거의 늘 남을 먼저 배려합니다.", kind:"sds"},
-    {id:"sds2", text:"나는 화를 낸 적이 거의 없습니다.", kind:"sds"}
-  ];
+  // 동기 촉진형 MA
+  {t:'MA', txt:'일이 의미가 있으면 쉽게 동기가 생긴다.', rev:false},
+  {t:'MA', txt:'목표가 명확하면 스스로 에너지가 생긴다.', rev:false},
+  {t:'MA', txt:'새로운 도전이나 경험을 찾으면 동기가 상승한다.', rev:false},
+  {t:'MA', txt:'다른 사람의 성취나 장점을 발견하면 힘을 실어주는 편이다.', rev:false},
+  {t:'MA', txt:'목표나 의미가 불분명하면 쉽게 포기하는 편이다.', rev:true}, // ※
 
-  /* 상태 */
-  let phase='intro', idx=0, combined=[], answers={};
-  const fill=document.getElementById('fill');
+  // 행동 실천형 BE
+  {t:'BE', txt:'해야 할 일이 생기면 가능한 빨리 행동으로 옮긴다.', rev:false},
+  {t:'BE', txt:'계획을 세우면 웬만하면 그대로 지키려 한다.', rev:false},
+  {t:'BE', txt:'새로운 아이디어를 실행 단계로 옮기는 것을 즐긴다.', rev:false},
+  {t:'BE', txt:'일을 미루는 편이라 계획대로 실행하기 어렵다.', rev:true}, // ※
+  {t:'BE', txt:'하루 목표를 정해두면 효율적으로 실천할 수 있다.', rev:false},
 
-  /* 유틸 */
-  function shuffle(n){const a=[...Array(n).keys()]; for(let i=n-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a;}
-  function stage(name){
-    document.getElementById('stageIntro').classList.toggle('hidden',name!=='intro');
-    document.getElementById('stageQ').classList.toggle('hidden',name!=='q');
-    document.getElementById('stageResult').classList.toggle('hidden',name!=='result');
-    document.getElementById('stageName').textContent=(name==='q'?'검사':name==='result'?'결과':'Intro');
+  // 관계 조율형 RR
+  {t:'RR', txt:'대화할 때 상대가 불편하지 않도록 분위기를 조절한다.', rev:false},
+  {t:'RR', txt:'갈등이 생기면 서로에게 손해가 적은 해결책을 찾으려 한다.', rev:false},
+  {t:'RR', txt:'새로운 사람과 관계를 맺을 때 적극적으로 친밀감을 쌓으려 한다.', rev:false},
+  {t:'RR', txt:'상대가 편안한지 늘 주의 깊게 살핀다.', rev:false},
+  {t:'RR', txt:'관계의 조화보다 내 의견 전달이 우선이라고 생각한다.', rev:true}, // ※
+
+  // 회복 유지형 RM
+  {t:'RM', txt:'감정이 흔들려도 나만의 회복 방법을 사용한다.', rev:false},
+  {t:'RM', txt:'어려움을 겪어도 다시 균형을 회복하려 노력한다.', rev:false},
+  {t:'RM', txt:'새로운 환경이나 변화가 와도 차분하게 적응하려 한다.', rev:false},
+  {t:'RM', txt:'부정적인 상황에서는 쉽게 불안해진다.', rev:true}, // ※
+  {t:'RM', txt:'스트레스를 받아도 일정 시간이 지나면 감정이 안정된다.', rev:false},
+];
+
+/* =========================
+   3) 상태
+========================= */
+const totalQ = QUESTIONS_RAW.length; // 30
+let order = shuffle([...Array(totalQ).keys()]);
+let answers = Array(totalQ).fill(null); // 0..4 저장
+let idx = 0;                            // 현재 문항 인덱스(0~29)
+let chart = null;
+
+/* =========================
+   4) UI 요소
+========================= */
+const qIdxEl = document.getElementById('qIdx');
+const qTotalEl = document.getElementById('qTotal');
+const qTextEl = document.getElementById('qtext');
+const optsEl = document.getElementById('opts');
+const barEl = document.getElementById('bar');
+
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+
+const stepQuiz = document.getElementById('step-quiz');
+const stepResult = document.getElementById('step-result');
+
+const mainTypeEl = document.getElementById('mainType');
+const subTypeEl  = document.getElementById('subType');
+const typeDescEl = document.getElementById('typeDesc');
+const sumTextEl  = document.getElementById('sumText');
+const radarCanvas= document.getElementById('radar');
+const resetBtn   = document.getElementById('resetBtn');
+
+qTotalEl.textContent = totalQ;
+
+/* =========================
+   5) 함수들
+========================= */
+function shuffle(arr){
+  for(let i=arr.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]] = [arr[j],arr[i]];
   }
-  function setProgress(cur,total){
-    document.getElementById('count').textContent=cur;
-    document.getElementById('total').textContent=total;
-    fill.style.width=(total?Math.round(cur/total*100):0)+'%';
-  }
+  return arr;
+}
+function renderQuestion(){
+  const real = order[idx];
+  const item = QUESTIONS_RAW[real];
+  qIdxEl.textContent = idx+1;
+  qTextEl.textContent = item.txt;
 
-  /* 시작 */
-  const startBtn=document.getElementById('startBtn');
-  startBtn.addEventListener('click', ()=>{
-    const coreStyleIdx = shuffle(STYLE_QUESTIONS.length).map(i=>({kind:"style",i}));
-    const coreTopicIdx = shuffle(TOPIC_QUESTIONS.length).map(i=>({kind:"topic",i}));
-    const relIdx = shuffle(RELIABILITY_ITEMS.length).map(i=>({kind:"rel",i}));
-    combined=[...coreStyleIdx, ...coreTopicIdx, ...relIdx];
-    answers={}; idx=0; phase='q'; stage(phase); renderQ();
+  const choices = ['전혀 아니다','대체로 아니다','보통이다','대체로 그렇다','매우 그렇다'];
+  optsEl.innerHTML = '';
+  choices.forEach((label,k)=>{
+    const id = `q${idx}_c${k}`;
+    const wrap = document.createElement('label');
+    wrap.className = 'opt';
+    wrap.innerHTML = `<input type="radio" name="q${idx}" id="${id}" value="${k}"><span>${label}</span>`;
+    optsEl.appendChild(wrap);
+  });
+  // 이전 응답 표시
+  if(answers[real] !== null){
+    const sel = optsEl.querySelector(`input[value="${answers[real]}"]`);
+    if(sel) sel.checked = true;
+  }
+  // 진행바
+  const answered = answers.filter(v=>v!==null).length;
+  const prog = Math.round((answered/totalQ)*100);
+  barEl.style.width = `${prog}%`;
+  // 버튼 상태
+  prevBtn.disabled = (idx===0);
+  nextBtn.textContent = (idx===totalQ-1) ? '결과 보기 →' : '다음 →';
+}
+
+// 현재 문항의 선택값을 저장
+function commitCurrent(){
+  const real = order[idx];
+  const checked = optsEl.querySelector('input[type="radio"]:checked');
+  if(!checked) return false;
+  answers[real] = parseInt(checked.value,10);
+  return true;
+}
+
+// 점수 계산
+function computeScores(){
+  // 유형별 원점수(0~20): 5문항 × (0~4)
+  const raw = [0,0,0,0,0,0]; // EE,CR,MA,BE,RR,RM
+  const cnt = [0,0,0,0,0,0];
+  QUESTIONS_RAW.forEach((q, realIndex)=>{
+    let v = answers[realIndex];               // 0..4
+    if(v===null) v = 0;
+    if(q.rev) v = 4 - v;                      // 역채점
+    const ti = TYPE_INDEX[q.t];
+    raw[ti] += v;
+    cnt[ti] += 1;
+  });
+  // 0~30 스케일 변환: (원점수/20)*30
+  const scaled = raw.map(sum => Math.round((sum/20)*30));
+  return {raw, scaled};
+}
+
+// 결과 표시
+function showResult(){
+  const {scaled} = computeScores();
+  const pairs = TYPES.map((t,i)=>({name:t.name, key:t.key, v:scaled[i], desc:t.desc}))
+                    .sort((a,b)=>b.v-a.v);
+  const main = pairs[0], sub = pairs[1];
+
+  mainTypeEl.textContent = `${main.name}`;
+  subTypeEl.textContent  = `${sub.name}`;
+  typeDescEl.textContent = TYPE_DESC(main.key);
+
+  sumTextEl.innerHTML = pairs.map(p=>`• ${p.name}: <b>${p.v}</b>/30`).join('<br>');
+
+  // Radar
+  const labels = TYPES.map(t=>t.name);
+  const data = scaled; // [..6]
+  if(chart){ chart.destroy(); }
+  chart = new Chart(radarCanvas, {
+    type:'radar',
+    data:{
+      labels,
+      datasets:[{
+        label:'성향 점수',
+        data,
+        fill:true,
+        borderWidth:2,
+        pointRadius:3
+      }]
+    },
+    options:{
+      plugins:{ legend:{display:false} },
+      scales:{ r:{ suggestedMin:0, suggestedMax:30, ticks:{stepSize:5,font:{size:11}}, pointLabels:{font:{size:12}} } }
+    }
   });
 
-  /* 문항 렌더 */
-  const prevBtn=document.getElementById('prevBtn');
-  const nextBtn=document.getElementById('nextBtn');
-  const optsBox=document.getElementById('opts');
+  stepQuiz.style.display='none';
+  stepResult.style.display='block';
+}
 
-  function renderQ(){
-    const item = combined[idx];
-    if(!item){ alert("문항이 준비되지 않았습니다."); return; }
-    let text, tag;
-    if(item.kind==='style'){ text=STYLE_QUESTIONS[item.i][0]; tag="대화방식"; }
-    else if(item.kind==='topic'){ text=TOPIC_QUESTIONS[item.i][0]; tag="대화주제"; }
-    else { text=RELIABILITY_ITEMS[item.i].text; tag="추가 문항"; }
-
-    document.getElementById('qid').textContent=`${tag} ${idx+1}/${combined.length}`;
-    document.getElementById('qtext').textContent=text;
-
-    const stored=answers[idx]||0;
-    optsBox.innerHTML = ANSWERS.map((a,k)=>`
-      <div class="opt ${stored===k+1?"selected":""}" data-val="${k+1}" role="button" tabindex="0">${a}</div>
-    `).join("");
-
-    optsBox.querySelectorAll('.opt').forEach(el=>{
-      const pick=()=>{
-        optsBox.querySelectorAll('.opt').forEach(x=>x.classList.remove('selected'));
-        el.classList.add('selected');
-        answers[idx]=+el.dataset.val;
-        nextBtn.disabled=false;
-      };
-      el.addEventListener('click', pick);
-      el.addEventListener('keydown', (e)=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); pick(); }});
-    });
-
-    prevBtn.disabled=(idx===0);
-    nextBtn.textContent=(idx===combined.length-1)?"결과 보기":"다음 →";
-    nextBtn.disabled = !(idx in answers);
-    setProgress(idx+1, combined.length);
+function TYPE_DESC(key){
+  switch(key){
+    case 'EE': return '따뜻한 공감과 정서적 지지가 강점입니다. 초기 라포 형성, 감정 라벨링에 유리합니다.';
+    case 'CR': return '상황 구조화, 논리적 재해석이 강점입니다. 문제 정리와 단계별 계획 수립에 유리합니다.';
+    case 'MA': return '의미·목표 제시에 민감하게 반응합니다. 칭찬·강점 피드백과 작은 도전 과제가 효과적입니다.';
+    case 'BE': return '작은 행동부터 시작해 확장하는 전략이 잘 맞습니다. 체크리스트/루틴화가 도움이 됩니다.';
+    case 'RR': return '관계의 안전감·조화 유지가 중요합니다. 대화 규칙 합의, 역할 명확화가 효과적입니다.';
+    case 'RM': return '회복 전략과 정서 안정 유지가 강점입니다. 호흡·수면·리듬을 지키는 계획이 유리합니다.';
+    default: return '';
   }
+}
 
-  prevBtn.addEventListener('click', ()=>{ if(idx>0){ idx--; renderQ(); } });
-  nextBtn.addEventListener('click', ()=>{
-    if(idx<combined.length-1){ idx++; renderQ(); }
-    else { computeResult(); }
-  });
-
-  /* 점수 계산 */
-  function sumBy(kind, typeList){
-    const sums={}; typeList.forEach(t=>sums[t]=0);
-    combined.forEach((obj,pos)=>{
-      if(obj.kind!==kind) return;
-      const arr=(kind==='style')?STYLE_QUESTIONS:TOPIC_QUESTIONS;
-      const trait=arr[obj.i][1];
-      sums[trait]+= (answers[pos]||0);
-    });
-    return sums;
+/* =========================
+   6) 이벤트
+========================= */
+prevBtn.onclick = ()=>{
+  if(idx>0){ idx--; renderQuestion(); }
+};
+nextBtn.onclick = ()=>{
+  if(!commitCurrent()){
+    alert('하나를 선택해 주세요.');
+    return;
   }
-  function top2(scores){const arr=Object.entries(scores).sort((a,b)=>b[1]-a[1]); return [arr[0]||[null,0],arr[1]||[null,0]];}
-  function mbtiFromHF(styleScores, topicScores){
-    const EI = (topicScores["관계·소통"]||0) >= (topicScores["자기인식·정서조절"]||0) ? "E":"I";
-    const SN = (topicScores["행동·습관"]||0) >= (topicScores["회복·적응"]||0) ? "S":"N";
-    const TF = (styleScores["인지형"]||0)     >= (styleScores["공감형"]||0)     ? "T":"F";
-    const JP = (styleScores["행동형"]||0)     >= (styleScores["동기형"]||0)     ? "J":"P";
-    return EI+SN+TF+JP;
+  if(idx<totalQ-1){
+    idx++;
+    renderQuestion();
+  }else{
+    showResult();
   }
+};
 
-  /* 캔버스 크기(라벨 여백 고려) */
-  function sizeCanvasOnce(canvas){
-    const pw = canvas.parentElement ? canvas.parentElement.clientWidth : 600;
-    const w  = Math.max(380, Math.floor(pw - 12));
-    const h  = Math.max(360, Math.round(w * 0.80));
-    canvas.width  = w;
-    canvas.height = h;
-  }
-  /* 라벨 줄바꿈 유틸(· 또는 공백 기준 1~2줄) */
-  function drawWrappedLabel(ctx, text, x, y, baseFontPx, align, baseline){
-    const parts = text.includes("·") ? text.split("·") : [text];
-    const lines = parts.length > 1 ? parts : [text];
-    ctx.textAlign = align;
-    ctx.textBaseline = baseline;
-    const lh = baseFontPx + 2;
-    if (lines.length === 1){
-      ctx.fillText(lines[0], x, y);
-    } else {
-      ctx.fillText(lines[0], x, y - lh/2);
-      ctx.fillText(lines[1], x, y + lh/2);
-    }
-  }
-  /* 레이더 (라벨 패딩 + 줄바꿈) */
-  function drawRadar(canvas, labels, vals, color, maxVal){
-    const ctx = canvas.getContext('2d');
-    const W = canvas.width, H = canvas.height;
-    ctx.clearRect(0,0,W,H);
+resetBtn.onclick = ()=>{
+  order = shuffle([...Array(totalQ).keys()]);
+  answers = Array(totalQ).fill(null);
+  idx = 0; chart && chart.destroy();
+  stepResult.style.display='none';
+  stepQuiz.style.display='block';
+  renderQuestion();
+};
 
-    const labelMargin = 64;
-    const cx = W/2, cy = H/2;
-    const r  = Math.min(W - 2*labelMargin, H - 2*labelMargin)/2;
-    const N  = labels.length;
-
-    ctx.strokeStyle = "#d6def0";
-    ctx.lineWidth = 1.5;
-    for (let ring=1; ring<=5; ring++){
-      const rr = r * ring/5;
-      ctx.beginPath();
-      for (let i=0;i<N;i++){
-        const a = -Math.PI/2 + i*2*Math.PI/N;
-        const x = cx + rr*Math.cos(a), y = cy + rr*Math.sin(a);
-        i ? ctx.lineTo(x,y) : ctx.moveTo(x,y);
-      }
-      ctx.closePath(); ctx.stroke();
-    }
-    for (let i=0;i<N;i++){
-      const a = -Math.PI/2 + i*2*Math.PI/N;
-      ctx.beginPath(); ctx.moveTo(cx,cy);
-      ctx.lineTo(cx + r*Math.cos(a), cy + r*Math.sin(a)); ctx.stroke();
-    }
-
-    const extra = 18, fontPx = 14;
-    ctx.fillStyle = "#0e1a36";
-    ctx.font = `${fontPx}px Noto Sans KR`;
-    for (let i=0;i<N;i++){
-      const a  = -Math.PI/2 + i*2*Math.PI/N;
-      const lx = cx + (r + extra) * Math.cos(a);
-      const ly = cy + (r + extra) * Math.sin(a);
-      const cos = Math.cos(a), sin = Math.sin(a);
-      let align = "center"; if (cos > 0.35) align = "left"; else if (cos < -0.35) align = "right";
-      let baseline = "middle"; if (sin > 0.35) baseline = "top"; else if (sin < -0.35) baseline = "bottom";
-      drawWrappedLabel(ctx, labels[i], lx, ly, fontPx, align, baseline);
-    }
-
-    const rgba = (hex,a)=>{const m=hex.match(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i); if(!m) return hex; const r=parseInt(m[1],16),g=parseInt(m[2],16),b=parseInt(m[3],16); return `rgba(${r},${g},${b},${a})`;};
-    const pts=[];
-    for (let i=0;i<N;i++){
-      const v = vals[i]||0;
-      const rr = r * (v / maxVal);
-      const a  = -Math.PI/2 + i*2*Math.PI/N;
-      pts.push([cx + rr*Math.cos(a), cy + rr*Math.sin(a)]);
-    }
-    ctx.beginPath(); pts.forEach(([x,y],i)=> i?ctx.lineTo(x,y):ctx.moveTo(x,y)); ctx.closePath();
-    ctx.fillStyle = rgba(color, .22); ctx.fill();
-    ctx.strokeStyle = color; ctx.lineWidth = 2.5; ctx.stroke();
-    ctx.fillStyle = color; pts.forEach(([x,y])=>{ctx.beginPath(); ctx.arc(x,y,3.5,0,Math.PI*2); ctx.fill();});
-  }
-
-  /* 신뢰도 계산 보조 */
-  function getAnswerOfReliability(id){
-    for(let pos=0; pos<combined.length; pos++){
-      const c=combined[pos];
-      if(c.kind==='rel' && RELIABILITY_ITEMS[c.i].id===id) return answers[pos]||0;
-    }
-    return 0;
-  }
-  function getAnswerAtCore(kind, idxInCore){
-    for(let pos=0; pos<combined.length; pos++){
-      const c=combined[pos];
-      if(c.kind===kind && c.i===idxInCore){ return answers[pos]||0; }
-    }
-    return 0;
-  }
-  function traitMean(trait, kind){
-    let sum=0,cnt=0;
-    combined.forEach((c,pos)=>{
-      if(c.kind!==kind) return;
-      const arr=(kind==='style')?STYLE_QUESTIONS:TOPIC_QUESTIONS;
-      if(arr[c.i][1]===trait){ sum+=(answers[pos]||0); cnt++; }
-    });
-    return cnt?sum/cnt:0;
-  }
-  function computeReliability(){
-    const dup1_a=getAnswerOfReliability("dup_empathy");
-    const dup1_b=getAnswerAtCore("style", RELIABILITY_ITEMS.find(r=>r.id==='dup_empathy').ref);
-    const dup2_a=getAnswerOfReliability("dup_action");
-    const dup2_b=getAnswerAtCore("style", RELIABILITY_ITEMS.find(r=>r.id==='dup_action').ref);
-    const sim=v=>1-Math.min(4,Math.abs(v))/4;
-    const dupScore=(sim(dup1_a-dup1_b)+sim(dup2_a-dup2_b))/2;
-
-    const empathMean=traitMean("공감형","style");
-    const habitMean =traitMean("행동·습관","topic");
-    const revEmp = 6 - getAnswerOfReliability("rev_empathy");
-    const revHab = 6 - getAnswerOfReliability("rev_habit");
-    const revScore=(sim(revEmp - empathMean)+sim(revHab - habitMean))/2;
-
-    const sds1=getAnswerOfReliability("sds1"), sds2=getAnswerOfReliability("sds2");
-    const sdsSum=sds1+sds2; // 2~10
-    const sdsPenalty = Math.max(0, (sdsSum-2)/8*0.4);
-
-    let overall01 = 0.4*dupScore + 0.4*revScore + 0.2*(1-sdsPenalty);
-    overall01 = Math.max(0, Math.min(1, overall01));
-    const overall = Math.round(overall01*100);
-    const band = overall>=80 ? "높음" : (overall>=60 ? "보통" : "낮음");
-    const note = `중복:${(dupScore*100).toFixed(0)} / 역문항:${(revScore*100).toFixed(0)} / SDS벌점:${(sdsPenalty*100).toFixed(0)} → 종합:${overall} (${band})`;
-
-    return {
-      dupTxt:`${(dupScore*100).toFixed(0)}`,
-      revTxt:`${(revScore*100).toFixed(0)}`,
-      sdsTxt:`-${Math.round(sdsPenalty*100)/100}`,
-      overall,
-      note
-    };
-  }
-
-  /* 직접 타당도 폼 */
-  function renderFaceForm(mainStyle, mainTopic, auxStyle, mbti){
-    const qs=[
-      {id:'f1',text:`대화방식(주 성향: ${mainStyle||"-"})이 나와 잘 맞습니다.`},
-      {id:'f2',text:`대화주제(주 성향: ${mainTopic||"-"})가 나와 잘 맞습니다.`},
-      {id:'f3',text:`보조 성향(${auxStyle||"-"})도 나에게 해당됩니다.`},
-      {id:'f4',text:`MBTI 추정(${mbti})이 나에게 가깝습니다.`},
-      {id:'f5',text:`전체 결과가 내 성향과 일치합니다.`}
-    ];
-    const el=document.getElementById('faceForm'); const picks={};
-    el.innerHTML = qs.map(q=>`
-      <div style="margin:10px 0;">
-        <div style="font-weight:700;margin:6px 0;">${q.text}</div>
-        <div class="opts" style="grid-template-columns:repeat(5,1fr);">
-          ${ANSWERS.map((a,i)=>`<div class="opt" data-q="${q.id}" data-val="${i+1}">${a}</div>`).join("")}
-        </div>
-      </div>
-    `).join("");
-    el.querySelectorAll('.opt').forEach(op=>{
-      op.addEventListener('click', ()=>{
-        const q=op.dataset.q; const v=+op.dataset.val;
-        el.querySelectorAll(`.opt[data-q="${q}"]`).forEach(x=>x.classList.remove('selected'));
-        op.classList.add('selected'); picks[q]=v;
-      });
-    });
-    document.getElementById('faceSubmit').onclick=()=>{
-      const vals=Object.values(picks); if(vals.length<qs.length){alert("모든 문항에 응답해주세요."); return;}
-      const avg = Math.round((vals.reduce((a,b)=>a+b,0)/qs.length)/5*100);
-      document.getElementById('faceAvg').textContent = `${avg}`;
-    };
-  }
-
-  /* 결과 계산 */
-  function computeResult(){
-    const styleScores = sumBy("style", STYLE_TYPES);
-    const topicScores = sumBy("topic", TOPIC_TYPES);
-    const [s1,s2]=top2(styleScores), [t1,t2]=top2(topicScores);
-
-    document.getElementById('styleSummary').innerHTML = `주 성향: <b>${s1[0]||"-"}</b><span class="badge">보조: ${s2[0]||"-"}</span>`;
-    document.getElementById('topicSummary').innerHTML = `주 성향: <b>${t1[0]||"-"}</b><span class="badge">보조: ${t2[0]||"-"}</span>`;
-    document.getElementById('styleSub').textContent = ({"공감형":"따뜻한 경청과 공감을 선호합니다.","인지형":"이유를 파악하고 차근차근 정리하는 대화를 선호합니다.","동기형":"격려와 의미 찾기로 의욕을 높이는 대화를 선호합니다.","행동형":"구체적 계획과 점검이 있는 실천 중심 대화를 선호합니다."}[s1[0]]||"-");
-    document.getElementById('topicSub').textContent = ({"자기인식·정서조절":"감정을 알아차리고 조절하는 주제를 선호합니다.","관계·소통":"가족·친구와 소통을 다루는 주제를 선호합니다.","회복·적응":"어려움을 이겨내는 방법을 선호합니다.","행동·습관":"생활 루틴과 작은 목표를 실천하는 주제를 선호합니다."}[t1[0]]||"-");
-
-    const mbti = mbtiFromHF(styleScores, topicScores);
-    document.getElementById('mbtiLine').textContent = `HF→MBTI 추정: ${mbti}`;
-
-    const sc=document.getElementById('styleChart'), tc=document.getElementById('topicChart');
-    sizeCanvasOnce(sc); sizeCanvasOnce(tc);
-    drawRadar(sc, STYLE_TYPES, STYLE_TYPES.map(k=>styleScores[k]||0), '#3a72ff', 20);
-    drawRadar(tc, TOPIC_TYPES, TOPIC_TYPES.map(k=>topicScores[k]||0), '#2dc5a6', 20);
-
-    const rel = computeReliability();
-    document.getElementById('kDup').textContent = rel.dupTxt;
-    document.getElementById('kRev').textContent = rel.revTxt;
-    document.getElementById('kSds').textContent = rel.sdsTxt;
-    document.getElementById('kOverall').textContent = `${rel.overall}`;
-    document.getElementById('relNote').textContent = rel.note;
-
-    renderFaceForm(s1[0], t1[0], s2[0], mbti);
-
-    phase='result'; stage(phase); setProgress(combined.length, combined.length);
-  }
-
-  /* 리스타트 */
-  document.getElementById('restartBtn').addEventListener('click', ()=>location.reload());
-
-  /* 초기 단계 */
-  stage('intro');
-
-  /* 키보드 단축키(선택지 1~5) */
-  document.addEventListener('keydown',(e)=>{
-    if(phase!=='q') return;
-    if(e.key>='1' && e.key<='5'){
-      const n=+e.key;
-      const opts=document.querySelectorAll('#opts .opt');
-      if(opts[n-1]) opts[n-1].click();
-    }
-  });
-});
+/* =========================
+   7) 시작
+========================= */
+renderQuestion();
 </script>
 </body>
 </html>
