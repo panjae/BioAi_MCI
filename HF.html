@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>HF(6) 설문 – 성향 결과 + 신뢰도</title>
+<title>HF(6) HF 검사</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"></script>
 <style>
@@ -116,7 +116,7 @@
 --------------------------- */
 const TYPES = [
   { key:'EE', name:'정서 공감형',  big5:'A(친화성) ↑, N(신경성) ↑', desc:
-    '타인의 감정을 세심하게 읽어내고 공감적으로 반응하는 성향입니다. 주변의 분위기와 정서 변화에 민감하게 반응하며, 정서적 안전감과 관계적 온기를 중요하게 여깁니다.' },
+    '타인의 감정을 세심하게 읽어내고 공감적으로 반응하는 성향입니다. 주변의 분위기와 정서 변화에 민감하게 반응하며, 정서적 안전감과 관계적 온기를 중요하게 느낍니다.' },
   { key:'CR', name:'인지 성찰형',  big5:'O(개방성) ↑, N(신경성/Reverse)', desc:
     '문제 상황을 논리·분석적으로 바라보고, 감정보다 사고를 중심으로 판단하는 경향이 강합니다. 정보를 구조화하고 정리하는 데 강점이 있으며, 감정 대신 근거와 이유를 찾는 편입니다.' },
   { key:'MA', name:'동기 촉진형',  big5:'C(성실성) ↑, E(외향성) ↑', desc:
@@ -128,7 +128,7 @@ const TYPES = [
   { key:'RM', name:'회복 유지형',  big5:'N(신경성/Reverse), C(성실성/중간~↑)', desc:
     '스트레스 상황에서도 감정이 너무 크게 흔들리지 않도록 스스로를 조절하려는 경향이 있습니다. 힘든 일이 있어도 어느 정도 시간이 지나면 다시 균형을 회복하려 애쓰는 유형입니다.' },
 ];
-const IDX = TYPES.reduce((a,t,i)=> (a[t.key]=i,a),{});
+const IDX = TYPES.reduce((a,t,i)=>{a[t.key]=i;return a;},{})
 
 /* --------------------------
    2) 문항(정문항+역문항)
@@ -176,19 +176,19 @@ const Q = [
   {t:'RM', txt:'부정적인 상황에서는 쉽게 불안해진다.', rev:true},
   {t:'RM', txt:'스트레스를 받아도 일정 시간이 지나면 감정이 안정된다.', rev:false},
 ];
-const TOTAL = Q.length; // 30
+const TOTAL = Q.length;
 
 /* --------------------------
-   3) 진행 상태
+   3) 상태
 --------------------------- */
 let order = shuffle(Array.from({length:TOTAL},(_,i)=>i));
 let ans = Array(TOTAL).fill(null); // 0..4
 let idx = 0;
-let chart;
+let chart = null;
 let lastSessionReliability = null;
 
 /* --------------------------
-   4) DOM 레퍼런스
+   4) DOM
 --------------------------- */
 const qIdxEl = document.getElementById('qIdx');
 const qTotalEl = document.getElementById('qTotal');
@@ -218,13 +218,13 @@ const resetBtn = document.getElementById('resetBtn');
 qTotalEl.textContent = TOTAL;
 
 /* --------------------------
-   5) 유틸
+   유틸
 --------------------------- */
 function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; }
 function choiceLabels(){ return ['전혀 아니다','대체로 아니다','보통이다','대체로 그렇다','매우 그렇다']; }
 
 /* --------------------------
-   6) 질문 렌더링
+   질문 렌더링
 --------------------------- */
 function renderQ(){
   const real = order[idx];
@@ -234,10 +234,9 @@ function renderQ(){
 
   optsEl.innerHTML = '';
   choiceLabels().forEach((lab,k)=>{
-    const id = `q${idx}_c${k}`;
     const wrap = document.createElement('label');
     wrap.className='opt';
-    wrap.innerHTML = `<input type="radio" name="q${idx}" id="${id}" value="${k}"><span>${lab}</span>`;
+    wrap.innerHTML = `<input type="radio" name="q${idx}" value="${k}"><span>${lab}</span>`;
     optsEl.appendChild(wrap);
   });
   if(ans[real]!=null){
@@ -249,6 +248,7 @@ function renderQ(){
   prevBtn.disabled = (idx===0);
   nextBtn.textContent = (idx===TOTAL-1)?'결과 보기 →':'다음 →';
 }
+
 function commitQ(){
   const picked = optsEl.querySelector('input[type="radio"]:checked');
   if(!picked) return false;
@@ -257,25 +257,24 @@ function commitQ(){
 }
 
 /* --------------------------
-   7) 점수 계산 (정문항만 사용)
+   점수 계산
 --------------------------- */
 function computeScores(){
   const sums = [0,0,0,0,0,0];
   Q.forEach((q,i)=>{
-    if(q.rev) return;             // 역문항: 점수 반영 X (신뢰도용)
-    const v = ans[i] ?? 0;        // 0..4
+    if(q.rev) return;
+    const v = ans[i] ?? 0;
     const t = IDX[q.t];
     sums[t]+=v;
   });
-  const scaled = sums.map(s=> Math.round((s/16)*30)); // 정문항 4문항 기준(최대 16)
+  const scaled = sums.map(s=> Math.round((s/16)*30));
   return {raw:sums, scaled};
 }
 
 /* --------------------------
-   8) 자동 신뢰도(CI, RP)
+   자동 신뢰도
 --------------------------- */
 function computeReliabilityAuto(){
-  // CI
   let ciSum=0, ciN=0;
   TYPES.forEach(t=>{
     const pos = Q
@@ -286,13 +285,12 @@ function computeReliabilityAuto(){
     const rIdx = Q.findIndex(q=>q.t===t.key && q.rev);
     const rRaw = rIdx>=0 ? (ans[rIdx] ?? 0) : 0;
     const rAligned = 4 - rRaw;
-    const diff = Math.abs(posMean - rAligned); // 0~4
+    const diff = Math.abs(posMean - rAligned);
     const ci = 1 - (diff/4);
     if(!Number.isNaN(ci)){ ciSum += ci; ciN++; }
   });
   const CI = ciN? (ciSum/ciN):0;
 
-  // RP
   const freq=[0,0,0,0,0];
   ans.forEach(v=>{freq[v??0]++;});
   const maxF = Math.max(...freq);
@@ -302,9 +300,8 @@ function computeReliabilityAuto(){
 }
 
 /* --------------------------
-   9) 결과 표시
+   결과 표시
 --------------------------- */
-let chart;
 function showResult(){
   const {scaled} = computeScores();
   const pairs = TYPES.map((t,i)=>({key:t.key,name:t.name,v:scaled[i],desc:t.desc,big5:t.big5}))
@@ -353,7 +350,7 @@ function showResult(){
 }
 
 /* --------------------------
-   10) 결과 타당성(자가 설문 5문항)
+   결과 타당성(자가 설문 5문항)
 --------------------------- */
 const FIT_ITEMS = [
   {k:'fit_match',  t:'이번 결과는 나의 실제 성향과 잘 맞는다고 느낀다.'},
@@ -396,7 +393,7 @@ function getFitVal(i){
 }
 
 /* --------------------------
-   11) CSV 내보내기(한 줄)
+   CSV 내보내기
 --------------------------- */
 csvBtn.onclick = ()=>{
   const {scaled}=computeScores();
@@ -420,7 +417,7 @@ csvBtn.onclick = ()=>{
 };
 
 /* --------------------------
-   12) 네비게이션
+   네비게이션
 --------------------------- */
 prevBtn.onclick = ()=>{ if(idx>0){ idx--; renderQ(); } };
 nextBtn.onclick = ()=>{
@@ -438,7 +435,7 @@ resetBtn.onclick = ()=>{
 };
 
 /* --------------------------
-   13) 시작
+   시작
 --------------------------- */
 renderQ();
 </script>
