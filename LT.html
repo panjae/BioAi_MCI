@@ -1,0 +1,569 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>LT – 유형 맞춤 Emotional Talk 시뮬레이터</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f6f8ff;
+    --card:#ffffff;
+    --line:#dde3f3;
+    --fg:#0f1a3a;
+    --accent:#3a72ff;
+    --accent-soft:#e3ebff;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--fg);
+    font-family:"Noto Sans KR",system-ui,-apple-system,BlinkMacSystemFont;
+  }
+  .wrap{
+    max-width:960px;
+    margin:24px auto;
+    padding:0 14px 28px;
+  }
+  .card{
+    background:var(--card);
+    border-radius:18px;
+    border:1px solid var(--line);
+    box-shadow:0 14px 34px rgba(15,26,58,.08);
+    overflow:hidden;
+  }
+  header{
+    padding:16px 18px;
+    border-bottom:1px solid var(--line);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+  }
+  h1{
+    margin:0;
+    font-size:20px;
+    font-weight:800;
+    letter-spacing:-0.02em;
+  }
+  .pill{
+    padding:6px 10px;
+    border-radius:999px;
+    border:1px solid var(--line);
+    background:#f7f8ff;
+    font-size:11px;
+  }
+  .step{
+    padding:18px;
+  }
+  .subtitle{
+    font-size:15px;
+    margin-top:4px;
+    color:#4a5675;
+  }
+  .type-grid{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:12px;
+    margin-top:16px;
+  }
+  @media(min-width:780px){
+    .type-grid{
+      grid-template-columns:1fr 1fr 1fr;
+    }
+  }
+  .type-card{
+    border-radius:14px;
+    border:1px solid var(--line);
+    padding:12px 12px 14px;
+    background:#fbfcff;
+    cursor:pointer;
+    transition:.15s all ease;
+  }
+  .type-card:hover{
+    border-color:var(--accent);
+    box-shadow:0 6px 18px rgba(58,114,255,.16);
+    transform:translateY(-1px);
+  }
+  .type-name{
+    font-weight:800;
+    margin-bottom:4px;
+    font-size:14px;
+  }
+  .type-tag{
+    font-size:11px;
+    color:#6a7595;
+    margin-bottom:6px;
+  }
+  .type-desc{
+    font-size:12px;
+    color:#4a5675;
+    line-height:1.5;
+  }
+  .badge{
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+    font-size:11px;
+    padding:3px 7px;
+    border-radius:999px;
+    background:var(--accent-soft);
+    color:#234097;
+    margin-right:4px;
+  }
+  /* chat */
+  #step-chat{display:none}
+  .chat-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:8px;
+    margin-bottom:10px;
+  }
+  .chat-header-main{
+    font-size:15px;
+    font-weight:800;
+  }
+  .chat-header-sub{
+    font-size:13px;
+    color:#4a5675;
+    margin-top:4px;
+  }
+  .chat-meta{
+    font-size:11px;
+    text-align:right;
+    color:#6a7595;
+  }
+  .chat-box{
+    border-radius:16px;
+    border:1px solid var(--line);
+    background:#f9faff;
+    padding:12px;
+    height:360px;
+    overflow-y:auto;
+  }
+  .msg-row{
+    display:flex;
+    margin-bottom:8px;
+  }
+  .msg-row.user{justify-content:flex-end;}
+  .msg-bubble{
+    max-width:72%;
+    padding:9px 11px;
+    border-radius:14px;
+    font-size:13px;
+    line-height:1.5;
+    white-space:pre-wrap;
+  }
+  .msg-row.assistant .msg-bubble{
+    background:#ffffff;
+    border:1px solid var(--line);
+  }
+  .msg-row.user .msg-bubble{
+    background:var(--accent);
+    color:#ffffff;
+    border-bottom-right-radius:4px;
+  }
+  .label-small{
+    font-size:11px;
+    margin-bottom:2px;
+    color:#6a7595;
+  }
+  .choice-area{
+    margin-top:12px;
+  }
+  .choice-title{
+    font-size:13px;
+    margin-bottom:6px;
+  }
+  .choice-list{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .choice-btn{
+    border-radius:999px;
+    padding:8px 11px;
+    border:1px solid var(--line);
+    background:#ffffff;
+    font-size:12px;
+    cursor:pointer;
+    transition:.15s all ease;
+  }
+  .choice-btn:hover{
+    border-color:var(--accent);
+    background:#eef2ff;
+  }
+  .choice-btn:disabled{
+    opacity:.45;
+    cursor:default;
+  }
+  .bottom-bar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:8px;
+    margin-top:10px;
+  }
+  .btn{
+    border-radius:999px;
+    border:1px solid var(--line);
+    background:#f2f4ff;
+    padding:8px 13px;
+    font-size:12px;
+    cursor:pointer;
+    font-weight:600;
+  }
+  .btn.primary{
+    background:linear-gradient(90deg,var(--accent),#7ea3ff);
+    color:#0f1a3a;
+    border:none;
+  }
+  .turn-indicator{
+    font-size:11px;
+    color:#6a7595;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <header>
+      <div>
+        <h1>LT – 유형 맞춤 Emotional Talk 시뮬레이터</h1>
+        <div class="subtitle">HF(6) 결과를 바탕으로, 유형에 맞는 대화 흐름을 <b>객관식으로</b> 체험하는 모듈입니다.</div>
+      </div>
+      <div class="pill">AI 미사용 · 로컬 실행용</div>
+    </header>
+
+    <!-- STEP 1: 유형 선택 -->
+    <section id="step-select" class="step">
+      <p style="font-size:14px;margin:0 0 10px;">
+        먼저 현재 상담자의 HF 성향과 가장 가까운 유형을 하나 선택해 주세요.<br>
+        선택된 유형에 따라 상담자가 선호할 만한 <b>Emotional Talk 스타일</b>로 6턴 대화를 진행합니다.
+      </p>
+
+      <div class="type-grid" id="typeGrid">
+        <!-- JS로 채움 -->
+      </div>
+    </section>
+
+    <!-- STEP 2: 대화 -->
+    <section id="step-chat" class="step">
+      <div class="chat-header">
+        <div>
+          <div class="chat-header-main" id="chatTypeTitle">정서 공감형 · Emotional Talk</div>
+          <div class="chat-header-sub" id="chatTypeDesc">
+            HF 결과 중 선택한 유형에 맞춰, 감정·사고·행동 스타일을 고려한 질문을 제공합니다.
+          </div>
+        </div>
+        <div class="chat-meta">
+          <div id="chatTypeTag" class="badge">정서 중심</div>
+          <div style="margin-top:4px;">현재 턴: <span id="turnNow">1</span> / <span id="turnMax">6</span></div>
+        </div>
+      </div>
+
+      <div class="chat-box" id="chatLog"></div>
+
+      <div class="choice-area">
+        <div class="choice-title">상담자의 말에 가장 가까운 생각/느낌을 골라 주세요.</div>
+        <div class="choice-list" id="choiceList"></div>
+      </div>
+
+      <div class="bottom-bar">
+        <button class="btn" id="restartBtn">처음으로 돌아가기</button>
+        <div class="turn-indicator">대화는 6턴 후 자동 종료됩니다.</div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<script>
+/* -------------------------------
+   1. 유형 정의
+-------------------------------- */
+const TYPES = [
+  {
+    key:"EE",
+    name:"정서 공감형",
+    tag:"감정 공감 중심",
+    short:"타인의 감정을 섬세하게 읽고 공감해 주는 것이 강점입니다.",
+    long:"정서 공감형은 상대의 감정 변화에 빠르게 반응하고, 따뜻한 말과 공감으로 관계를 이어 가는 스타일입니다."
+  },
+  {
+    key:"CR",
+    name:"인지 성찰형",
+    tag:"사고·성찰 중심",
+    short:"상황을 한 걸음 떨어져서 분석하고 정리하는 데 강점이 있습니다.",
+    long:"인지 성찰형은 감정보다 전체 흐름과 의미를 생각하며, 차분하게 정리하고 이해하려는 태도가 두드러집니다."
+  },
+  {
+    key:"MA",
+    name:"동기 촉진형",
+    tag:"동기·의미 중심",
+    short:"목표와 의미를 발견하면 에너지가 살아나는 스타일입니다.",
+    long:"동기 촉진형은 스스로와 타인의 ‘왜 하는가’를 확인하면서, 동기를 북돋우는 말과 질문에 잘 반응합니다."
+  },
+  {
+    key:"BE",
+    name:"행동 실천형",
+    tag:"실행·습관 중심",
+    short:"생각보다 ‘해 보는 것’에서 힘을 얻는 실천형 스타일입니다.",
+    long:"행동 실천형은 작은 행동부터 하나씩 실행해 나가는 과정에서 안정감을 느끼고, 구체적인 제안에 잘 반응합니다."
+  },
+  {
+    key:"RR",
+    name:"관계 조율형",
+    tag:"관계·소통 중심",
+    short:"분위기를 조절하고 갈등을 완화하는 데 강점이 있습니다.",
+    long:"관계 조율형은 나와 타인 모두가 덜 불편한 지점을 찾으려 하며, 말투·표정·분위기를 함께 고려합니다."
+  },
+  {
+    key:"RM",
+    name:"회복 유지형",
+    tag:"회복·안정 중심",
+    short:"변화 속에서도 균형을 회복하려는 힘이 중요한 유형입니다.",
+    long:"회복 유지형은 스트레스 상황에서도 스스로를 다독이며, 다시 평형을 찾는 방법을 함께 찾는 대화에 잘 반응합니다."
+  }
+];
+
+const TYPE_INDEX = Object.fromEntries(TYPES.map((t,i)=>[t.key,i]));
+
+/* -------------------------------
+   2. 대화 스크립트
+   각 항목 = 상담자 메시지 + 객관식 3개
+-------------------------------- */
+
+// 공통 선택지 템플릿(턴별)
+const BASE_CHOICES = [
+  [
+    "오늘은 비교적 괜찮은 편이에요.",
+    "조금 지치고 예민한 느낌이에요.",
+    "솔직히 제 상태가 어떤지 잘 모르겠어요."
+  ],
+  [
+    "요즘 가장 신경 쓰이는 건 가족/관계 쪽이에요.",
+    "건강이나 컨디션이 제일 걱정돼요.",
+    "앞으로의 계획, 일이나 진로 쪽이 많이 떠올라요."
+  ],
+  [
+    "그래도 누군가 내 얘기를 들어준다는 느낌은 있어요.",
+    "말을 하다 보면 정리가 되는 것 같기도 해요.",
+    "사실 여전히 조심스럽고, 말을 아끼게 돼요."
+  ],
+  [
+    "작게라도 해볼 수 있는 행동이 있으면 좋겠어요.",
+    "일단 지금 감정이 조금만 진정됐으면 좋겠어요.",
+    "생각을 정리하는 데에 더 초점을 두고 싶어요."
+  ],
+  [
+    "오늘 이야기 나눈 것만으로도 조금 가벼워졌어요.",
+    "아직은 잘 모르겠지만, 한 번 더 시도해 보고 싶어요.",
+    "조금 힘들긴 했지만, 나쁘지는 않았어요."
+  ],
+  [
+    "네, 오늘처럼 짧게라도 가끔 이야기를 나눠보고 싶어요.",
+    "상황을 정리하는 데 도움이 될 때 다시 해보고 싶어요.",
+    "오늘은 여기까지가 적당한 것 같아요."
+  ]
+];
+
+// 유형별 상담자 톤(턴 6개)
+const SCRIPT = {
+  EE: [
+    "안녕하세요. 만나서 반가워요.\n요즘 마음 상태는 어떤지, 편하게 한 단어로 표현해 볼까요?",
+    "지금 말씀해 주신 마음을 들으면서, 그 안에 숨은 감정이 무엇일까 같이 살펴보고 싶어요.\n요즘 특히 마음을 가장 많이 흔드는 건 어떤 쪽인가요?",
+    "그 감정을 느끼는 나 자신을 떠올려 보면 어떤가요?\n‘그럴 수 있어’라고 말해줄 수 있는 부분이 있다면 어디일까요?",
+    "혹시 오늘 대화 안에서, 제가 조금 더 같이 붙잡고 들어주었으면 하는 감정이 있나요?",
+    "지금까지 나눠준 이야기 속에서, 내가 나 자신에게 해주고 싶은 말이 하나 있다면 어떤 말일까요?",
+    "좋아요. 오늘은 여기까지 함께했어요.\n지금 이 순간 마음을 한 번 더 느껴보면서, 나에게 작은 수고의 인사를 건네볼까요?"
+  ],
+  CR: [
+    "안녕하세요. 오늘은 최근 상황을 함께 정리해 보는 시간을 가져보면 어떨까요?\n요즘 머릿속을 가장 자주 차지하는 생각은 무엇인가요?",
+    "그 생각을 조금만 더 구체적으로 풀어본다면,\n‘문제의 핵심’은 무엇이라고 느끼시나요?",
+    "지금의 나를 한 발짝 떨어져서 바라본다면,\n어떤 패턴이나 반복되는 방식이 눈에 들어오나요?",
+    "그 패턴 안에서 내가 바꾸고 싶은 지점이 있다면,\n현실적으로 가장 작은 단위의 변화는 무엇일까요?",
+    "오늘 정리한 내용 중, 특히 기억해 두고 싶은 문장이나 키워리가 있다면 무엇인가요?",
+    "좋아요. 지금 정리된 생각들이 앞으로의 선택에 작은 기준점이 되었으면 합니다.\n지금 상태를 한 문장으로 요약해 본다면 어떻게 말해볼 수 있을까요?"
+  ],
+  MA: [
+    "안녕하세요. 요즘 마음에 ‘에너지가 나는 지점’과 ‘빠지는 지점’이 어떻게 느껴지는지 궁금해요.\n어떤 일이 있을 때 특히 힘이 빠지나요?",
+    "반대로, 작더라도 ‘이건 의미 있다’고 느끼는 순간은 언제인가요?",
+    "그 의미 있는 순간이 조금 더 자주 등장하려면,\n오늘 이후에 시도해 볼 수 있는 한 가지가 있을까요?",
+    "그 시도를 할 때, 스스로에게 어떤 응원 문장을 들려주고 싶나요?",
+    "지금 떠오르는 나만의 응원 문장을 한 번 말로 정리해 볼까요?",
+    "좋아요. 오늘 나눈 이야기가 앞으로의 에너지를 조금 보태주었으면 합니다.\n지금 마음속 동기 수준을 0~10이라면 어느 정도인가요?"
+  ],
+  BE: [
+    "안녕하세요. 오늘은 ‘생각’보다는 ‘작은 행동’에 초점을 맞춰보면 어떨까요?\n요즘 가장 미루게 되는 일 한 가지가 있다면 무엇인가요?",
+    "그 일을 완벽하게가 아니라, ‘1단계’만 한다면 무엇을 할 수 있을까요?",
+    "그 1단계를 오늘 혹은 내일 안에 실행하기 위해,\n필요한 준비물이 있다면 무엇일까요?",
+    "그 행동을 해냈을 때, 나에게 어떤 보상을 주고 싶나요?\n아주 사소한 것이라도 괜찮아요.",
+    "지금 떠오르는 ‘다음 한 걸음’을 한 문장으로 적어 본다면 어떻게 말할 수 있을까요?",
+    "좋아요. 오늘 정리한 한 걸음이 실제 행동으로 이어지길 응원할게요.\n대화를 마치며, 지금 나의 실행 의지는 어느 정도인가요?"
+  ],
+  RR: [
+    "안녕하세요. 요즘 사람들과의 관계 분위기는 어떠신가요?\n가장 먼저 떠오르는 관계가 있다면 어떤 관계인가요?",
+    "그 관계 안에서 요즘 나의 역할은 어떻게 느껴지나요?\n(예: 듣는 사람, 맞춰주는 사람, 이끄는 사람 등)",
+    "그 역할을 하면서, 내 마음 안에서는 어떤 감정이 가장 자주 올라오나요?",
+    "그 관계에서 ‘조금 더 편안했으면 하는 지점’이 있다면 어디인가요?",
+    "지금 떠오르는 사람 한 명을 떠올리며,\n그 사람에게 건네고 싶은 말 한 문장을 상상해 본다면 어떤 말인가요?",
+    "좋아요. 오늘 떠올린 말과 감정이, 앞으로의 관계 조율에 작은 힌트가 되었으면 합니다.\n지금 관계에 대한 마음 상태를 한 단어로 표현하면 무엇일까요?"
+  ],
+  RM: [
+    "안녕하세요. 요즘 나의 ‘회복 속도’는 어떤 느낌인가요?\n힘든 일이 생겼을 때, 감정이 가라앉는 데 얼마나 걸리나요?",
+    "지금까지 살아오면서, 나만의 회복 방법 중 잘 맞았던 건 무엇이었나요?",
+    "반대로, 썩 도움이 되지 않았던 회복 방식이 있다면 어떤 게 떠오르나요?",
+    "앞으로는 나를 조금 덜 힘들게 하면서도 회복을 돕는 방법을 하나 더 추가해 본다면,\n어떤 것이 좋을까요?",
+    "오늘 나눈 이야기 속에서, ‘내가 생각보다 괜찮았던 순간’을 떠올려 본다면 언제였나요?",
+    "좋아요. 나만의 회복 속도를 존중해 주는 것이 가장 중요한 출발점입니다.\n지금 마음의 안정감을 0~10이라면 몇 점 정도로 느껴지나요?"
+  ]
+};
+
+/* -------------------------------
+   3. 대화 상태
+-------------------------------- */
+const MAX_TURNS = 6; // 상담자 발화 기준
+let currentType = null;
+let currentTurn = 0;
+
+/* DOM 캐시 */
+const stepSelect = document.getElementById("step-select");
+const stepChat   = document.getElementById("step-chat");
+const typeGrid   = document.getElementById("typeGrid");
+const chatTypeTitle = document.getElementById("chatTypeTitle");
+const chatTypeDesc  = document.getElementById("chatTypeDesc");
+const chatTypeTag   = document.getElementById("chatTypeTag");
+const chatLog       = document.getElementById("chatLog");
+const choiceList    = document.getElementById("choiceList");
+const turnNowSpan   = document.getElementById("turnNow");
+const turnMaxSpan   = document.getElementById("turnMax");
+const restartBtn    = document.getElementById("restartBtn");
+
+turnMaxSpan.textContent = MAX_TURNS;
+
+/* -------------------------------
+   4. 초기 유형 카드 렌더링
+-------------------------------- */
+function renderTypeCards(){
+  typeGrid.innerHTML = "";
+  TYPES.forEach(t=>{
+    const div = document.createElement("div");
+    div.className = "type-card";
+    div.innerHTML = `
+      <div class="type-name">${t.name}</div>
+      <div class="type-tag">${t.tag}</div>
+      <div class="type-desc">${t.short}</div>
+    `;
+    div.onclick = ()=> startConversation(t.key);
+    typeGrid.appendChild(div);
+  });
+}
+
+/* -------------------------------
+   5. 대화 시작
+-------------------------------- */
+function startConversation(typeKey){
+  currentType = typeKey;
+  currentTurn = 0;
+  chatLog.innerHTML = "";
+  choiceList.innerHTML = "";
+
+  const info = TYPES[TYPE_INDEX[typeKey]];
+  chatTypeTitle.textContent = `${info.name} · Emotional Talk`;
+  chatTypeDesc.textContent  = info.long;
+  chatTypeTag.textContent   = info.tag;
+
+  stepSelect.style.display = "none";
+  stepChat.style.display   = "block";
+
+  addAssistantMessage(SCRIPT[typeKey][currentTurn]);
+  renderChoices();
+  updateTurnIndicator();
+}
+
+/* -------------------------------
+   6. 채팅 UI 유틸
+-------------------------------- */
+function addAssistantMessage(text){
+  const row = document.createElement("div");
+  row.className = "msg-row assistant";
+  const bubble = document.createElement("div");
+  bubble.className = "msg-bubble";
+  bubble.textContent = text;
+  row.appendChild(bubble);
+  chatLog.appendChild(row);
+  chatLog.scrollTop = chatLog.scrollHeight;
+}
+
+function addUserMessage(text){
+  const row = document.createElement("div");
+  row.className = "msg-row user";
+  const bubble = document.createElement("div");
+  bubble.className = "msg-bubble";
+  bubble.textContent = text;
+  row.appendChild(bubble);
+  chatLog.appendChild(row);
+  chatLog.scrollTop = chatLog.scrollHeight;
+}
+
+/* -------------------------------
+   7. 선택지 렌더링 및 처리
+-------------------------------- */
+function renderChoices(){
+  choiceList.innerHTML = "";
+  if(currentTurn >= MAX_TURNS){
+    const endSpan = document.createElement("span");
+    endSpan.style.fontSize = "12px";
+    endSpan.style.color = "#4a5675";
+    endSpan.textContent = "대화가 종료되었습니다. ‘처음으로 돌아가기’를 눌러 새로운 유형으로 다시 진행할 수 있습니다.";
+    choiceList.appendChild(endSpan);
+    return;
+  }
+
+  const options = BASE_CHOICES[currentTurn] || BASE_CHOICES[BASE_CHOICES.length-1];
+
+  options.forEach(opt=>{
+    const btn = document.createElement("button");
+    btn.className = "choice-btn";
+    btn.textContent = opt;
+    btn.onclick = ()=>{
+      addUserMessage(opt);
+      currentTurn++;
+      updateTurnIndicator();
+      if(currentTurn < MAX_TURNS){
+        // 다음 상담자 메시지
+        addAssistantMessage(SCRIPT[currentType][currentTurn]);
+        renderChoices();
+      }else{
+        // 마지막 턴 종료 안내
+        renderChoices();
+      }
+    };
+    choiceList.appendChild(btn);
+  });
+}
+
+function updateTurnIndicator(){
+  turnNowSpan.textContent = Math.min(currentTurn+1, MAX_TURNS);
+}
+
+/* -------------------------------
+   8. 초기화 버튼
+-------------------------------- */
+restartBtn.onclick = ()=>{
+  stepChat.style.display   = "none";
+  stepSelect.style.display = "block";
+  currentType = null;
+  currentTurn = 0;
+};
+
+/* -------------------------------
+   9. 시작 시 실행
+-------------------------------- */
+renderTypeCards();
+</script>
+</body>
+</html>
