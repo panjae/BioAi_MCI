@@ -1,372 +1,842 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8" />
-<title>LT 대화 시뮬레이터 (HF 기반 6유형 상담)</title>
+<meta charset="utf-8">
+<title>LT – HF 기반 Emotional Talk (6유형)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
 <style>
-    body {
-        font-family: "Segoe UI", sans-serif;
-        background: #f3f6fc;
-        padding: 40px;
-        color: #222;
+  :root{
+    --bg:#f4f6ff;
+    --card:#ffffff;
+    --line:#d7def2;
+    --fg:#141b3f;
+    --accent:#3a6bff;
+    --accent-soft:#e4ebff;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    font-family:"Noto Sans KR",system-ui,-apple-system,BlinkMacSystemFont;
+    color:var(--fg);
+  }
+  .wrap{
+    max-width:960px;
+    margin:30px auto;
+    padding:0 14px 32px;
+  }
+  .card{
+    background:var(--card);
+    border-radius:20px;
+    border:1px solid var(--line);
+    box-shadow:0 14px 40px rgba(14,26,67,.12);
+    overflow:hidden;
+  }
+  header{
+    padding:18px 20px 14px;
+    border-bottom:1px solid var(--line);
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    align-items:flex-start;
+  }
+  h1{
+    font-size:22px;
+    font-weight:800;
+    letter-spacing:-0.02em;
+  }
+  .sub{
+    font-size:14px;
+    color:#4f5a80;
+    margin-top:4px;
+  }
+  .pill{
+    padding:6px 10px;
+    border-radius:999px;
+    border:1px solid var(--line);
+    font-size:11px;
+    background:#f7f8ff;
+    color:#35406a;
+    white-space:nowrap;
+  }
+  .body{
+    padding:18px 18px 22px;
+  }
+
+  /* 유형 선택 */
+  #step-select{}
+  .intro-text{
+    font-size:14px;
+    color:#3d476e;
+    line-height:1.6;
+    margin-bottom:12px;
+  }
+  .type-grid{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:12px;
+  }
+  @media(min-width:780px){
+    .type-grid{
+      grid-template-columns:1fr 1fr 1fr;
     }
-    .container {
-        max-width: 960px;
-        margin: auto;
-        background: #fff;
-        padding: 32px;
-        border-radius: 16px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-    }
-    h1 {
-        font-size: 28px;
-        font-weight: 700;
-        margin-bottom: 4px;
-    }
-    .sub {
-        font-size: 15px;
-        color: #666;
-        margin-bottom: 24px;
-    }
-    .select-box {
-        padding: 16px;
-        margin: 20px 0;
-        border-radius: 12px;
-        background: #eef3ff;
-    }
-    button {
-        padding: 12px 20px;
-        border: none;
-        background: #4a6bff;
-        color: white;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 16px;
-        margin-top: 12px;
-    }
-    button:hover {
-        background: #3955d8;
-    }
-    .choice-btn {
-        display: block;
-        width: 100%;
-        text-align: left;
-        margin: 8px 0;
-        padding: 14px;
-        background: #fafafa;
-        border: 1px solid #ddd;
-        border-radius: 10px;
-        cursor: pointer;
-        font-size: 15px;
-    }
-    .choice-btn:hover {
-        background: #f0f3ff;
-        border-color: #4a6bff;
-    }
-    .bubble-user {
-        text-align: right;
-        margin: 16px 0;
-    }
-    .bubble-user span {
-        display: inline-block;
-        background: #4a6bff;
-        color: white;
-        padding: 12px 18px;
-        border-radius: 18px;
-    }
-    .bubble-bot {
-        text-align: left;
-        margin: 16px 0;
-    }
-    .bubble-bot span {
-        display: inline-block;
-        background: #eef1ff;
-        padding: 12px 18px;
-        border-radius: 18px;
-    }
+  }
+  .type-card{
+    background:#f9faff;
+    border-radius:14px;
+    border:1px solid var(--line);
+    padding:12px 12px 14px;
+    cursor:pointer;
+    transition:.15s all ease;
+  }
+  .type-card:hover{
+    border-color:var(--accent);
+    box-shadow:0 6px 18px rgba(58,107,255,.18);
+    transform:translateY(-1px);
+  }
+  .type-name{
+    font-size:14px;
+    font-weight:800;
+    margin-bottom:4px;
+  }
+  .type-tag{
+    font-size:11px;
+    color:#6a7597;
+    margin-bottom:6px;
+  }
+  .type-desc{
+    font-size:12px;
+    color:#4a557c;
+    line-height:1.5;
+  }
+
+  /* 대화 영역 */
+  #step-chat{display:none;}
+  .chat-header{
+    display:flex;
+    justify-content:space-between;
+    gap:8px;
+    margin-bottom:12px;
+  }
+  .chat-header-main{
+    font-size:15px;
+    font-weight:800;
+  }
+  .chat-header-sub{
+    font-size:13px;
+    color:#4a557c;
+    margin-top:4px;
+    line-height:1.5;
+  }
+  .chat-meta{
+    font-size:11px;
+    text-align:right;
+    color:#6b7598;
+  }
+  .badge{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:3px 8px;
+    border-radius:999px;
+    background:var(--accent-soft);
+    color:#263a83;
+    margin-bottom:4px;
+  }
+  .chat-box{
+    border-radius:16px;
+    border:1px solid var(--line);
+    background:#f7f8ff;
+    padding:12px;
+    height:360px;
+    overflow-y:auto;
+  }
+  .msg-row{
+    display:flex;
+    margin-bottom:10px;
+  }
+  .msg-row.assistant{
+    justify-content:flex-start;
+  }
+  .msg-row.user{
+    justify-content:flex-end;
+  }
+  .msg-bubble{
+    max-width:75%;
+    padding:10px 12px;
+    border-radius:14px;
+    font-size:13px;
+    line-height:1.6;
+    white-space:pre-wrap;
+  }
+  .msg-row.assistant .msg-bubble{
+    background:#ffffff;
+    border:1px solid var(--line);
+  }
+  .msg-row.user .msg-bubble{
+    background:var(--accent);
+    color:#ffffff;
+    border-bottom-right-radius:4px;
+  }
+
+  .choice-area{
+    margin-top:12px;
+  }
+  .choice-title{
+    font-size:13px;
+    margin-bottom:6px;
+    color:#364069;
+  }
+  .choice-list{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+  .choice-btn{
+    border-radius:10px;
+    border:1px solid #c8d0eb;
+    background:#ffffff;
+    padding:10px 12px;
+    font-size:13px;
+    text-align:left;
+    cursor:pointer;
+    color:#141b3f; /* 텍스트 확실히 보이게 */
+  }
+  .choice-btn:hover{
+    background:#eef1ff;
+    border-color:var(--accent);
+  }
+  .choice-btn:disabled{
+    opacity:.5;
+    cursor:default;
+  }
+  .bottom-bar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:10px;
+    font-size:11px;
+    color:#6b7598;
+  }
+  .btn{
+    border-radius:999px;
+    border:1px solid #c8d0eb;
+    background:#f1f3ff;
+    padding:7px 12px;
+    font-size:11px;
+    cursor:pointer;
+    color:#141b3f;
+  }
+  .btn:hover{
+    background:#e4e7ff;
+  }
 </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <header>
+      <div>
+        <h1>LT – HF 기반 Emotional Talk (6유형 시뮬레이터)</h1>
+        <div class="sub">HF에서 도출된 6가지 성향 중 하나를 선택하고, 유형에 맞는 정서·인지·행동 대화를 6턴 동안 객관식으로 체험합니다.</div>
+      </div>
+      <div class="pill">AI 미사용 · 로컬 HTML 데모</div>
+    </header>
+    <div class="body">
+
+      <!-- STEP 1: 유형 선택 -->
+      <section id="step-select">
+        <p class="intro-text">
+          먼저 현재 상담자의 HF 성향과 가장 가까운 유형을 하나 선택해 주세요.<br>
+          각 유형 카드를 클릭하면, 해당 유형에 맞춘 Emotional Talk 흐름으로 6턴 대화가 진행됩니다.
+        </p>
+        <div class="type-grid" id="typeGrid">
+          <!-- JS로 채움 -->
+        </div>
+      </section>
+
+      <!-- STEP 2: 대화 -->
+      <section id="step-chat">
+        <div class="chat-header">
+          <div>
+            <div class="chat-header-main" id="chatTypeTitle">정서 공감형 · Emotional Talk</div>
+            <div class="chat-header-sub" id="chatTypeDesc">
+              선택된 HF 성향에 맞게, 감정·생각·행동을 자연스럽게 풀어보는 대화를 진행합니다.
+            </div>
+          </div>
+          <div class="chat-meta">
+            <div class="badge" id="chatTypeTag">정서 공감형</div>
+            <div style="margin-top:4px;">턴 <span id="turnNow">1</span> / <span id="turnMax">6</span></div>
+          </div>
+        </div>
+
+        <div class="chat-box" id="chatLog"></div>
+
+        <div class="choice-area">
+          <div class="choice-title">상담자의 질문에 가장 가까운 생각·느낌을 선택해 주세요.</div>
+          <div class="choice-list" id="choiceList"></div>
+        </div>
+
+        <div class="bottom-bar">
+          <button class="btn" id="restartBtn">처음으로 돌아가기</button>
+          <span>대화는 6턴 후 자연스럽게 마무리됩니다.</span>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
 
 <script>
-//////////////////////////////////////
-// 1) 유형 데이터 정의
-//////////////////////////////////////
+// -------------------------------
+// 1. 유형 정보
+// -------------------------------
+const TYPES = [
+  {
+    key:"EE",
+    name:"정서 공감형",
+    tag:"감정 같이 느끼기 중심",
+    desc:"상대의 감정을 빠르게 읽고 공감해 줄 때 힘을 얻는 스타일입니다."
+  },
+  {
+    key:"CR",
+    name:"인지 성찰형",
+    tag:"상황·사고 정리 중심",
+    desc:"상황을 한 걸음 떨어져 분석하고 정리하면서 안정을 찾는 유형입니다."
+  },
+  {
+    key:"MA",
+    name:"동기 촉진형",
+    tag:"의미·에너지 회복 중심",
+    desc:"작은 의미와 목표를 발견할 때 에너지가 살아나는 유형입니다."
+  },
+  {
+    key:"BE",
+    name:"행동 실천형",
+    tag:"실제 행동·습관 중심",
+    desc:"생각보다 직접 움직이고 실천하는 과정에서 힘을 얻는 유형입니다."
+  },
+  {
+    key:"RR",
+    name:"관계 조율형",
+    tag:"관계 분위기·역할 중심",
+    desc:"분위기를 조절하고 관계의 균형을 맞추는 데 민감한 유형입니다."
+  },
+  {
+    key:"RM",
+    name:"회복 유지형",
+    tag:"회복력·안정감 중심",
+    desc:"변화 속에서도 균형을 다시 찾아가는 회복력이 중요한 유형입니다."
+  }
+];
 
-const TYPE_NAMES = {
-    "empathy": "정서 공감형",
-    "cognitive": "인지 성찰형",
-    "motivation": "동기 촉진형",
-    "execution": "행동 실천형",
-    "relation": "관계 조율형",
-    "resilience": "회복 유지형"
+const TYPE_MAP = Object.fromEntries(TYPES.map(t=>[t.key,t]));
+
+// -------------------------------
+// 2. 유형별 질문/선택지 (6턴)
+// -------------------------------
+
+// 1) 정서 공감형 (EE)
+const SCRIPT_EE = [
+  {
+    q: "안녕하세요. 오늘 이렇게 이야기 나누게 되어 반가워요.\n지금 마음 상태를 한 단어로 표현한다면 어떤 느낌에 가깝나요?",
+    c: [
+      "그냥 그럭저럭이요.",
+      "조금 지치고 답답해요.",
+      "괜찮은 편이에요, 나쁘진 않아요.",
+      "말로 설명하기가 애매해요."
+    ]
+  },
+  {
+    q: "그 마음이 생기게 된 요즘 일상 중에,\n마음이 가장 많이 흔들렸던 순간이 있다면 언제였을까요?",
+    c: [
+      "건강이 예전 같지 않다고 느낄 때요.",
+      "가족이나 주변 사람들과 관계가 어색할 때요.",
+      "특별한 사건은 없는데 그냥 이유 없이요.",
+      "잘 떠오르진 않지만, 자주 불안한 느낌이 들어요."
+    ]
+  },
+  {
+    q: "그 순간의 나를 떠올려 보면,\n가장 가까운 감정은 어떤 말로 부를 수 있을까요?",
+    c: [
+      "서운함이나 외로움 같은 느낌이요.",
+      "걱정, 불안이 더 큰 것 같아요.",
+      "짜증, 화 같은 게 올라와요.",
+      "감정이 잘 안 느껴지고 멍한 느낌이에요."
+    ]
+  },
+  {
+    q: "그때의 나에게, 지금 여기에서 한 마디 건네줄 수 있다면\n어떤 말을 해주고 싶으신가요?",
+    c: [
+      "그럴 수 있어, 너무 탓하지 말자.",
+      "조금 힘들면 쉬어도 괜찮아.",
+      "누군가에게 좀 더 털어놔볼까?",
+      "지금은 그냥 버티자, 언젠가는 나아질 거야."
+    ]
+  },
+  {
+    q: "이야기를 나누다 보니, 어떤 방식의 공감이 가장 위로가 되나요?",
+    c: [
+      "먼저 내 이야기를 충분히 들어주는 게 좋아요.",
+      "힘들었겠다고 말해 주면 마음이 누그러져요.",
+      "해결책보다, 내 마음이 괜찮다고 확인해 주는 게 좋아요.",
+      "가볍게 농담 섞어서 분위기를 풀어주는 것도 좋아요."
+    ]
+  },
+  {
+    q: "오늘 이 정도 이야기를 나눠 보니,\n지금 마음 상태는 처음 시작할 때와 비교해서 어떠세요?",
+    c: [
+      "조금은 가벼워진 느낌이에요.",
+      "비슷하지만, 그래도 누군가 들어준 느낌은 있어요.",
+      "오히려 내 마음을 다시 떠올리니 살짝 무거워졌어요.",
+      "아직 잘 모르겠어요."
+    ]
+  }
+];
+
+// 2) 인지 성찰형 (CR)
+const SCRIPT_CR = [
+  {
+    q: "안녕하세요. 요즘 머릿속을 가장 자주 차지하는 생각은 어떤 쪽인가요?",
+    c: [
+      "건강이나 기억력에 대한 걱정이에요.",
+      "앞으로 어떻게 지낼지, 노후가 걱정돼요.",
+      "가족, 자녀에 대한 생각이 많아요.",
+      "정확히는 모르겠지만, 막연한 불안이 계속 떠다녀요."
+    ]
+  },
+  {
+    q: "지금 말씀해 주신 것들 중에서,\n‘이게 제일 큰 문제 같다’ 싶은 핵심을 하나 고른다면 무엇일까요?",
+    c: [
+      "몸·건강이 예전 같지 않다는 느낌.",
+      "앞으로에 대한 준비가 충분하지 않은 것 같은 느낌.",
+      "사람들과 거리가 생기는 느낌.",
+      "딱 집어 말하긴 어렵지만, 전반적인 불안감."
+    ]
+  },
+  {
+    q: "비슷한 상황이 있을 때,\n보통 나는 어떤 방식으로 생각하거나 반응해 왔던 것 같나요?",
+    c: [
+      "너무 최악의 상황까지 먼저 상상해요.",
+      "일단 혼자서 오래 고민하다가 지쳐버려요.",
+      "대수롭지 않은 척, 생각하지 않으려고 해요.",
+      "누군가에게 상담하긴 하는데 금방 잊고 반복돼요."
+    ]
+  },
+  {
+    q: "그 패턴 중에서,\n‘이 부분만 조금 달라져도 좋겠다’ 싶은 부분이 있다면 어디일까요?",
+    c: [
+      "최악의 상상을 조금 줄이고 싶어요.",
+      "혼자 끙끙대는 시간을 줄이고 싶어요.",
+      "문제를 외면하는 습관을 줄이고 싶어요.",
+      "같은 고민을 반복하는 걸 줄이고 싶어요."
+    ]
+  },
+  {
+    q: "그 지점을 바꾸기 위해,\n현실적으로 해볼 수 있는 가장 작은 행동 한 가지는 무엇일까요?",
+    c: [
+      "걱정이 떠오를 때, 종이에 적어 정리해 보기.",
+      "혼자 고민이 길어지면, 누군가에게 한 번 털어놓기.",
+      "하루에 10분이라도 천천히 산책하며 생각 정리하기.",
+      "걱정이 생길 때마다 ‘지금 할 수 있는 일’을 하나 떠올려 보기."
+    ]
+  },
+  {
+    q: "오늘 대화를 통해 정리된 내용 중,\n특히 기억해 두고 싶은 문장이나 생각은 어떤 건가요?",
+    c: [
+      "걱정을 적어 보는 것도 도움이 될 수 있겠다.",
+      "혼자만 끙끙대지 말고 나누는 게 필요하겠다.",
+      "작은 행동 하나라도 정해보는 게 의미 있겠다.",
+      "지금 상태를 너무 심하게 평가하지 말아야겠다."
+    ]
+  }
+];
+
+// 3) 동기 촉진형 (MA)
+const SCRIPT_MA = [
+  {
+    q: "안녕하세요. 요즘 ‘힘이 빠진다’고 느끼는 순간은 언제가 가장 많나요?",
+    c: [
+      "해야 할 일을 떠올릴 때, 막막할 때요.",
+      "하루가 비슷하게 반복될 때 재미가 없어요.",
+      "몸이 피곤하고 아플 때요.",
+      "특별한 이유는 없는데 의욕이 잘 안 나요."
+    ]
+  },
+  {
+    q: "반대로, 작더라도 ‘이럴 땐 조금 힘이 난다’ 싶은 순간이 있을까요?",
+    c: [
+      "가족이나 지인과 편하게 이야기할 때요.",
+      "햇볕 쬐면서 산책하거나 몸을 움직일 때요.",
+      "작은 일을 하나라도 끝냈을 때요.",
+      "예전에 좋아하던 취미를 다시 떠올릴 때요."
+    ]
+  },
+  {
+    q: "지금 상황에서 너무 큰 목표 말고,\n‘이 정도면 한번 해볼 수 있겠다’ 싶은 작은 목표가 있을까요?",
+    c: [
+      "하루에 10~20분 정도 걷기.",
+      "일주일에 한 번은 누군가와 전화나 대화하기.",
+      "잠깐이라도 예전에 즐기던 취미를 다시 해보기.",
+      "오늘 해야 할 일 한 가지만 정해서 꼭 해내기."
+    ]
+  },
+  {
+    q: "그 작은 목표를 했을 때,\n나에게 어떤 의미가 생길 것 같나요?",
+    c: [
+      "그래도 나는 뭔가 하고 있다는 느낌.",
+      "건강을 조금이라도 지키고 있다는 안도감.",
+      "사람들과 연결되어 있다는 느낌.",
+      "앞으로도 뭔가 해볼 수 있다는 희망."
+    ]
+  },
+  {
+    q: "이 목표를 떠올리며,\n지금의 나에게 해주고 싶은 응원 한 마디가 있다면 무엇일까요?",
+    c: [
+      "조금 늦어도 괜찮아, 지금부터 다시 시작하자.",
+      "작은 걸음도 걸음이다.",
+      "오늘 한 번만이라도 움직여 보자.",
+      "안 되더라도 자책하지 말고 다시 해보자."
+    ]
+  },
+  {
+    q: "지금 느낌을 0~10점으로 표현한다면,\n‘뭔가 한 번 해볼까?’ 하는 마음은 어느 정도인가요?",
+    c: [
+      "3점 정도, 아직은 조심스럽지만 조금은 의욕이 생겼어요.",
+      "5점 정도, 해볼까 말까 사이에 있어요.",
+      "7점 이상, 작게라도 시작해 보고 싶어요.",
+      "아직 1~2점 정도지만, 앞으로 생각은 해볼 수 있을 것 같아요."
+    ]
+  }
+];
+
+// 4) 행동 실천형 (BE)
+const SCRIPT_BE = [
+  {
+    q: "안녕하세요. 오늘은 ‘생각’보다는 ‘작은 행동’에 초점을 맞춰보면 어떨까요?\n요즘 가장 미루고 있는 일 한 가지가 있다면 무엇인가요?",
+    c: [
+      "건강검진, 병원 예약 같은 것들.",
+      "간단한 정리·청소 같은 집안일.",
+      "운동이나 스트레칭 같은 활동.",
+      "전화해야지 하면서 미루는 연락들."
+    ]
+  },
+  {
+    q: "그 일 전체 말고, ‘1단계’만 한다면\n어떤 행동을 할 수 있을까요?",
+    c: [
+      "병원 전화번호만 먼저 찾아두기.",
+      "하루에 한 곳만 정리해 보기.",
+      "5분만 스트레칭 해보기.",
+      "오늘 한 사람에게만 연락해 보기."
+    ]
+  },
+  {
+    q: "그 작은 1단계를 막는 가장 큰 이유는 무엇이라고 느끼시나요?",
+    c: [
+      "귀찮고 피곤해서요.",
+      "혹시 결과가 안 좋을까 봐 걱정돼서요.",
+      "하다가 중간에 포기할까 봐 겁나요.",
+      "그냥 마음이 잘 안 움직여요."
+    ]
+  },
+  {
+    q: "그 이유를 조금이라도 줄이기 위해\n현실적으로 해볼 수 있는 방법이 있을까요?",
+    c: [
+      "시간을 딱 정해두고 그때만 해보기.",
+      "가족이나 지인에게 같이 도와달라고 말하기.",
+      "결과보다는 ‘시도했다’는 것에 의미 두기.",
+      "너무 큰 기대 없이, 그냥 시험 삼아 해보기."
+    ]
+  },
+  {
+    q: "그럼 오늘 대화를 마치기 전에,\n‘다음 한 걸음’을 한 문장으로 정리해 볼까요?",
+    c: [
+      "오늘 안에 병원 번호를 찾아본다.",
+      "내일 오전에 방 한 곳만 정리해 본다.",
+      "지금 이 대화 끝나고 5분만 스트레칭 한다.",
+      "이번 주 안에 한 사람에게 전화해 본다."
+    ]
+  },
+  {
+    q: "지금 이 계획을 실행할 가능성을 0~10으로 본다면\n내가 생각하는 점수는 어느 정도인가요?",
+    c: [
+      "7점 이상, 꽤 해볼 수 있을 것 같아요.",
+      "5점 정도, 반반이에요.",
+      "3점 이하, 마음은 있지만 쉽지 않을 것 같아요.",
+      "지금은 잘 모르겠어요."
+    ]
+  }
+];
+
+// 5) 관계 조율형 (RR)
+const SCRIPT_RR = [
+  {
+    q: "안녕하세요. 요즘 가장 자주 떠오르는 사람이나 관계가 있다면 누구인가요?",
+    c: [
+      "배우자나 가족.",
+      "자녀, 손주.",
+      "친구나 이웃.",
+      "누군가 있지만 말하기는 조금 조심스러워요."
+    ]
+  },
+  {
+    q: "그 관계의 요즘 분위기를 한마디로 표현한다면 어떨까요?",
+    c: [
+      "무난하지만 예전만큼 가깝진 않은 느낌.",
+      "조금 서먹하거나 어색한 느낌.",
+      "자주 부딪히거나 신경 쓰이는 느낌.",
+      "좋긴 한데, 왠지 내가 눈치를 많이 보는 느낌."
+    ]
+  },
+  {
+    q: "그 관계 안에서 나는 보통 어떤 역할을 하는 편인가요?",
+    c: [
+      "상대 기분을 맞춰주는 사람.",
+      "불편하지 않게 분위기를 풀어주는 사람.",
+      "내 의견을 잘 말하지 못하고 참고 넘기는 사람.",
+      "가끔은 내가 너무 강하게 말하는 사람."
+    ]
+  },
+  {
+    q: "그 역할 중에서,\n‘이 부분만 조금 달라졌으면 좋겠다’ 싶은 지점이 있다면 무엇일까요?",
+    c: [
+      "조금은 내 마음도 솔직하게 말하고 싶어요.",
+      "상대 눈치를 덜 보고 싶어요.",
+      "화를 덜 내고 차분히 말하고 싶어요.",
+      "부담을 혼자만 짊어지지 않고 나누고 싶어요."
+    ]
+  },
+  {
+    q: "다음에 그 사람을 만났을 때,\n작게나마 해볼 수 있는 대화 방식이 있을까요?",
+    c: [
+      "먼저 안부나 고마운 점을 이야기해 보기.",
+      "내 기분을 ‘너 때문’이 아니라 ‘나는 ~하게 느꼈어’로 말해 보기.",
+      "감정이 올라오면 잠깐 숨 고르고 말하기.",
+      "무리해서 맞추기보다는, 솔직하게 ‘지금은 힘들다’고 말해 보기."
+    ]
+  },
+  {
+    q: "이야기를 나눠 보니,\n그 관계에 대해 지금 느끼는 마음은 어떻게 달라졌나요?",
+    c: [
+      "조금은 덜 답답해진 것 같아요.",
+      "완전히 해결된 건 아니지만, 해볼 수 있는 게 생긴 느낌이에요.",
+      "여전히 복잡하지만, 정리가 조금 된 것 같아요.",
+      "잘 모르겠지만, 그래도 말해볼 수 있겠다는 생각은 들어요."
+    ]
+  }
+];
+
+// 6) 회복 유지형 (RM)
+const SCRIPT_RM = [
+  {
+    q: "안녕하세요. 최근 한 달 안에,\n특히 마음이 많이 힘들었다고 느낀 순간이 있었나요?",
+    c: [
+      "건강 문제나 몸 상태가 안 좋았을 때.",
+      "가족이나 가까운 사람과 다툰 일.",
+      "갑작스러운 변화나 예상치 못한 일.",
+      "큰 일은 아니지만, 사소한 일들이 계속 겹쳤을 때."
+    ]
+  },
+  {
+    q: "그때 나는 보통 어떻게 반응하셨나요?",
+    c: [
+      "한동안 아무것도 하기 싫어져요.",
+      "혼자 속으로만 계속 곱씹어요.",
+      "누군가에게 털어놓고 나면 조금 나아져요.",
+      "일단 바쁘게 움직이면서 잊으려고 해요."
+    ]
+  },
+  {
+    q: "지금까지 경험을 떠올려 보면,\n그래도 도움이 되었던 회복 방법이 있다면 무엇일까요?",
+    c: [
+      "잠깐이라도 산책하거나 바깥 공기를 쐬는 것.",
+      "믿을 수 있는 사람과 솔직하게 이야기하는 것.",
+      "음악이나 TV, 라디오로 기분 전환하는 것.",
+      "조용히 혼자 있으면서 생각을 정리하는 것."
+    ]
+  },
+  {
+    q: "반대로, 돌이켜보니\n그다지 도움이 되지 않았던 방식도 있을까요?",
+    c: [
+      "혼자 너무 오래 버티기만 했던 것.",
+      "술, 과식처럼 몸을 더 힘들게 하는 방식.",
+      "감정을 무시하고 ‘괜찮다’고만 했던 것.",
+      "화를 참지 못하고 주변에 풀었던 것."
+    ]
+  },
+  {
+    q: "앞으로는 나를 조금 덜 힘들게 하면서\n지속적으로 도와줄 수 있는 회복 습관을 하나 추가한다면 어떤 것이 좋을까요?",
+    c: [
+      "하루에 한 번, 나에게 고마운 점이나 괜찮은 점 적어보기.",
+      "일주일에 한 번은 누군가와 진심 어린 대화 나누기.",
+      "감정이 심하게 흔들릴 때, 잠깐 쉬는 시간을 의도적으로 갖기.",
+      "몸을 너무 혹사하지 않고, 잠과 식사를 조금 더 챙기기."
+    ]
+  },
+  {
+    q: "이야기를 나눈 지금,\n마음의 안정감을 0~10점으로 표현한다면 몇 점 정도로 느끼시나요?",
+    c: [
+      "7점 이상, 그래도 한결 나아진 느낌이에요.",
+      "5점 정도, 조금은 편안해졌어요.",
+      "3점 이하, 여전히 많이 불안해요.",
+      "잘 모르겠지만, 그래도 누군가 들어줬다는 느낌은 있어요."
+    ]
+  }
+];
+
+const SCRIPT_BY_TYPE = {
+  "EE": SCRIPT_EE,
+  "CR": SCRIPT_CR,
+  "MA": SCRIPT_MA,
+  "BE": SCRIPT_BE,
+  "RR": SCRIPT_RR,
+  "RM": SCRIPT_RM
 };
 
-// 각 유형별 6턴 상담 스크립트
-const SCRIPT = {
+// -------------------------------
+// 3. 상태
+// -------------------------------
+let currentType = null;
+let currentTurn = 0;
+let chatHistory = [];
 
-   //////////////////////////////
-   // 1. 정서 공감형
-   //////////////////////////////
-   "empathy": [
-        { q: "지금 가장 먼저 떠오르는 감정은 어떤가요?", 
-          c: ["기쁨", "불안", "답답함", "피곤함", "설명하기 어려운 감정"] },
+const stepSelect = document.getElementById("step-select");
+const stepChat   = document.getElementById("step-chat");
+const typeGrid   = document.getElementById("typeGrid");
+const chatLog    = document.getElementById("chatLog");
+const choiceList = document.getElementById("choiceList");
+const chatTypeTitle = document.getElementById("chatTypeTitle");
+const chatTypeDesc  = document.getElementById("chatTypeDesc");
+const chatTypeTag   = document.getElementById("chatTypeTag");
+const turnNowSpan   = document.getElementById("turnNow");
+const turnMaxSpan   = document.getElementById("turnMax");
+const restartBtn    = document.getElementById("restartBtn");
 
-        { q: "그 감정을 가장 강하게 느낀 순간은 언제였나요?", 
-          c: ["오늘 아침", "사람과 대화할 때", "혼자 있을 때", "일이 잘 안 풀릴 때", "특별한 사건은 없음"] },
+const MAX_TURNS = 6;
+turnMaxSpan.textContent = MAX_TURNS.toString();
 
-        { q: "그 감정에 이름을 붙인다면 어떤 말이 가장 가깝나요?", 
-          c: ["서운함", "긴장감", "허무함", "안정감", "복합적인 감정"] },
+// -------------------------------
+// 4. UI 렌더링
+// -------------------------------
+function renderTypeCards(){
+  typeGrid.innerHTML = "";
+  TYPES.forEach(t=>{
+    const div = document.createElement("div");
+    div.className = "type-card";
+    div.innerHTML = `
+      <div class="type-name">${t.name}</div>
+      <div class="type-tag">${t.tag}</div>
+      <div class="type-desc">${t.desc}</div>
+    `;
+    div.onclick = ()=> startConversation(t.key);
+    typeGrid.appendChild(div);
+  });
+}
 
-        { q: "그 감정을 느끼는 자신에게 어떤 말을 건네주고 싶나요?", 
-          c: ["괜찮아, 잘하고 있어", "지금 힘들겠지만 지나갈 거야", "너무 신경 쓰지 말자", "잠시 쉬자", "말하기 어렵다"] },
+function addMsg(role, text){
+  chatHistory.push({role,text});
+}
 
-        { q: "누군가가 지금 당신에게 어떤 방식으로 공감해주면 가장 좋을까요?", 
-          c: ["조용히 들어주기", "따뜻한 말", "논리적 설명", "그냥 옆에 있기", "모르겠다"] },
+function renderChat(){
+  chatLog.innerHTML = "";
+  chatHistory.forEach(m=>{
+    const row = document.createElement("div");
+    row.className = "msg-row " + (m.role === "assistant" ? "assistant" : "user");
+    const bubble = document.createElement("div");
+    bubble.className = "msg-bubble";
+    bubble.textContent = m.text;
+    row.appendChild(bubble);
+    chatLog.appendChild(row);
+  });
+  chatLog.scrollTop = chatLog.scrollHeight;
+}
 
-        { q: "지금 대화를 나누며 감정이 조금은 변했나요?", 
-          c: ["조금 나아짐", "비슷함", "더 복잡해짐", "잘 모르겠음"] }
-   ],
+function renderChoices(){
+  choiceList.innerHTML = "";
+  if(!currentType) return;
 
+  if(currentTurn >= MAX_TURNS){
+    const span = document.createElement("span");
+    span.style.fontSize = "12px";
+    span.style.color = "#4a557c";
+    span.textContent = "대화를 모두 마쳤어요. ‘처음으로 돌아가기’를 눌러 다른 유형으로도 체험해볼 수 있습니다.";
+    choiceList.appendChild(span);
+    return;
+  }
 
-   //////////////////////////////
-   // 2. 인지 성찰형
-   //////////////////////////////
-   "cognitive": [
-        { q: "지금 머릿속에서 가장 떠오르는 생각 한 가지가 있다면 무엇인가요?",
-          c: ["해야 할 일", "걱정거리", "앞으로의 계획", "사람과의 관계", "정확히 모르겠음"] },
+  const step = SCRIPT_BY_TYPE[currentType][currentTurn];
+  if(!step) return;
 
-        { q: "그 생각과 관련해 가장 핵심 문제는 무엇이라고 느끼나요?",
-          c: ["정보 부족", "시간 부족", "감정 문제", "타인과의 갈등", "정확히 모르겠음"] },
+  step.c.forEach(choiceText=>{
+    const btn = document.createElement("button");
+    btn.className = "choice-btn";
+    btn.textContent = choiceText;
+    btn.onclick = ()=> onUserChoice(choiceText);
+    choiceList.appendChild(btn);
+  });
+}
 
-        { q: "지금의 생각/문제를 바라보는 당신의 사고 패턴은 어떤가요?",
-          c: ["완벽주의", "미루기", "걱정이 많음", "분석적임", "모르겠음"] },
+function updateTurnIndicator(){
+  turnNowSpan.textContent = String(Math.min(currentTurn+1, MAX_TURNS));
+}
 
-        { q: "이 문제를 바꾸기 위해 가장 먼저 조정하고 싶은 부분은 무엇인가요?",
-          c: ["생각 방식", "감정 관리", "시간 관리", "대인 관계 방식", "아직 없음"] },
+// -------------------------------
+// 5. 흐름 제어
+// -------------------------------
+function startConversation(typeKey){
+  currentType = typeKey;
+  currentTurn = 0;
+  chatHistory = [];
 
-        { q: "그 변화를 위해 가장 작게 시작할 수 있는 행동은 무엇일까요?",
-          c: ["일 분만 해보기", "메모로 정리하기", "사람에게 말하기", "쉬는 시간 확보", "모르겠다"] },
+  const info = TYPE_MAP[typeKey];
+  chatTypeTitle.textContent = `${info.name} · Emotional Talk`;
+  chatTypeTag.textContent   = info.tag;
+  chatTypeDesc.textContent  = info.desc;
 
-        { q: "지금 대화를 통해 머릿속이 조금 정리되었나요?",
-          c: ["네, 정리됨", "조금 정리됨", "그대로임", "잘 모르겠음"] }
-   ],
+  const firstQ = SCRIPT_BY_TYPE[typeKey][0].q;
+  addMsg("assistant", firstQ);
 
+  renderChat();
+  renderChoices();
+  updateTurnIndicator();
 
-   //////////////////////////////
-   // 3. 동기 촉진형
-   //////////////////////////////
-   "motivation": [
-        { q: "요즘 에너지가 가장 떨어지는 지점은 무엇인가요?",
-          c: ["일", "관계", "건강", "감정", "딱히 없음"] },
+  stepSelect.style.display = "none";
+  stepChat.style.display   = "block";
+}
 
-        { q: "반대로, 당신에게 에너지를 주는 요소는 무엇인가요?",
-          c: ["성취감", "칭찬", "휴식", "새로운 경험", "가끔 다름"] },
+function onUserChoice(choiceText){
+  addMsg("user", choiceText);
+  currentTurn++;
 
-        { q: "지금 떠오르는 '작은 목표'가 있다면 어떤가요?",
-          c: ["정리하기", "산책하기", "연락하기", "쉬기", "없음"] },
+  if(currentTurn >= MAX_TURNS){
+    addMsg("assistant","오늘 대화를 함께해 주셔서 감사합니다.\n지금 느껴지는 감정을 잠시 느껴보면서, 스스로의 수고를 인정해 주셔도 좋겠습니다.");
+    renderChat();
+    renderChoices();
+    updateTurnIndicator();
+    return;
+  }
 
-        { q: "그 목표가 당신에게 의미 있는 이유는 무엇일까요?",
-          c: ["성장", "관계", "건강", "의무감", "잘 모르겠음"] },
+  const nextQ = SCRIPT_BY_TYPE[currentType][currentTurn].q;
+  addMsg("assistant", nextQ);
+  renderChat();
+  renderChoices();
+  updateTurnIndicator();
+}
 
-        { q: "오늘 하루를 더 나아지게 만드는 한 문장을 만든다면?",
-          c: ["나는 할 수 있다", "조금씩 나아진다", "잘하고 있다", "오늘 만큼은 쉬자", "만들기 어렵다"] },
-
-        { q: "지금의 동기 수준을 말한다면?",
-          c: ["높아짐", "조금 올라감", "비슷함", "잘 모르겠음"] }
-   ],
-
-
-   //////////////////////////////
-   // 4. 행동 실천형
-   //////////////////////////////
-   "execution": [
-        { q: "최근에 미루고 있는 일이 있다면 무엇인가요?",
-          c: ["정리", "연락", "업무", "건강관리", "특별히 없음"] },
-
-        { q: "그 일을 '한 단계'로 쪼개면 어떤 행동이 되나요?",
-          c: ["5분만 하기", "도구 준비하기", "메모하기", "사람에게 말하기", "쪼개기 어려움"] },
-
-        { q: "실행을 방해하는 가장 큰 요인은 무엇인가요?",
-          c: ["귀찮음", "피로", "시간 부족", "불안", "모름"] },
-
-        { q: "그 방해요인을 줄이기 위해 할 수 있는 건 무엇인가요?",
-          c: ["시간 정해두기", "쉬었다 하기", "사람에게 도움 요청", "환경 바꾸기", "잘 모르겠음"] },
-
-        { q: "지금 가장 현실적인 '실행 선언'을 해본다면?",
-          c: ["지금 바로 3분", "오늘 안에 5분", "내일 첫 일정으로", "주말에 정리", "아직 자신없음"] },
-
-        { q: "지금 행동에 옮길 가능성은 어느 정도인가요?",
-          c: ["높음", "중간", "낮음", "잘 모르겠음"] }
-   ],
-
-
-   //////////////////////////////
-   // 5. 관계 조율형
-   //////////////////////////////
-   "relation": [
-        { q: "요즘 가장 신경 쓰이는 관계는 어떤 관계인가요?",
-          c: ["가족", "친구", "직장", "연인/배우자", "특별히 없음"] },
-
-        { q: "현재 그 관계의 분위기는 어떤가요?",
-          c: ["좋음", "어색함", "멀어짐", "갈등 중", "모르겠음"] },
-
-        { q: "그 관계 속에서 당신이 맡고 있는 역할은 무엇인가요?",
-          c: ["배려형", "리더형", "중재형", "거리를 두는 편", "모르겠음"] },
-
-        { q: "그 관계에서 바꾸고 싶은 한 가지가 있다면 무엇인가요?",
-          c: ["대화 방식", "거리를 조절", "감정 표현", "갈등 해결", "아직 없음"] },
-
-        { q: "다음 대화에서 시도해보고 싶은 작은 행동은?",
-          c: ["먼저 인사하기", "감정 말하기", "상대 말 듣기", "시간 요청", "모르겠음"] },
-
-        { q: "지금 이 관계에 대한 감정은 어떤가요?",
-          c: ["나아짐", "조금 편안", "비슷함", "잘 모르겠음"] }
-   ],
-
-
-   //////////////////////////////
-   // 6. 회복 유지형
-   //////////////////////////////
-   "resilience": [
-        { q: "최근 가장 스트레스를 준 사건은 무엇인가요?",
-          c: ["일", "사람", "건강", "환경 변화", "크게 없음"] },
-
-        { q: "그 상황에서 나타난 당신의 반응은 어떤가요?",
-          c: ["걱정", "피로", "짜증", "무기력", "잘 모르겠음"] },
-
-        { q: "예전에 잘 먹혔던 '회복 전략'이 있다면?",
-          c: ["산책", "휴식", "대화", "취미", "떠오르지 않음"] },
-
-        { q: "반대로, 지금은 효과가 적은 전략은?",
-          c: ["참기", "걱정하기", "과도한 일", "피할 수 없음", "모름"] },
-
-        { q: "오늘 시도해볼 수 있는 새로운 회복 행동은?",
-          c: ["천천히 걷기", "잠시 휴식", "정리하기", "따뜻한 물 마시기", "모르겠다"] },
-
-        { q: "지금의 안정감 수준은 어떤가요?",
-          c: ["높음", "조금 안정", "비슷함", "잘 모르겠음"] }
-   ]
+restartBtn.onclick = ()=>{
+  currentType = null;
+  currentTurn = 0;
+  chatHistory = [];
+  stepChat.style.display   = "none";
+  stepSelect.style.display = "block";
 };
 
-
-//////////////////////////////////////
-// 2) 대화 엔진
-//////////////////////////////////////
-
-let userType = null;
-let turnIndex = 0;
-let history = [];
-
-// UI 업데이트
-function renderChat() {
-    const chatBox = document.getElementById("chat");
-    chatBox.innerHTML = "";
-
-    history.forEach(h => {
-        if (h.from === "bot") {
-            chatBox.innerHTML += `<div class="bubble-bot"><span>${h.text}</span></div>`;
-        } else {
-            chatBox.innerHTML += `<div class="bubble-user"><span>${h.text}</span></div>`;
-        }
-    });
-}
-
-// 선택지 출력
-function renderChoices() {
-    const panel = document.getElementById("choices");
-    panel.innerHTML = "";
-
-    if (!userType) return;
-
-    const step = SCRIPT[userType][turnIndex];
-    if (!step) return;
-
-    step.c.forEach(choice => {
-        const btn = document.createElement("button");
-        btn.className = "choice-btn";
-        btn.innerText = choice;
-        btn.onclick = function() {
-            userSelect(choice);
-        };
-        panel.appendChild(btn);
-    });
-}
-
-// 사용자 선택 처리
-function userSelect(choice) {
-    history.push({from:"user", text: choice});
-    turnIndex++;
-
-    if (turnIndex >= 6) {
-        endConversation();
-        return;
-    }
-
-    const nextQ = SCRIPT[userType][turnIndex].q;
-    history.push({from:"bot", text: nextQ});
-    renderChat();
-    renderChoices();
-}
-
-// 시작 (유형 선택)
-function startType() {
-    const type = document.getElementById("typeSelect").value;
-    if (!type) return alert("유형을 선택해주세요!");
-
-    userType = type;
-    turnIndex = 0;
-    history = [];
-
-    // 첫 질문 시작
-    const firstQ = SCRIPT[userType][0].q;
-    history.push({from:"bot", text: firstQ});
-
-    renderChat();
-    renderChoices();
-
-    document.getElementById("type-area").style.display = "none";
-    document.getElementById("chat-area").style.display = "block";
-}
-
-// 대화 종료
-function endConversation() {
-    history.push({from:"bot", text:"오늘 대화를 마무리해볼게요. 지금까지의 이야기를 잘 들었어요."});
-    renderChat();
-    document.getElementById("choices").innerHTML = "";
-}
-
+// -------------------------------
+// 6. 초기 실행
+// -------------------------------
+renderTypeCards();
+renderChat();
+renderChoices();
 </script>
-
-</head>
-
-<body>
-<div class="container">
-
-<h1>LT — Emotional Talk (HF 기반 6유형 맞춤형 상담)</h1>
-<div class="sub">유형별 맞춤 대화를 객관식 선택으로 6턴 진행합니다.</div>
-
-<!-- 유형 선택 -->
-<div id="type-area">
-    <div class="select-box">
-        <b>어떤 성향(HF 유형)으로 상담을 진행할까요?</b><br><br>
-        <select id="typeSelect" style="padding:10px; font-size:16px; width:100%;">
-            <option value="">선택하세요</option>
-            <option value="empathy">정서 공감형</option>
-            <option value="cognitive">인지 성찰형</option>
-            <option value="motivation">동기 촉진형</option>
-            <option value="execution">행동 실천형</option>
-            <option value="relation">관계 조율형</option>
-            <option value="resilience">회복 유지형</option>
-        </select>
-        <button onclick="startType()">상담 시작하기</button>
-    </div>
-</div>
-
-<!-- 대화 UI -->
-<div id="chat-area" style="display:none;">
-    <div id="chat" style="margin-bottom:20px;"></div>
-    <div id="choices"></div>
-</div>
-
-</div>
 </body>
 </html>
